@@ -496,13 +496,31 @@ body{
   touch-action: none;
 }
 .game-scene.active { display: block; }
+
+/* Фон со звездами */
+.game-scene::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
+                    radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+                    radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+  background-size: 550px 550px, 350px 350px, 250px 250px;
+  background-position: 0 0, 40px 60px, 130px 270px;
+  opacity: 0.4;
+  animation: bgMove 20s linear infinite;
+  pointer-events: none;
+}
+@keyframes bgMove {
+  0% { background-position: 0 0, 40px 60px, 130px 270px; }
+  100% { background-position: 0 550px, 40px 410px, 130px 520px; }
+}
+
 .game-player {
   position: absolute;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
   z-index: 10;
   pointer-events: none;
   transition: left 0.1s linear;
@@ -515,30 +533,31 @@ body{
 }
 .game-myaul {
   position: absolute;
-  top: -100px;
+  top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   z-index: 5;
   pointer-events: none;
   animation: flyMyaul 4s ease-in-out infinite alternate;
 }
 @keyframes flyMyaul {
-  0% { transform: translateX(-50%) translateY(0px); }
-  50% { transform: translateX(-50%) translateY(20px); }
-  100% { transform: translateX(-50%) translateY(0px); }
+  0% { transform: translateX(-50%) translateY(0px) rotate(-5deg); }
+  50% { transform: translateX(-50%) translateY(20px) rotate(5deg); }
+  100% { transform: translateX(-50%) translateY(0px) rotate(-5deg); }
 }
 .game-myaul img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 0 20px rgba(249,115,22,0.6));
+  filter: drop-shadow(0 0 25px rgba(249,115,22,0.6));
 }
+
 .game-coin {
   position: absolute;
-  width: 40px;
-  height: 40px;
+  width: 80px; /* Увеличен размер */
+  height: 80px;
   z-index: 3;
   pointer-events: none;
 }
@@ -546,12 +565,13 @@ body{
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+  filter: drop-shadow(0 0 12px rgba(0,0,0,0.6));
 }
 @keyframes fall {
-  0% { transform: translateY(0) rotate(0deg); }
-  100% { transform: translateY(600px) rotate(360deg); }
+  0% { transform: translateY(0) rotateY(0deg); }
+  100% { transform: translateY(600px) rotateY(360deg); }
 }
+
 .game-hud {
   position: absolute;
   top: 10px;
@@ -567,10 +587,11 @@ body{
   font-size: 24px;
   font-weight: 900;
   color: #fff;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.6);
   padding: 6px 12px;
   border-radius: 8px;
   border: 1px solid var(--color-purple);
+  box-shadow: 0 0 15px rgba(139,92,246,0.4);
 }
 .game-score {
   display: flex;
@@ -579,23 +600,26 @@ body{
 .game-score-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(0,0,0,0.5);
+  gap: 8px;
+  background: rgba(0,0,0,0.6);
   padding: 6px 12px;
   border-radius: 8px;
   border: 1px solid var(--glass-border);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 800;
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
 }
 .game-score-item img {
-  width: 20px;
-  height: 20px;
+  width: 30px; /* Увеличен размер в HUD */
+  height: 30px;
 }
+
+/* Результат */
 .game-result-overlay {
   position: absolute;
   inset: 0;
   background: rgba(14,10,20,0.95);
-  display: flex;
+  display: none; /* Изначально скрыт */
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -603,29 +627,67 @@ body{
   text-align: center;
   padding: 20px;
 }
+.game-result-overlay.show { display: flex; }
+
+.coin-flip-container {
+  perspective: 1000px;
+  width: 200px;
+  height: 200px;
+  margin-bottom: 20px;
+}
+.coin-flip {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.coin-flip.flipping {
+  transform: rotateY(1800deg);
+}
+.coin-side {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.coin-side img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 30px rgba(255,255,255,0.2));
+}
+.coin-side.back {
+  transform: rotateY(180deg);
+}
+
 .game-result-title {
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 2px;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
+  opacity: 0;
+  transition: opacity 0.5s;
 }
+.game-result-title.show { opacity: 1; }
 .game-result-title.win { color: #22c55e; text-shadow: 0 0 20px rgba(34,197,94,0.6); }
 .game-result-title.lose { color: var(--color-red); text-shadow: 0 0 20px rgba(239,68,68,0.6); }
-.game-result-stats {
-  font-size: 18px;
-  color: #fff;
-  margin-bottom: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.game-result-stats span {
-  color: var(--color-orange-soft);
-  font-weight: 900;
-}
+.game-result-title.draw { color: var(--color-orange-soft); text-shadow: 0 0 20px rgba(249,115,22,0.6); }
 
-/* ================== MOBILE ================== */
+.game-result-profit {
+  font-size: 24px;
+  font-weight: 900;
+  color: #fff;
+  margin-top: 10px;
+  opacity: 0;
+  transition: opacity 0.5s 0.3s;
+}
+.game-result-profit.show { opacity: 1; }
+
 @media (max-width: 768px) {
   .site-stats { flex-direction: column; }
   .top-nav-panel { display: none; }
@@ -652,6 +714,9 @@ body{
   .progress-center{width:134px;height:134px;}
   .progress-section{padding:24px 0 8px 0;}
   .inventory-row, .shop-grid { grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); }
+  .game-scene { height: 400px; }
+  .game-player { width: 70px; height: 70px; }
+  .game-coin { width: 60px; height: 60px; }
 }
 .inv-tab-card{background: var(--bg-surface);border: 1px solid var(--glass-border);border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;}
 .inv-tab-card img.inv-main{width:52px;height:52px;object-fit:contain;}
@@ -1069,7 +1134,7 @@ body{
     <div class="tab-panel" id="panelCatch">
         <div class="cases-title-main" style="margin-top:8px;">Поймай и получи</div>
         <div id="catchMainBlock" style="text-align:center;padding:20px;background:var(--bg-surface);border-radius:16px;border:1px solid var(--glass-border);max-width:500px;margin:0 auto;">
-            <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:16px;">Собери монетки за 2 минуты!<br>Больше Добрых = x2, Больше Злых = Проигрыш</div>
+            <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:16px;">Собери монетки за 1 минуту!<br>Больше Добрых = x2, Больше Злых = Проигрыш</div>
             <div style="display:flex;flex-direction:column;gap:12px;max-width:300px;margin:0 auto;">
                 <div class="form-group">
                     <label class="form-label">Ваша ставка</label>
@@ -1081,7 +1146,7 @@ body{
         </div>
         <div class="game-scene" id="gameScene">
             <div class="game-hud">
-                <div class="game-timer" id="gameTimer">02:00</div>
+                <div class="game-timer" id="gameTimer">01:00</div>
                 <div class="game-score">
                     <div class="game-score-item" style="color:#22c55e;">
                         <img src="https://github.com/saintezz/brainrolltester/blob/main/dobryy.png?raw=true" alt="Добрый"> <span id="scoreGood">0</span>
@@ -1097,14 +1162,21 @@ body{
             <div class="game-player" id="gamePlayer">
                 <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/Orchidox.png" alt="Player">
             </div>
-            <div class="game-result-overlay" id="gameResultOverlay" style="display:none;">
-                <div class="game-result-title" id="gameResultTitle">ПОБЕДА</div>
-                <div class="game-result-stats">
-                    <div>Добрых: <span id="resGood">0</span></div>
-                    <div>Злых: <span id="resEvil">0</span></div>
-                    <div>Выигрыш: <span id="resProfit">0</span></div>
+            
+            <div class="game-result-overlay" id="gameResultOverlay">
+                <div class="coin-flip-container">
+                    <div class="coin-flip" id="coinFlip">
+                        <div class="coin-side front">
+                            <img src="https://github.com/saintezz/brainrolltester/blob/main/dobryy.png?raw=true" alt="Добрый">
+                        </div>
+                        <div class="coin-side back">
+                            <img src="https://github.com/saintezz/brainrolltester/blob/main/Zloy.png?raw=true" alt="Злой">
+                        </div>
+                    </div>
                 </div>
-                <button class="action-btn" onclick="closeCatchGame()" style="max-width:200px;">ЗАКРЫТЬ</button>
+                <div class="game-result-title" id="gameResultTitle">ПОБЕДА</div>
+                <div class="game-result-profit" id="gameResultProfit">+82</div>
+                <button class="action-btn" onclick="closeCatchGame()" style="max-width:200px; margin-top: 20px;">ЗАКРЫТЬ</button>
             </div>
         </div>
     </div>
@@ -2341,14 +2413,12 @@ window.activateAutoPromo = function() { const promo = getCurrentAutoPromo(); act
 function updateTopupPromoDisplay() { const infoBlock = document.getElementById('activePromoInfo'); const bonusSpan = document.getElementById('activePromoBonus'); if (activePromo) { if (infoBlock) infoBlock.style.display = 'block'; if (bonusSpan) bonusSpan.textContent = '+' + activePromo.bonus + '%'; } else if (infoBlock) infoBlock.style.display = 'none'; updateTopupPrice(); }
 
 // ================== CATCH GAME ==================
-let catchGameResult = null;
-let catchGameBet = 0;
-let catchTimerValue = 120;
-let catchGood = 0;
-let catchEvil = 0;
-let catchCoins = [];
-let catchCoinSpawnInterval = null;
-let catchGameLoop = null;
+let catchGameActive = false;
+let catchBet = 0;
+let catchScoreGood = 0;
+let catchScoreEvil = 0;
+let catchTimer = null;
+let catchCoinsTimer = null;
 let catchPlayerXPercent = 50;
 let catchMoveHandler = null;
 let catchTouchHandler = null;
@@ -2441,12 +2511,12 @@ function checkCatchCollisions() {
     if (coinRight >= playerLeft && coinLeft <= playerRight && coinBottom >= playerTop && coinTop <= playerBottom) {
       const isGood = coin.dataset.good === '1';
       if (isGood) {
-        catchGood++;
-        document.getElementById('scoreGood').textContent = catchGood;
+        catchScoreGood++;
+        document.getElementById('scoreGood').textContent = catchScoreGood;
         playCoin(); vibrate(10);
       } else {
-        catchEvil++;
-        document.getElementById('scoreEvil').textContent = catchEvil;
+        catchScoreEvil++;
+        document.getElementById('scoreEvil').textContent = catchScoreEvil;
         playLose(); vibrate(15);
       }
       coin.remove();
@@ -2483,18 +2553,21 @@ window.startCatchGame = async function() {
   
   catchGameActive = true;
   catchGameBet = bet;
-  catchGood = 0;
-  catchEvil = 0;
-  catchTimerValue = 120;
+  catchScoreGood = 0;
+  catchScoreEvil = 0;
+  catchTimerValue = 60; // 1 МИНУТА
   catchPlayerXPercent = 50;
   catchCoins = [];
   
   document.getElementById('scoreGood').textContent = '0';
   document.getElementById('scoreEvil').textContent = '0';
-  document.getElementById('gameTimer').textContent = '02:00';
+  document.getElementById('gameTimer').textContent = '01:00';
   document.getElementById('catchMainBlock').style.display = 'none';
-  document.getElementById('gameResultOverlay').style.display = 'none';
+  document.getElementById('gameResultOverlay').classList.remove('show');
   document.getElementById('gameScene').classList.add('active');
+  document.getElementById('coinFlip').classList.remove('flipping');
+  document.getElementById('gameResultTitle').classList.remove('show');
+  document.getElementById('gameResultProfit').classList.remove('show');
   
   initCatchPlayerMovement();
   updateCatchPlayerPosition();
@@ -2502,7 +2575,7 @@ window.startCatchGame = async function() {
   if (msg) { msg.textContent = ''; }
   
   if (catchCoinSpawnInterval) clearInterval(catchCoinSpawnInterval);
-  catchCoinSpawnInterval = setInterval(spawnCatchCoin, 300);
+  catchCoinSpawnInterval = setInterval(spawnCatchCoin, 300); // каждые 300мс спавн монетки
   
   if (catchGameLoop) cancelAnimationFrame(catchGameLoop);
   function loop() {
@@ -2540,58 +2613,64 @@ function endCatchGame() {
   if (catchMoveHandler) scene.removeEventListener('mousemove', catchMoveHandler);
   if (catchTouchHandler) scene.removeEventListener('touchmove', catchTouchHandler);
   
-  let result = 'lose';
-  let profit = 0;
-  
-  if (catchGood > catchEvil) {
-    result = 'win';
-    profit = catchGameBet * 2;
-    balance += profit;
-  } else if (catchGood === catchEvil) {
-    result = 'draw';
-    profit = catchGameBet;
-    balance += profit;
-  } else {
-    result = 'lose';
-    profit = 0;
-  }
-  
-  saveCache();
-  updateBalanceUI();
+  // ЛОГИКА ПОДСЧЕТА
+  let isWin = catchScoreGood > catchScoreEvil;
+  let isDraw = catchScoreGood === catchScoreEvil;
   
   const overlay = document.getElementById('gameResultOverlay');
+  const coinFlip = document.getElementById('coinFlip');
   const title = document.getElementById('gameResultTitle');
-  const resGood = document.getElementById('resGood');
-  const resEvil = document.getElementById('resEvil');
-  const resProfit = document.getElementById('resProfit');
+  const profitEl = document.getElementById('gameResultProfit');
   
-  overlay.style.display = 'flex';
-  resGood.textContent = catchGood;
-  resEvil.textContent = catchEvil;
+  overlay.classList.add('show');
   
-  if (result === 'win') {
-    title.textContent = 'ПОБЕДА';
-    title.className = 'game-result-title win';
-    resProfit.textContent = `+${profit}`;
-    playWin(); vibratePattern([30,50,30,50,60]);
-  } else if (result === 'draw') {
-    title.textContent = 'НИЧЬЯ';
-    title.className = 'game-result-title';
-    title.style.color = 'var(--color-orange-soft)';
-    resProfit.textContent = `Возврат ${profit}`;
-    playCoin();
-  } else {
-    title.textContent = 'ПОРАЖЕНИЕ';
-    title.className = 'game-result-title lose';
-    resProfit.textContent = `-${catchGameBet}`;
-    playLose(); vibratePattern([50,30,100]);
-  }
+  // Запускаем анимацию монетки
+  setTimeout(() => {
+    coinFlip.classList.add('flipping');
+  }, 100);
+
+  setTimeout(() => {
+    // После того как монетка докрутилась
+    if (isDraw) {
+      // Если ничья, просто решаем по рандому для визуала, но возвращаем ставку
+      isWin = Math.random() < 0.5;
+      // Но по факту это ничья, просто показываем монетку
+      title.textContent = 'НИЧЬЯ';
+      title.className = 'game-result-title show draw';
+      profitEl.textContent = `Возврат ${catchGameBet}`;
+      balance += catchGameBet;
+      saveCache(); updateBalanceUI();
+      playCoin();
+    } else if (isWin) {
+      title.textContent = 'ПОБЕДА';
+      title.className = 'game-result-title show win';
+      profitEl.textContent = `+${catchGameBet}`;
+      balance += catchGameBet * 2;
+      saveCache(); updateBalanceUI();
+      playWin(); vibratePattern([30,50,30,50,60]);
+    } else {
+      title.textContent = 'ПОРАЖЕНИЕ';
+      title.className = 'game-result-title show lose';
+      profitEl.textContent = `-${catchGameBet}`;
+      // Ставка уже списана
+      playLose(); vibratePattern([50,30,100]);
+    }
+    profitEl.classList.add('show');
+    
+    // Ставим правильную картинку на монетку
+    if (isWin) {
+      coinFlip.style.transform = 'rotateY(0deg)'; // Добрая
+    } else {
+      coinFlip.style.transform = 'rotateY(180deg)'; // Злая
+    }
+    coinFlip.style.transition = 'transform 0.5s'; // Быстрый доворот
+  }, 2500); // Ждем 2.5 сек пока крутится
 }
 
 window.closeCatchGame = function() {
   document.getElementById('gameScene').classList.remove('active');
   document.getElementById('catchMainBlock').style.display = 'block';
-  document.getElementById('gameResultOverlay').style.display = 'none';
+  document.getElementById('gameResultOverlay').classList.remove('show');
   document.getElementById('catchBetInput').value = '';
   document.getElementById('catchMsg').textContent = '';
 };
