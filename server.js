@@ -18,6 +18,8 @@ const STATS_FILE = path.join(DATA_DIR, 'stats.json');
 
 const ADMIN_USERNAMES = ['saintezz7', 'vortyn1'];
 
+const START_BALANCE = 500;
+
 const ITEMS = {
   lagrande: { name: 'La Grande Combination', price: 4 },
   nuclearo: { name: 'Nuclearo Dinausauro', price: 12 },
@@ -103,7 +105,7 @@ let promocodes = {}, users = {}, deposits = [], withdraws = [];
 let maintenance = { enabled: false, since: null, by: '' };
 let currentAnnouncement = null;
 let stats = { total_upgrades: 0, total_cases: 0 };
-let onlineUsers = new Map(); // telegram_id -> last_seen_timestamp
+let onlineUsers = new Map();
 
 function ensureDataDir() { try { if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (e) {} }
 function loadJSON(file, fallback) { try { if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (err) { console.error('[ERROR] Load', file, err.message); } return fallback; }
@@ -134,7 +136,7 @@ function getOnlineCount() {
   const now = Date.now();
   let count = 0;
   for (const [id, time] of onlineUsers) {
-    if (now - time < 60000) { // Активен в последние 60 секунд
+    if (now - time < 60000) {
       count++;
     } else {
       onlineUsers.delete(id);
@@ -186,7 +188,7 @@ function getTelegramUser(req, body) {
 function ensureUser(telegramId, username) {
   if (!telegramId) telegramId = 'guest_' + Date.now();
   if (!users[telegramId]) {
-    users[telegramId] = { balance: 1000, inventory: [], username: username || '', roblox_name: '', custom_nick: '', avatar: '', accent: '', created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+    users[telegramId] = { balance: START_BALANCE, inventory: [], username: username || '', roblox_name: '', custom_nick: '', avatar: '', accent: '', created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
   } else if (username && users[telegramId].username !== username) {
     users[telegramId].username = username; users[telegramId].updated_at = new Date().toISOString();
   }
@@ -450,10 +452,14 @@ const server = http.createServer(async (req, res) => {
       const body = await readBody(req);
       const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
       updateOnline(user.id);
-      const { custom_nick, avatar } = body;
+      const { custom_nick, avatar, balance } = body;
       const u = ensureUser(user.id, user.username);
       if (typeof custom_nick === 'string') u.custom_nick = custom_nick.slice(0, 20);
       if (typeof avatar === 'string') u.avatar = avatar;
+      // 👇 Сохранение баланса с клиента (после мини-игр и т.п.)
+      if (typeof balance === 'number' && isFinite(balance) && balance >= 0) {
+        u.balance = balance;
+      }
       u.updated_at = new Date().toISOString(); saveUsers();
       return sendJSON(res, 200, { ok: true, user: publicUser(u, user.id) });
     }
@@ -464,14 +470,19 @@ const server = http.createServer(async (req, res) => {
 
 loadAll();
 
+// Одноразовая миграция: тем пользователям, у которых вообще нет поля balance, ставим START_BALANCE.
+// Если поле balance уже есть — НЕ трогаем (это и ломало ранее синхронизацию).
 (function migrateBalances() {
-  let changed = false;
+  let changed = 0;
   for (const id in users) {
-    if (users[id].balance !== 1000) { users[id].balance = 1000; changed = true; }
+    if (typeof users[id].balance !== 'number') {
+      users[id].balance = START_BALANCE;
+      changed++;
+    }
   }
-  if (changed) {
+  if (changed > 0) {
     saveUsers();
-    console.log('[MIGRATE] Всем пользователям установлен баланс 1000');
+    console.log('[MIGRATE] Установлен стартовый баланс ' + START_BALANCE + ' для ' + changed + ' пользователей без поля balance');
   }
 })();
 
