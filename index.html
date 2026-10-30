@@ -159,6 +159,258 @@ body{
 .segmented-control .segment{flex: 1;text-align: center;padding: 13px;font-size: 12px;font-weight:600;color: var(--text-muted);cursor: pointer;border-radius: 8px;transition: all .2s;border: 1px solid transparent;text-transform: uppercase;letter-spacing:.6px;}
 .segmented-control .segment.active{color: #fff;background:linear-gradient(180deg, rgba(139,92,246,.16), rgba(139,92,246,.06)),var(--bg-surface);border: 1px solid rgba(139,92,246,.32);}
 
+/* ================== ИНВЕНТАРЬ (REDESIGN) ================== */
+.inventory-page {
+  position: relative;
+  padding: 4px 0 20px;
+}
+.inventory-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 0 4px;
+  flex-wrap: wrap;
+}
+.inventory-hero-title {
+  font-size: clamp(22px, 4vw, 30px);
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 24px rgba(139,92,246,.55);
+  line-height: 1;
+}
+.inventory-hero-sub {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+.inventory-hero-stats {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.inv-hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(139,92,246,.08);
+  border: 1px solid rgba(139,92,246,.35);
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: .5px;
+}
+.inv-hero-pill img { width: 16px; height: 16px; object-fit: contain; }
+.inv-hero-pill.gold {
+  background: rgba(249,115,22,.10);
+  border-color: rgba(249,115,22,.45);
+  color: var(--color-orange-soft);
+}
+
+.inventory-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 0 4px;
+}
+.inv-filter-btn {
+  padding: 9px 16px;
+  border-radius: 11px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,.03);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .15s;
+}
+.inv-filter-btn:hover { color: #fff; border-color: rgba(139,92,246,.5); }
+.inv-filter-btn.active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-purple), var(--color-purple-deep));
+  border-color: var(--color-purple);
+  box-shadow: 0 8px 20px -10px rgba(139,92,246,.7);
+}
+
+.inventory-tab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+  padding: 0 4px 12px;
+}
+
+.inv-tab-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    radial-gradient(160% 100% at 50% 0%, rgba(139,92,246,.14), transparent 55%),
+    linear-gradient(180deg, #1a1229 0%, #0f0918 100%);
+  border: 1px solid rgba(139,92,246,.22);
+  box-shadow: 0 14px 30px -18px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.04);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  min-height: 260px;
+}
+.inv-tab-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(139,92,246,.6);
+  box-shadow: 0 22px 40px -20px rgba(139,92,246,.7), inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.inv-tab-card .inv-art {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(139,92,246,.22), transparent 62%),
+    radial-gradient(circle at 50% 110%, rgba(249,115,22,.18), transparent 60%),
+    #0a0612;
+  overflow: hidden;
+}
+.inv-tab-card .inv-art::before {
+  content: '';
+  position: absolute;
+  inset: 14px;
+  border-radius: 14px;
+  border: 1px dashed rgba(167,139,250,.16);
+  pointer-events: none;
+}
+.inv-tab-card .inv-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(139,92,246,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139,92,246,.06) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(circle at 50% 50%, #000 35%, transparent 75%);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 35%, transparent 75%);
+  pointer-events: none;
+}
+.inv-tab-card .inv-main {
+  position: relative;
+  z-index: 2;
+  width: 78%;
+  height: 78%;
+  max-width: 140px;
+  max-height: 140px;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 24px rgba(0,0,0,.7)) drop-shadow(0 0 18px rgba(139,92,246,.35));
+  transition: transform .25s ease;
+  pointer-events: none;
+}
+.inv-tab-card:hover .inv-main { transform: scale(1.08) translateY(-2px); }
+
+.inv-tab-card .inv-info {
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid rgba(255,255,255,.05);
+  background: linear-gradient(180deg, rgba(20,14,32,.9), rgba(10,6,18,.95));
+}
+.inv-tab-card .inv-name {
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  text-align: center;
+  line-height: 1.25;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: .3px;
+}
+.inv-tab-card .inv-price {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--color-orange-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: rgba(249,115,22,.08);
+  border: 1px solid rgba(249,115,22,.25);
+  align-self: center;
+}
+.inv-tab-card .inv-price img { width: 14px; height: 14px; }
+
+.inv-tab-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+.inv-tab-actions.single { grid-template-columns: 1fr; }
+.inv-tab-actions button {
+  padding: 9px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid transparent;
+  letter-spacing: .8px;
+  transition: all .15s;
+}
+.inv-sell {
+  background: rgba(239,68,68,.08);
+  color: #ff7b7b;
+  border-color: rgba(239,68,68,.4);
+}
+.inv-sell:hover { background: rgba(239,68,68,.2); color: #fff; }
+.inv-wd {
+  background: rgba(139,92,246,.10);
+  color: var(--color-purple-soft);
+  border-color: rgba(139,92,246,.45);
+}
+.inv-wd:hover { background: rgba(139,92,246,.22); color: #fff; }
+
+.inv-tab-card.on-withdraw { filter: saturate(.7); }
+.inv-tab-card.on-withdraw .inv-art { filter: grayscale(.6) brightness(.7); }
+.inv-tab-card.on-withdraw .inv-onwithdraw-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .8px;
+  color: #fff;
+  background: rgba(249,115,22,.9);
+  padding: 5px 9px;
+  border-radius: 7px;
+  text-transform: uppercase;
+  pointer-events: none;
+  box-shadow: 0 6px 14px -4px rgba(249,115,22,.6);
+  animation: badgePulse 1.6s ease-in-out infinite;
+}
+@keyframes badgePulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+/* inline inventory for upgrade screen (unchanged logic but nicer) */
 .inventory-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;padding:4px 0 12px;}
 .shop-scroll{max-height:480px;overflow-y:auto;padding:4px 0 12px;scrollbar-width:thin;}
 .shop-scroll::-webkit-scrollbar{width:8px}
@@ -446,41 +698,6 @@ body{
   text-transform: uppercase;
 }
 
-/* ================== FOOTER STATS ================== */
-.site-stats {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 24px 20px;
-  background: var(--bg-surface);
-  border-top: 1px solid var(--glass-border);
-  margin-top: auto;
-  width: 100%;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-.stat-value {
-  font-size: 24px;
-  font-weight: 900;
-  color: var(--color-orange-soft);
-}
-.stat-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-.stat-online .stat-value {
-  color: #22c55e;
-}
-
 /* ================== CATCH & GET GAME — REDESIGN ================== */
 #panelCatch {
   position: relative;
@@ -536,7 +753,6 @@ body{
 }
 
 .catch-hero-sub b { color: var(--color-orange-soft); }
-.catch-hero-sub i { color: var(--color-purple-soft); font-style: normal; }
 
 .catch-bet-row {
   position: relative;
@@ -638,7 +854,6 @@ body{
 
 .game-scene.active { display: block; }
 
-/* сетка-арена */
 .game-scene::before {
   content: '';
   position: absolute;
@@ -653,7 +868,6 @@ body{
   z-index: 0;
 }
 
-/* неоновое кольцо-арена */
 .game-scene::after {
   content: '';
   position: absolute;
@@ -706,41 +920,8 @@ body{
   50% { transform: scale(1.06); }
 }
 
-.game-score { display: flex; gap: 10px; }
-
-.game-score-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 14px;
-  border-radius: 14px;
-  background: rgba(10,6,18,.7);
-  border: 1px solid var(--glass-border);
-  font-size: 22px;
-  font-weight: 900;
-  min-width: 84px;
-  justify-content: center;
-  font-variant-numeric: tabular-nums;
-}
-
-.game-score-item.good {
-  border-color: rgba(34,197,94,.6);
-  box-shadow: 0 0 20px rgba(34,197,94,.3), inset 0 0 10px rgba(34,197,94,.1);
-  color: #4ade80;
-}
-
-.game-score-item.evil {
-  border-color: rgba(239,68,68,.6);
-  box-shadow: 0 0 20px rgba(239,68,68,.3), inset 0 0 10px rgba(239,68,68,.1);
-  color: #ff7b7b;
-}
-
-.game-score-item img {
-  width: 30px;
-  height: 30px;
-  object-fit: contain;
-  filter: drop-shadow(0 0 8px currentColor);
-}
+/* счётчики очков игры скрыты — результат только через бросок монеты */
+.game-score { display: none; }
 
 /* ---- ИГРОК ---- */
 .game-player {
@@ -773,7 +954,6 @@ body{
   filter: drop-shadow(0 0 18px rgba(167,139,250,.85));
 }
 
-/* логотип сверху — сделан ненавязчивым */
 .game-myaul {
   position: absolute;
   top: 70px;
@@ -799,7 +979,7 @@ body{
   object-fit: contain;
 }
 
-/* ---- МОНЕТКИ (крупные) ---- */
+/* ---- ЧЁРНЫЕ МОНЕТКИ ---- */
 .game-coin {
   position: absolute;
   width: 64px;
@@ -813,34 +993,16 @@ body{
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 6px 14px rgba(0,0,0,.65));
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,.75)) drop-shadow(0 0 12px rgba(139,92,246,.7));
 }
 
-.game-coin.good img { filter: drop-shadow(0 0 14px rgba(34,197,94,.9)); }
-.game-coin.evil img { filter: drop-shadow(0 0 14px rgba(239,68,68,.9)); }
+.game-coin.good img { filter: drop-shadow(0 6px 14px rgba(0,0,0,.75)) drop-shadow(0 0 16px rgba(139,92,246,.9)); }
+.game-coin.evil img { filter: drop-shadow(0 6px 14px rgba(0,0,0,.75)) drop-shadow(0 0 16px rgba(249,115,22,.8)); }
 
 @keyframes fall {
   0%   { transform: translateY(0) rotate(0deg) scale(.9); opacity: 0; }
   10%  { opacity: 1; }
   100% { transform: translateY(760px) rotate(360deg) scale(1); opacity: 1; }
-}
-
-/* всплывающие +1 / -1 */
-.catch-pop {
-  position: absolute;
-  font-size: 22px;
-  font-weight: 900;
-  pointer-events: none;
-  z-index: 25;
-  animation: popUp .7s ease-out forwards;
-  text-shadow: 0 2px 8px rgba(0,0,0,.8);
-}
-.catch-pop.good { color: #4ade80; }
-.catch-pop.evil { color: #ff7b7b; }
-
-@keyframes popUp {
-  0%   { transform: translate(-50%, 0) scale(.6); opacity: 1; }
-  100% { transform: translate(-50%, -70px) scale(1.2); opacity: 0; }
 }
 
 /* ---- ОВЕРЛЕЙ РЕЗУЛЬТАТА ---- */
@@ -867,7 +1029,6 @@ body{
   to   { opacity: 1; }
 }
 
-/* Крутящаяся монета */
 .result-coin-stage {
   position: relative;
   width: 160px;
@@ -970,7 +1131,6 @@ body{
 
 /* ================== MOBILE ================== */
 @media (max-width: 768px) {
-  .site-stats { flex-direction: column; }
   .top-nav-panel { display: none; }
   .burger-btn { display: block; }
   .top-bar { padding: 14px 0 14px 45px; }
@@ -1000,61 +1160,11 @@ body{
   .game-myaul { width: 90px; height: 90px; top: 64px; }
   .game-coin { width: 56px; height: 56px; }
   .game-timer { font-size: 20px; padding: 6px 12px; }
-  .game-score-item { font-size: 18px; padding: 6px 10px; min-width: 70px; gap: 6px; }
-  .game-score-item img { width: 24px; height: 24px; }
   .result-coin-stage { width: 130px; height: 130px; }
+  .inventory-tab-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .inv-tab-card { min-height: 230px; }
+  .inventory-hero { align-items: flex-start; }
 }
-.inv-tab-card{background: var(--bg-surface);border: 1px solid var(--glass-border);border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;}
-.inv-tab-card img.inv-main{width:52px;height:52px;object-fit:contain;}
-.inv-tab-card .inv-name{font-size:12px;font-weight:700;color:#fff;text-align:center;height:32px;overflow:hidden;line-height:1.1}
-.inv-tab-card .inv-price{font-size:12px;font-weight:800;color:var(--color-orange-soft);display:flex;align-items:center;gap:4px;}
-.inv-tab-card .inv-price img{width:12px;height:12px;}
-.inv-tab-actions{display:flex;flex-direction:column;gap:6px;width:100%;}
-.inv-tab-actions button{flex:1;padding:7px 4px;border-radius:6px;font-size:10px;font-weight:800;text-transform:uppercase;cursor:pointer;border:1px solid transparent;line-height:1.2;}
-.inv-sell{background: rgba(239,68,68,0.10);color:var(--color-red);border-color:var(--color-red);}
-.inv-sell:hover{background:rgba(239,68,68,.22);}
-.inv-wd{background: rgba(139,92,246,0.12);color:var(--color-purple-soft);border-color:var(--color-purple);}
-.inv-wd:hover{background:rgba(139,92,246,.25);}
-.inv-tab-card.on-withdraw{position:relative;}
-.inv-tab-card.on-withdraw::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.45);pointer-events:none;border-radius:12px;}
-.inv-tab-card.on-withdraw .inv-onwithdraw-badge{position:absolute;top:8px;right:8px;z-index:5;font-size:9px;font-weight:900;letter-spacing:.5px;color:#fff;background:var(--bg-void);border:1px solid var(--glass-border);padding:4px 7px;border-radius:6px;text-transform:uppercase;pointer-events:none;}
-.inv-tab-card.on-withdraw .inv-tab-actions{display:none;}
-.withdraw-items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;max-height:260px;overflow-y:auto;padding:8px;background:var(--bg-void);border:1px solid var(--glass-border);border-radius:8px;}
-.withdraw-item{background: var(--bg-surface);border: 1px solid var(--glass-border);border-radius:8px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all .15s;}
-.withdraw-item.selected{border-color: var(--color-purple);background:rgba(139,92,246,.12);}
-.withdraw-item img{width:40px;height:40px;object-fit:contain;}
-.withdraw-item .wname{font-size:9px;font-weight:600;color:#fff;text-align:center;height:22px;overflow:hidden;line-height:1.1;}
-.withdraw-item .wprice{font-size:10px;font-weight:800;color:var(--color-orange-soft);}
-.withdraw-selected-info{margin-top:8px;font-size:12px;font-weight:700;color:#ccc;text-align:center;padding:8px;background:rgba(139,92,246,.06);border:1px solid var(--color-purple);border-radius:8px;}
-.withdraw-warning{background:rgba(239,68,68,0.10);border:1px solid var(--color-red);border-radius:10px;padding:14px 12px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start;}
-.withdraw-warning .ww-icon{width:28px;height:28px;flex-shrink:0;border-radius:50%;background:var(--color-red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;line-height:1;}
-.withdraw-warning .ww-text{font-size:12px;font-weight:800;color:#fff;line-height:1.45;letter-spacing:.3px;text-transform:uppercase;}
-.withdraw-agree{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px 12px;background:var(--bg-surface);border:1px solid var(--glass-border);border-radius:8px;cursor:pointer;user-select:none;transition:all .15s;}
-.withdraw-agree:hover{border-color:var(--color-orange);}
-.withdraw-agree.checked{border-color:var(--color-orange);background:rgba(249,115,22,.06);}
-.withdraw-agree .wa-box{width:22px;height:22px;flex-shrink:0;border-radius:5px;border:1px solid var(--text-muted);background:var(--bg-void);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:transparent;transition:all .15s;}
-.withdraw-agree.checked .wa-box{background:var(--color-orange);border-color:var(--color-orange);color:#fff;}
-.withdraw-agree .wa-label{font-size:13px;font-weight:700;color:#ccc;line-height:1.3;text-transform:uppercase;letter-spacing:.4px;}
-.admin-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
-.admin-tab{flex:1;min-width:90px;padding:10px 6px;border-radius:8px;border:1px solid var(--glass-border);background: var(--bg-surface);color:var(--text-muted);font-size:12px;font-weight:800;text-transform:uppercase;cursor:pointer;transition:all .15s;letter-spacing:.5px;position:relative;}
-.admin-tab:hover{color:#fff;}
-.admin-tab.active{background: linear-gradient(135deg, var(--color-purple), var(--color-purple-deep));border-color: var(--color-purple);color:#fff;}
-.admin-tab .admin-tab-count{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--color-red);color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;}
-.admin-tab-count[data-zero="1"]{display:none;}
-.admin-tab-panel{display:none;}
-.admin-tab-panel.active{display:block;}
-.admin-request-card{background: var(--bg-surface);border: 1px solid var(--glass-border);border-radius:10px;padding:12px;margin-bottom:8px;display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center;position:relative;overflow:hidden;}
-.admin-request-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--color-purple);}
-.admin-request-card img.req-img{width:48px;height:48px;object-fit:contain;}
-.admin-request-info{min-width:0;font-size:12px;font-weight:600;line-height:1.35;color:#d8d8e4;}
-.admin-request-info .req-line{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.admin-request-info .req-key{color:var(--text-muted);font-size:11px;font-weight:700;}
-.admin-request-info .req-val{color:#fff;font-weight:700;}
-.admin-request-info .req-val.accent{color:var(--color-purple-soft);}
-.admin-request-actions{display:flex;flex-direction:column;gap:4px;min-width:88px;}
-.admin-request-empty{text-align:center;color:var(--text-muted);font-size:13px;font-weight:600;padding:24px;line-height:1.3;}
-.admin-mini-stat{display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:12px;background:rgba(249,115,22,.05);border:1px solid var(--color-orange);border-radius:8px;font-size:12px;font-weight:700;color:#fff;line-height:1.3;}
-.admin-mini-stat .stat-dot{width:8px;height:8px;border-radius:50%;background:var(--color-orange);}
 </style>
 </head>
 <body>
@@ -1087,10 +1197,8 @@ body{
   <button class="mobile-nav-btn" id="mNavProfile" onclick="switchTab('profile'); toggleMobileMenu()">Профиль</button>
 </div>
 
-<!-- Контейнер для анонсов -->
 <div class="announcement-container" id="announcementContainer"></div>
 
-<!-- Экран техперерыва -->
 <div class="maintenance-overlay" id="maintenanceOverlay" style="display:none;">
   <div class="maintenance-bg-glow"></div>
   <div class="maintenance-content">
@@ -1107,7 +1215,6 @@ body{
 
 <div id="toastContainer"></div>
 
-<!-- Модалки -->
 <div class="modal" id="topupModal">
     <div class="modal-card">
         <button class="modal-close" onclick="closeModal('topupModal')">X</button>
@@ -1421,8 +1528,8 @@ body{
         <div class="catch-hero" id="catchMainBlock">
             <div class="catch-hero-title">Поймай и получи</div>
             <div class="catch-hero-sub">
-                Лови <b>добрые</b> монетки · избегай <i>злых</i><br>
-                Больше добрых — победа ×2 · Равно — возврат ставки · Меньше — проигрыш
+                Лови <b>чёрные монетки</b> за 60 секунд<br>
+                В конце игры подбросится монета — что соберёшь, то и выпадет
             </div>
             <div class="catch-bet-row">
                 <input type="number" class="form-input" id="catchBetInput" placeholder="Ставка" min="1">
@@ -1441,16 +1548,6 @@ body{
         <div class="game-scene" id="gameScene">
             <div class="game-hud">
                 <div class="game-timer" id="gameTimer">01:00</div>
-                <div class="game-score">
-                    <div class="game-score-item good">
-                        <img src="https://github.com/saintezz/brainrolltester/blob/main/dobryy.png?raw=true" alt="Добрый">
-                        <span id="scoreGood">0</span>
-                    </div>
-                    <div class="game-score-item evil">
-                        <img src="https://github.com/saintezz/brainrolltester/blob/main/Zloy.png?raw=true" alt="Злой">
-                        <span id="scoreEvil">0</span>
-                    </div>
-                </div>
             </div>
 
             <div class="game-myaul">
@@ -1482,8 +1579,29 @@ body{
     </div>
 
     <div class="tab-panel" id="panelInventory">
-        <div class="cases-title-main" style="margin-top:8px;">Мой инвентарь</div>
-        <div id="inventoryTabGrid" class="inventory-row" style="padding:4px 0 12px;"></div>
+        <div class="inventory-page">
+            <div class="inventory-hero">
+                <div>
+                    <div class="inventory-hero-title">Мой инвентарь</div>
+                    <div class="inventory-hero-sub">Все твои брейнроты в одном месте</div>
+                </div>
+                <div class="inventory-hero-stats">
+                    <div class="inv-hero-pill" id="invHeroCount">0 предметов</div>
+                    <div class="inv-hero-pill gold" id="invHeroValue"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin"><span>0</span></div>
+                </div>
+            </div>
+
+            <div class="inventory-filters" id="invFilters">
+                <button class="inv-filter-btn active" data-filter="all" onclick="setInvFilter('all')">Все</button>
+                <button class="inv-filter-btn" data-filter="common" onclick="setInvFilter('common')">Common</button>
+                <button class="inv-filter-btn" data-filter="uncommon" onclick="setInvFilter('uncommon')">Uncommon</button>
+                <button class="inv-filter-btn" data-filter="rare" onclick="setInvFilter('rare')">Rare</button>
+                <button class="inv-filter-btn" data-filter="epic" onclick="setInvFilter('epic')">Epic</button>
+                <button class="inv-filter-btn" data-filter="legendary" onclick="setInvFilter('legendary')">Legendary</button>
+            </div>
+
+            <div id="inventoryTabGrid" class="inventory-tab-grid"></div>
+        </div>
     </div>
 
     <div class="tab-panel" id="panelPromo">
@@ -1566,23 +1684,7 @@ body{
             </div>
         </div>
     </div>
-
-    <!-- Статистика сайта в самом низу -->
-    <div class="site-stats">
-        <div class="stat-item stat-online">
-            <div class="stat-value" id="statOnline">0</div>
-            <div class="stat-label">Онлайн</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value" id="statUpgrades">0</div>
-            <div class="stat-label">Апгрейдов сделано</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value" id="statCases">0</div>
-            <div class="stat-label">Кейсов открыто</div>
-        </div>
-    </div>
-</div> 
+</div>
 
 <script>
 // ================== КОНСТАНТЫ ==================
@@ -1680,6 +1782,13 @@ function getRarityClass(price) {
   if (price < 10000) return 'rarity-epic';
   return 'rarity-legendary';
 }
+function getRarityKey(price) {
+  if (price < 100) return 'common';
+  if (price < 500) return 'uncommon';
+  if (price < 1500) return 'rare';
+  if (price < 10000) return 'epic';
+  return 'legendary';
+}
 
 let USER = { nick: 'Гость', tg: '@guest', tgLink: '#', id: null, username: null };
 let customNick = localStorage.getItem('ggbrainx_custom_nick') || null;
@@ -1705,7 +1814,6 @@ let selectedAdminItem = null;
 let activePromo = null;
 let maintenanceEnabled = false;
 let maintenanceInterval = null;
-let statsInterval = null;
 let announcementInterval = null;
 let lastAnnouncementId = null;
 
@@ -1724,10 +1832,14 @@ let catchTouchHandler = null;
 let catchTimerValue = 60;
 
 const CATCH_DURATION = 60;
+const CATCH_COIN_IMG = 'https://github.com/saintezz/brainrolltester/blob/main/bc.png?raw=true';
 
 const SPIN_DURATION = 7000;
 const SPIN_DURATION_FAST = 4000;
 const CIRCUMFERENCE = 2 * Math.PI * 130;
+
+// inventory filter
+let invFilter = 'all';
 
 (function initTelegramUser() {
   try {
@@ -1773,19 +1885,6 @@ function getTelegramId() {
 function getDisplayNick() { return customNick || USER.nick; }
 function isCurrentUserAdmin() { return ADMIN_USERNAMES.includes((USER.username || '').toLowerCase()); }
 function getItemById(id) { return ITEMS.find(item => item.id === id) || CASE_ONLY_ITEMS.find(item => item.id === id); }
-
-// ================== СТАТИСТИКА ==================
-async function fetchStats() {
-  try {
-    const res = await fetch(API_URL + '/api/stats');
-    const data = await res.json();
-    if (data.ok) {
-      document.getElementById('statOnline').textContent = data.online.toLocaleString('ru-RU');
-      document.getElementById('statUpgrades').textContent = data.upgrades.toLocaleString('ru-RU');
-      document.getElementById('statCases').textContent = data.cases.toLocaleString('ru-RU');
-    }
-  } catch (e) {}
-}
 
 // ================== АНОНСЫ ==================
 async function checkAnnouncement() {
@@ -1901,6 +2000,7 @@ function updateBalanceUI() {
   if (pic) pic.innerText = inventory.length;
   const label = document.getElementById('inventoryCountLabel');
   if (label) label.textContent = inventory.length + ' ' + getItemsWord(inventory.length);
+  updateInventoryHero();
   updateProfileStats();
 }
 function getItemsWord(n) {
@@ -1915,6 +2015,16 @@ function updateProfileStats() {
   inventory.forEach(id => { const it = getItemById(id); if (it && it.price > bestPrice) { bestPrice = it.price; best = it; } });
   bestEl.textContent = best ? best.name : '—';
   bestEl.title = best ? best.name : '';
+}
+function updateInventoryHero() {
+  const cnt = document.getElementById('invHeroCount');
+  const val = document.getElementById('invHeroValue');
+  if (cnt) cnt.textContent = inventory.length + ' ' + getItemsWord(inventory.length);
+  if (val) {
+    let total = 0;
+    inventory.forEach(id => { const it = getItemById(id); if (it) total += it.price; });
+    val.querySelector('span').textContent = total.toLocaleString('ru-RU');
+  }
 }
 
 // ================== ЗВУКИ ==================
@@ -2199,8 +2309,8 @@ window.sendAnnouncement = async function() {
       if (msg) { msg.className = 'msg ok'; msg.textContent = 'Анонс отправлен!'; }
       playWin(); vibrate(20);
       textEl.value = '';
-      checkAnnouncement(); // Мгновенно показываем себе
-      setTimeout(() => { if (btn) btn.disabled = false; }, 10000); // Блокируем кнопку на 10 сек
+      checkAnnouncement();
+      setTimeout(() => { if (btn) btn.disabled = false; }, 10000);
     } else {
       if (msg) { msg.className = 'msg err'; msg.textContent = data.error || 'Ошибка'; }
       if (btn) btn.disabled = false;
@@ -2618,14 +2728,46 @@ window.confirmOpenCase = async function() {
 // ================== ВЫВОД ==================
 let withdrawSelectedIndexes = [];
 let withdrawAgree = false;
+
+window.setInvFilter = function(f) {
+  invFilter = f;
+  document.querySelectorAll('.inv-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === f));
+  playClick(); vibrate(8);
+  renderInventoryTab();
+};
+
 function renderInventoryTab() {
   const grid = document.getElementById('inventoryTabGrid'); if (!grid) return;
-  if (!inventory.length) { grid.innerHTML = '<div class="empty-inv" style="display:flex;flex-direction:column;align-items:center;gap:10px;">Инвентарь пуст <button onclick="switchTab(\'menu\')" style="background:rgba(249,115,22,.15);color:#fff;padding:8px 16px;border-radius:6px;border:1px solid var(--color-orange);font-weight:800;cursor:pointer;">К кейсам</button></div>'; return; }
-  grid.innerHTML = inventory.map((id, index) => {
-    const item = getItemById(id); if (!item) return '';
-    const mut = item.mutation ? `<img class="mutation-badge" src="${MUTATION_ICONS[item.mutation]}" alt="mutation" loading="lazy" decoding="async">` : '';
+  if (!inventory.length) {
+    grid.innerHTML = '<div class="empty-inv" style="display:flex;flex-direction:column;align-items:center;gap:10px;grid-column:1/-1;">Инвентарь пуст <button onclick="switchTab(\'menu\')" style="background:rgba(249,115,22,.15);color:#fff;padding:8px 16px;border-radius:6px;border:1px solid var(--color-orange);font-weight:800;cursor:pointer;">К кейсам</button></div>';
+    return;
+  }
+  const filtered = inventory.map((id, index) => ({ id, index, item: getItemById(id) }))
+    .filter(x => x.item && (invFilter === 'all' || getRarityKey(x.item.price) === invFilter));
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty-inv" style="grid-column:1/-1;padding:30px;">Нет предметов с этим фильтром</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(({ id, index, item }) => {
+    const mut = item.mutation ? `<img class="mutation-badge" src="${MUTATION_ICONS[item.mutation]}" alt="mutation" loading="lazy" decoding="async" style="top:10px;left:10px;width:22px;height:22px;z-index:6;">` : '';
     const onW = pendingWithdrawItemIds.has(id);
-    return `<div class="inv-tab-card ${getRarityClass(item.price)} ${onW ? 'on-withdraw' : ''}">${mut}${onW ? `<div class="inv-onwithdraw-badge">на выводе</div>` : ''}<img class="inv-main" src="${item.img}" alt="${item.name}" loading="lazy" decoding="async" ${FALLBACK_ATTR}><div class="inv-name" title="${item.name}">${item.name}</div><div class="inv-price"><img src="${COIN_IMG}" alt="coin">${item.price}</div><div class="inv-tab-actions" style="${onW ? 'display:block;' : ''}">${onW ? `<button class="inv-wd" style="width:100%;padding:8px;font-size:10px;" onclick="showWithdrawInfo('${id}')">Информация о выводе</button>` : `<button class="inv-sell" onclick="sellItemFromTab(${index})">Продать</button><button class="inv-wd" onclick="openWithdrawFor(${index})">Вывод</button>`}</div></div>`;
+    const actions = onW
+      ? `<div class="inv-tab-actions single"><button class="inv-wd" onclick="showWithdrawInfo('${id}')">На выводе — инфо</button></div>`
+      : `<div class="inv-tab-actions"><button class="inv-sell" onclick="sellItemFromTab(${index})">Продать</button><button class="inv-wd" onclick="openWithdrawFor(${index})">Вывод</button></div>`;
+    return `<div class="inv-tab-card ${getRarityClass(item.price)} ${onW ? 'on-withdraw' : ''}">
+      ${onW ? '<div class="inv-onwithdraw-badge">На выводе</div>' : ''}
+      <div class="inv-art">
+        ${mut}
+        <img class="inv-main" src="${item.img}" alt="${item.name}" loading="lazy" decoding="async" ${FALLBACK_ATTR}>
+      </div>
+      <div class="inv-info">
+        <div class="inv-name" title="${item.name}">${item.name}</div>
+        <div class="inv-price"><img src="${COIN_IMG}" alt="coin">${item.price}</div>
+        ${actions}
+      </div>
+    </div>`;
   }).join('');
 }
 window.sellItemFromTab = async function(index) {
@@ -2718,7 +2860,7 @@ window.copyAutoPromoCode = function() { const promo = getCurrentAutoPromo(); nav
 window.activateAutoPromo = function() { const promo = getCurrentAutoPromo(); activePromo = { code: promo.code, bonus: promo.bonus }; playWin(); vibrate(20); if (document.getElementById('topupModal').classList.contains('open')) updateTopupPromoDisplay(); };
 function updateTopupPromoDisplay() { const infoBlock = document.getElementById('activePromoInfo'); const bonusSpan = document.getElementById('activePromoBonus'); if (activePromo) { if (infoBlock) infoBlock.style.display = 'block'; if (bonusSpan) bonusSpan.textContent = '+' + activePromo.bonus + '%'; } else if (infoBlock) infoBlock.style.display = 'none'; updateTopupPrice(); }
 
-// ================== CATCH GAME (REDESIGNED) ==================
+// ================== CATCH GAME ==================
 window.setCatchBet = function (v) {
   const input = document.getElementById('catchBetInput');
   if (!input) return;
@@ -2768,36 +2910,21 @@ function spawnCatchCoin() {
   const isGood = Math.random() < 0.5;
   coin.classList.add(isGood ? 'good' : 'evil');
   coin.dataset.good = isGood ? '1' : '0';
-  coin.dataset.ready = '0';
 
   const x = 6 + Math.random() * 88;
   const duration = 1.6 + Math.random() * 1.4;
   coin.style.left = x + '%';
   coin.style.top = '-70px';
   coin.style.animation = `fall ${duration}s linear forwards`;
-  coin.innerHTML = `<img src="https://github.com/saintezz/brainrolltester/blob/main/${isGood ? 'dobryy.png' : 'Zloy.png'}?raw=true" alt="coin">`;
+  coin.innerHTML = `<img src="${CATCH_COIN_IMG}" alt="coin">`;
 
   scene.appendChild(coin);
   catchCoins.push(coin);
-
-  setTimeout(() => coin.dataset.ready = '1', 60);
 
   coin.addEventListener('animationend', () => {
     coin.remove();
     catchCoins = catchCoins.filter(c => c !== coin);
   });
-}
-
-function spawnPop(x, y, text, type) {
-  const scene = document.getElementById('gameScene');
-  if (!scene) return;
-  const pop = document.createElement('div');
-  pop.className = 'catch-pop ' + type;
-  pop.textContent = text;
-  pop.style.left = x + 'px';
-  pop.style.top = y + 'px';
-  scene.appendChild(pop);
-  setTimeout(() => pop.remove(), 750);
 }
 
 function checkCatchCollisions() {
@@ -2823,18 +2950,12 @@ function checkCatchCollisions() {
 
     if (cR >= pL && cL <= pR && cB >= pT && cT <= pB) {
       const isGood = coin.dataset.good === '1';
-      const cx = (cL + cR) / 2;
-      const cy = (cT + cB) / 2;
       if (isGood) {
         catchScoreGood++;
-        document.getElementById('scoreGood').textContent = catchScoreGood;
         playCoin(); vibrate(10);
-        spawnPop(cx, cy, '+1', 'good');
       } else {
         catchScoreEvil++;
-        document.getElementById('scoreEvil').textContent = catchScoreEvil;
         playLose(); vibrate(15);
-        spawnPop(cx, cy, '-1', 'evil');
       }
       coin.remove();
       catchCoins = catchCoins.filter(c => c !== coin);
@@ -2860,7 +2981,6 @@ window.startCatchGame = function () {
 
   if (msg) { msg.className = 'msg'; msg.textContent = ''; }
 
-  // списываем ставку
   balance -= bet;
   saveCache();
   updateBalanceUI();
@@ -2873,8 +2993,6 @@ window.startCatchGame = function () {
   catchPlayerXPercent = 50;
   catchCoins = [];
 
-  document.getElementById('scoreGood').textContent = '0';
-  document.getElementById('scoreEvil').textContent = '0';
   document.getElementById('gameTimer').textContent = '01:00';
   document.getElementById('gameTimer').classList.remove('low');
   document.getElementById('gameResultOverlay').style.display = 'none';
@@ -2923,7 +3041,6 @@ function endCatchGame() {
   if (catchMoveHandler) scene.removeEventListener('mousemove', catchMoveHandler);
   if (catchTouchHandler) scene.removeEventListener('touchmove', catchTouchHandler);
 
-  // Определяем результат
   let kind = 'draw';
   let profit = 0;
   if (catchScoreGood > catchScoreEvil) { kind = 'win';  profit = catchBet * 2; }
@@ -2945,7 +3062,6 @@ function showCatchResult(kind, profit) {
 
   overlay.style.display = 'flex';
 
-  // сброс
   coin.className = 'result-coin';
   title.className = 'game-result-title';
   title.textContent = '';
@@ -2953,12 +3069,10 @@ function showCatchResult(kind, profit) {
   profitEl.innerHTML = '';
   caption.textContent = 'Бросаем монетку…';
 
-  // фаза 1 — крутим
   requestAnimationFrame(() => {
     coin.classList.add('spin');
   });
 
-  // фаза 2 — «падает» на нужную сторону
   setTimeout(() => {
     coin.classList.remove('spin');
     const landedGood = kind !== 'lose';
@@ -2968,7 +3082,6 @@ function showCatchResult(kind, profit) {
     else if (kind === 'draw') { playCoin(); }
     else { playLose(); vibratePattern([50,30,100]); }
 
-    // фаза 3 — показываем подписи (без чисел добрых/злых)
     setTimeout(() => {
       if (kind === 'win') {
         title.textContent = 'ПОБЕДА';
@@ -3015,14 +3128,10 @@ async function init() {
   applyMaintenanceState(maintenanceEnabled);
   
   await loadUserFromServer();
-  await fetchStats();
   await checkAnnouncement();
   
   if (maintenanceInterval) clearInterval(maintenanceInterval);
   maintenanceInterval = setInterval(checkMaintenance, 1000);
-
-  if (statsInterval) clearInterval(statsInterval);
-  statsInterval = setInterval(fetchStats, 5000);
 
   if (announcementInterval) clearInterval(announcementInterval);
   announcementInterval = setInterval(checkAnnouncement, 1000);
