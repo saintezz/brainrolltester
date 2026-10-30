@@ -481,213 +481,494 @@ body{
   color: #22c55e;
 }
 
-/* ================== CATCH & GET GAME ================== */
+/* ================== CATCH & GET GAME — REDESIGN ================== */
+#panelCatch {
+  position: relative;
+  padding: 8px 0 24px;
+}
+
+.catch-hero {
+  max-width: 560px;
+  margin: 0 auto 18px;
+  padding: 26px 22px;
+  border-radius: 22px;
+  background:
+    radial-gradient(500px 220px at 15% 0%, rgba(139,92,246,.22), transparent 70%),
+    radial-gradient(500px 220px at 90% 100%, rgba(249,115,22,.18), transparent 70%),
+    linear-gradient(160deg, var(--bg-surface), #0b0712);
+  border: 1px solid rgba(139,92,246,.35);
+  box-shadow: 0 24px 60px -30px rgba(139,92,246,.7), inset 0 1px 0 rgba(255,255,255,.04);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.catch-hero::before {
+  content: '';
+  position: absolute;
+  inset: -40% -20% auto -20%;
+  height: 220px;
+  background: radial-gradient(circle, rgba(167,139,250,.25), transparent 60%);
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+.catch-hero-title {
+  position: relative;
+  font-size: clamp(22px, 4vw, 30px);
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 24px rgba(139,92,246,.6);
+  margin-bottom: 6px;
+}
+
+.catch-hero-sub {
+  position: relative;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+
+.catch-hero-sub b { color: var(--color-orange-soft); }
+.catch-hero-sub i { color: var(--color-purple-soft); font-style: normal; }
+
+.catch-bet-row {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  max-width: 380px;
+  margin: 0 auto 12px;
+}
+
+.catch-bet-row .form-input {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: 1px;
+  padding: 14px;
+  background: var(--bg-void);
+  border: 1px solid rgba(139,92,246,.4);
+}
+
+.catch-bet-row .form-input:focus {
+  border-color: var(--color-purple);
+  box-shadow: 0 0 0 3px rgba(139,92,246,.15);
+}
+
+.catch-quick-bets {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.catch-quick-bet {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,.03);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.catch-quick-bet:hover {
+  color: #fff;
+  border-color: var(--color-orange);
+  background: rgba(249,115,22,.12);
+}
+
+.catch-start-btn {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  display: block;
+  padding: 18px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--color-orange), var(--color-orange-deep));
+  color: #fff;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 18px 40px -18px rgba(249,115,22,.9);
+  transition: transform .15s, filter .15s;
+}
+
+.catch-start-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+.catch-start-btn:active { transform: translateY(0); }
+
+/* ---- СЦЕНА ---- */
 .game-scene {
   position: relative;
   width: 100%;
-  height: 500px;
-  background: radial-gradient(circle at 50% 50%, #1a1229, #0e0a14);
-  border-radius: 16px;
+  max-width: 1000px;
+  margin: 0 auto 20px;
+  height: min(72vh, 620px);
+  border-radius: 22px;
   overflow: hidden;
-  border: 2px solid var(--color-purple);
-  box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+  border: 1px solid rgba(139,92,246,.45);
+  background:
+    radial-gradient(900px 400px at 50% 0%, rgba(139,92,246,.28), transparent 60%),
+    radial-gradient(700px 300px at 50% 100%, rgba(249,115,22,.20), transparent 60%),
+    linear-gradient(180deg, #170f24 0%, #0b0712 100%);
+  box-shadow:
+    inset 0 0 80px rgba(0,0,0,.85),
+    0 30px 70px -40px rgba(139,92,246,.9);
   display: none;
-  margin-bottom: 20px;
   touch-action: none;
+  isolation: isolate;
 }
+
 .game-scene.active { display: block; }
 
-/* Фон со звездами */
+/* сетка-арена */
 .game-scene::before {
-  content: ''; position: absolute; inset: 0;
-  background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
-                    radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
-                    radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
-  background-size: 550px 550px, 350px 350px, 250px 250px;
-  background-position: 0 0, 40px 60px, 130px 270px;
-  opacity: 0.4;
-  animation: bgMove 20s linear infinite;
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(139,92,246,.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139,92,246,.08) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(circle at 50% 45%, #000 30%, transparent 78%);
+  -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 30%, transparent 78%);
   pointer-events: none;
-}
-@keyframes bgMove {
-  0% { background-position: 0 0, 40px 60px, 130px 270px; }
-  100% { background-position: 0 550px, 40px 410px, 130px 520px; }
+  z-index: 0;
 }
 
+/* неоновое кольцо-арена */
+.game-scene::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -40%;
+  width: 120%;
+  height: 90%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(249,115,22,.18), transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.game-hud {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 30;
+  pointer-events: none;
+  gap: 12px;
+}
+
+.game-timer {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #fff;
+  background: rgba(10,6,18,.7);
+  padding: 8px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(139,92,246,.6);
+  box-shadow: 0 0 24px rgba(139,92,246,.4), inset 0 0 12px rgba(139,92,246,.15);
+  font-variant-numeric: tabular-nums;
+}
+
+.game-timer.low {
+  border-color: var(--color-red);
+  color: #ff8b8b;
+  box-shadow: 0 0 24px rgba(239,68,68,.5);
+  animation: timerPulse .8s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+.game-score { display: flex; gap: 10px; }
+
+.game-score-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 14px;
+  background: rgba(10,6,18,.7);
+  border: 1px solid var(--glass-border);
+  font-size: 22px;
+  font-weight: 900;
+  min-width: 84px;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.game-score-item.good {
+  border-color: rgba(34,197,94,.6);
+  box-shadow: 0 0 20px rgba(34,197,94,.3), inset 0 0 10px rgba(34,197,94,.1);
+  color: #4ade80;
+}
+
+.game-score-item.evil {
+  border-color: rgba(239,68,68,.6);
+  box-shadow: 0 0 20px rgba(239,68,68,.3), inset 0 0 10px rgba(239,68,68,.1);
+  color: #ff7b7b;
+}
+
+.game-score-item img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+/* ---- ИГРОК ---- */
 .game-player {
   position: absolute;
-  bottom: 20px;
+  bottom: 18px;
   left: 50%;
   transform: translateX(-50%);
-  width: 90px;
-  height: 90px;
-  z-index: 10;
+  width: 96px;
+  height: 96px;
+  z-index: 20;
   pointer-events: none;
-  transition: left 0.1s linear;
+  transition: left .08s linear;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,.6));
 }
+
+.game-player::before {
+  content: '';
+  position: absolute;
+  inset: -18px -12px -6px -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139,92,246,.45), transparent 65%);
+  filter: blur(6px);
+  z-index: -1;
+}
+
 .game-player img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 0 15px rgba(139,92,246,0.8));
+  filter: drop-shadow(0 0 18px rgba(167,139,250,.85));
 }
+
+/* логотип сверху — сделан ненавязчивым */
 .game-myaul {
   position: absolute;
-  top: 10px;
+  top: 70px;
   left: 50%;
   transform: translateX(-50%);
   width: 120px;
   height: 120px;
   z-index: 5;
   pointer-events: none;
-  animation: flyMyaul 4s ease-in-out infinite alternate;
+  opacity: .35;
+  filter: blur(.2px) drop-shadow(0 0 30px rgba(249,115,22,.5));
+  animation: flyMyaul 5s ease-in-out infinite alternate;
 }
+
 @keyframes flyMyaul {
-  0% { transform: translateX(-50%) translateY(0px) rotate(-5deg); }
-  50% { transform: translateX(-50%) translateY(20px) rotate(5deg); }
-  100% { transform: translateX(-50%) translateY(0px) rotate(-5deg); }
+  0% { transform: translateX(-50%) translateY(0px); }
+  100% { transform: translateX(-50%) translateY(22px); }
 }
+
 .game-myaul img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 0 25px rgba(249,115,22,0.6));
 }
 
+/* ---- МОНЕТКИ (крупные) ---- */
 .game-coin {
   position: absolute;
-  width: 80px; /* Увеличен размер */
-  height: 80px;
-  z-index: 3;
+  width: 64px;
+  height: 64px;
+  z-index: 10;
   pointer-events: none;
+  will-change: transform;
 }
+
 .game-coin img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 0 12px rgba(0,0,0,0.6));
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,.65));
 }
+
+.game-coin.good img { filter: drop-shadow(0 0 14px rgba(34,197,94,.9)); }
+.game-coin.evil img { filter: drop-shadow(0 0 14px rgba(239,68,68,.9)); }
+
 @keyframes fall {
-  0% { transform: translateY(0) rotateY(0deg); }
-  100% { transform: translateY(600px) rotateY(360deg); }
+  0%   { transform: translateY(0) rotate(0deg) scale(.9); opacity: 0; }
+  10%  { opacity: 1; }
+  100% { transform: translateY(760px) rotate(360deg) scale(1); opacity: 1; }
 }
 
-.game-hud {
+/* всплывающие +1 / -1 */
+.catch-pop {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 20;
-  pointer-events: none;
-}
-.game-timer {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 900;
-  color: #fff;
-  background: rgba(0,0,0,0.6);
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--color-purple);
-  box-shadow: 0 0 15px rgba(139,92,246,0.4);
+  pointer-events: none;
+  z-index: 25;
+  animation: popUp .7s ease-out forwards;
+  text-shadow: 0 2px 8px rgba(0,0,0,.8);
 }
-.game-score {
-  display: flex;
-  gap: 10px;
-}
-.game-score-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(0,0,0,0.6);
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--glass-border);
-  font-size: 18px;
-  font-weight: 800;
-  box-shadow: 0 0 15px rgba(0,0,0,0.5);
-}
-.game-score-item img {
-  width: 30px; /* Увеличен размер в HUD */
-  height: 30px;
+.catch-pop.good { color: #4ade80; }
+.catch-pop.evil { color: #ff7b7b; }
+
+@keyframes popUp {
+  0%   { transform: translate(-50%, 0) scale(.6); opacity: 1; }
+  100% { transform: translate(-50%, -70px) scale(1.2); opacity: 0; }
 }
 
-/* Результат */
+/* ---- ОВЕРЛЕЙ РЕЗУЛЬТАТА ---- */
 .game-result-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(14,10,20,0.95);
-  display: none; /* Изначально скрыт */
+  background:
+    radial-gradient(circle at 50% 35%, rgba(139,92,246,.18), transparent 60%),
+    rgba(8,5,14,.95);
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 50;
+  z-index: 60;
   text-align: center;
-  padding: 20px;
+  padding: 24px;
+  gap: 18px;
+  backdrop-filter: blur(4px);
+  animation: overlayIn .3s ease-out;
 }
-.game-result-overlay.show { display: flex; }
 
-.coin-flip-container {
-  perspective: 1000px;
-  width: 200px;
-  height: 200px;
-  margin-bottom: 20px;
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
-.coin-flip {
-  width: 100%;
-  height: 100%;
+
+/* Крутящаяся монета */
+.result-coin-stage {
   position: relative;
-  transform-style: preserve-3d;
-  transition: transform 3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  width: 160px;
+  height: 160px;
+  perspective: 800px;
 }
-.coin-flip.flipping {
-  transform: rotateY(1800deg);
-}
-.coin-side {
+
+.result-coin {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  transform-style: preserve-3d;
+  transition: transform 1.2s cubic-bezier(.22,.9,.28,1);
 }
-.coin-side img {
+
+.result-coin.spin {
+  animation: coinSpin 1.1s linear infinite;
+}
+
+.result-coin.landed-good { transform: rotateY(0deg) scale(1); }
+.result-coin.landed-evil { transform: rotateY(180deg) scale(1); }
+
+@keyframes coinSpin {
+  0%   { transform: rotateY(0deg) scale(1); }
+  50%  { transform: rotateY(540deg) scale(1.08); }
+  100% { transform: rotateY(1080deg) scale(1); }
+}
+
+.result-coin img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 0 30px rgba(255,255,255,0.2));
+  filter: drop-shadow(0 0 30px rgba(139,92,246,.8));
 }
-.coin-side.back {
-  transform: rotateY(180deg);
+
+.result-coin .coin-side {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+}
+
+.result-coin .coin-evil-side { transform: rotateY(180deg); }
+
+.result-caption {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 .game-result-title {
-  font-size: 32px;
+  font-size: clamp(30px, 6vw, 46px);
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 10px;
-  opacity: 0;
-  transition: opacity 0.5s;
+  letter-spacing: 3px;
+  line-height: 1;
 }
-.game-result-title.show { opacity: 1; }
-.game-result-title.win { color: #22c55e; text-shadow: 0 0 20px rgba(34,197,94,0.6); }
-.game-result-title.lose { color: var(--color-red); text-shadow: 0 0 20px rgba(239,68,68,0.6); }
-.game-result-title.draw { color: var(--color-orange-soft); text-shadow: 0 0 20px rgba(249,115,22,0.6); }
+
+.game-result-title.win  { color: #4ade80; text-shadow: 0 0 30px rgba(34,197,94,.7); }
+.game-result-title.lose { color: #ff7b7b; text-shadow: 0 0 30px rgba(239,68,68,.7); }
+.game-result-title.draw { color: var(--color-orange-soft); text-shadow: 0 0 30px rgba(249,115,22,.6); }
+
+.game-result-sub {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-orange-soft);
+}
 
 .game-result-profit {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 900;
   color: #fff;
-  margin-top: 10px;
-  opacity: 0;
-  transition: opacity 0.5s 0.3s;
+  padding: 12px 26px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--glass-border);
+  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
-.game-result-profit.show { opacity: 1; }
 
+.game-result-profit img {
+  width: 26px;
+  height: 26px;
+}
+
+.catch-close-btn {
+  max-width: 220px;
+  width: 100%;
+}
+
+/* ================== MOBILE ================== */
 @media (max-width: 768px) {
   .site-stats { flex-direction: column; }
   .top-nav-panel { display: none; }
@@ -714,9 +995,14 @@ body{
   .progress-center{width:134px;height:134px;}
   .progress-section{padding:24px 0 8px 0;}
   .inventory-row, .shop-grid { grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); }
-  .game-scene { height: 400px; }
-  .game-player { width: 70px; height: 70px; }
-  .game-coin { width: 60px; height: 60px; }
+  .game-scene { height: min(70vh, 520px); border-radius: 16px; }
+  .game-player { width: 78px; height: 78px; }
+  .game-myaul { width: 90px; height: 90px; top: 64px; }
+  .game-coin { width: 56px; height: 56px; }
+  .game-timer { font-size: 20px; padding: 6px 12px; }
+  .game-score-item { font-size: 18px; padding: 6px 10px; min-width: 70px; gap: 6px; }
+  .game-score-item img { width: 24px; height: 24px; }
+  .result-coin-stage { width: 130px; height: 130px; }
 }
 .inv-tab-card{background: var(--bg-surface);border: 1px solid var(--glass-border);border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;}
 .inv-tab-card img.inv-main{width:52px;height:52px;object-fit:contain;}
@@ -1132,51 +1418,65 @@ body{
     </div>
 
     <div class="tab-panel" id="panelCatch">
-        <div class="cases-title-main" style="margin-top:8px;">Поймай и получи</div>
-        <div id="catchMainBlock" style="text-align:center;padding:20px;background:var(--bg-surface);border-radius:16px;border:1px solid var(--glass-border);max-width:500px;margin:0 auto;">
-            <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:16px;">Собери монетки за 1 минуту!<br>Больше Добрых = x2, Больше Злых = Проигрыш</div>
-            <div style="display:flex;flex-direction:column;gap:12px;max-width:300px;margin:0 auto;">
-                <div class="form-group">
-                    <label class="form-label">Ваша ставка</label>
-                    <input type="number" class="form-input" id="catchBetInput" placeholder="Например: 41" min="1">
-                </div>
-                <button class="action-btn" onclick="startCatchGame()" style="background: linear-gradient(135deg, var(--color-purple), var(--color-purple-deep));">ИГРАТЬ</button>
-                <div class="msg" id="catchMsg"></div>
+        <div class="catch-hero" id="catchMainBlock">
+            <div class="catch-hero-title">Поймай и получи</div>
+            <div class="catch-hero-sub">
+                Лови <b>добрые</b> монетки · избегай <i>злых</i><br>
+                Больше добрых — победа ×2 · Равно — возврат ставки · Меньше — проигрыш
             </div>
+            <div class="catch-bet-row">
+                <input type="number" class="form-input" id="catchBetInput" placeholder="Ставка" min="1">
+            </div>
+            <div class="catch-quick-bets">
+                <button class="catch-quick-bet" onclick="setCatchBet(10)">10</button>
+                <button class="catch-quick-bet" onclick="setCatchBet(50)">50</button>
+                <button class="catch-quick-bet" onclick="setCatchBet(100)">100</button>
+                <button class="catch-quick-bet" onclick="setCatchBet(500)">500</button>
+                <button class="catch-quick-bet" onclick="setCatchBet('max')">MAX</button>
+            </div>
+            <button class="catch-start-btn" onclick="startCatchGame()">Играть</button>
+            <div class="msg" id="catchMsg"></div>
         </div>
+
         <div class="game-scene" id="gameScene">
             <div class="game-hud">
                 <div class="game-timer" id="gameTimer">01:00</div>
                 <div class="game-score">
-                    <div class="game-score-item" style="color:#22c55e;">
-                        <img src="https://github.com/saintezz/brainrolltester/blob/main/dobryy.png?raw=true" alt="Добрый"> <span id="scoreGood">0</span>
+                    <div class="game-score-item good">
+                        <img src="https://github.com/saintezz/brainrolltester/blob/main/dobryy.png?raw=true" alt="Добрый">
+                        <span id="scoreGood">0</span>
                     </div>
-                    <div class="game-score-item" style="color:var(--color-red);">
-                        <img src="https://github.com/saintezz/brainrolltester/blob/main/Zloy.png?raw=true" alt="Злой"> <span id="scoreEvil">0</span>
+                    <div class="game-score-item evil">
+                        <img src="https://github.com/saintezz/brainrolltester/blob/main/Zloy.png?raw=true" alt="Злой">
+                        <span id="scoreEvil">0</span>
                     </div>
                 </div>
             </div>
+
             <div class="game-myaul">
                 <img src="https://github.com/saintezz/brainrolltester/blob/main/dobryy.png?raw=true" alt="Myaul">
             </div>
+
             <div class="game-player" id="gamePlayer">
                 <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/Orchidox.png" alt="Player">
             </div>
-            
-            <div class="game-result-overlay" id="gameResultOverlay">
-                <div class="coin-flip-container">
-                    <div class="coin-flip" id="coinFlip">
-                        <div class="coin-side front">
-                            <img src="https://github.com/saintezz/brainrolltester/blob/main/dobryy.png?raw=true" alt="Добрый">
+
+            <div class="game-result-overlay" id="gameResultOverlay" style="display:none;">
+                <div class="result-coin-stage">
+                    <div class="result-coin" id="resultCoin">
+                        <div class="coin-side coin-good-side">
+                            <img src="https://github.com/saintezz/brainrolltester/blob/main/dobryy.png?raw=true" alt="Good">
                         </div>
-                        <div class="coin-side back">
-                            <img src="https://github.com/saintezz/brainrolltester/blob/main/Zloy.png?raw=true" alt="Злой">
+                        <div class="coin-side coin-evil-side">
+                            <img src="https://github.com/saintezz/brainrolltester/blob/main/Zloy.png?raw=true" alt="Evil">
                         </div>
                     </div>
                 </div>
-                <div class="game-result-title" id="gameResultTitle">ПОБЕДА</div>
-                <div class="game-result-profit" id="gameResultProfit">+82</div>
-                <button class="action-btn" onclick="closeCatchGame()" style="max-width:200px; margin-top: 20px;">ЗАКРЫТЬ</button>
+                <div class="result-caption" id="resultCaption">Бросаем монетку…</div>
+                <div class="game-result-title" id="gameResultTitle"></div>
+                <div class="game-result-sub" id="gameResultSub"></div>
+                <div class="game-result-profit" id="gameResultProfit"></div>
+                <button class="action-btn catch-close-btn" onclick="closeCatchGame()">Закрыть</button>
             </div>
         </div>
     </div>
@@ -1416,8 +1716,14 @@ let catchScoreGood = 0;
 let catchScoreEvil = 0;
 let catchTimer = null;
 let catchCoinsTimer = null;
-let catchPlayerX = 0;
-let catchPlayerWidth = 80;
+let catchPlayerXPercent = 50;
+let catchCoins = [];
+let catchGameLoop = null;
+let catchMoveHandler = null;
+let catchTouchHandler = null;
+let catchTimerValue = 60;
+
+const CATCH_DURATION = 60;
 
 const SPIN_DURATION = 7000;
 const SPIN_DURATION_FAST = 4000;
@@ -2412,51 +2718,44 @@ window.copyAutoPromoCode = function() { const promo = getCurrentAutoPromo(); nav
 window.activateAutoPromo = function() { const promo = getCurrentAutoPromo(); activePromo = { code: promo.code, bonus: promo.bonus }; playWin(); vibrate(20); if (document.getElementById('topupModal').classList.contains('open')) updateTopupPromoDisplay(); };
 function updateTopupPromoDisplay() { const infoBlock = document.getElementById('activePromoInfo'); const bonusSpan = document.getElementById('activePromoBonus'); if (activePromo) { if (infoBlock) infoBlock.style.display = 'block'; if (bonusSpan) bonusSpan.textContent = '+' + activePromo.bonus + '%'; } else if (infoBlock) infoBlock.style.display = 'none'; updateTopupPrice(); }
 
-// ================== CATCH GAME ==================
-let catchGameActive = false;
-let catchBet = 0;
-let catchScoreGood = 0;
-let catchScoreEvil = 0;
-let catchTimer = null;
-let catchCoinsTimer = null;
-let catchPlayerXPercent = 50;
-let catchMoveHandler = null;
-let catchTouchHandler = null;
+// ================== CATCH GAME (REDESIGNED) ==================
+window.setCatchBet = function (v) {
+  const input = document.getElementById('catchBetInput');
+  if (!input) return;
+  if (v === 'max') input.value = Math.max(1, Math.floor(balance));
+  else input.value = v;
+  playClick(); vibrate(8);
+};
 
 function initCatchPlayerMovement() {
   const scene = document.getElementById('gameScene');
   if (!scene) return;
-  
   catchMoveHandler = (e) => {
     if (!catchGameActive) return;
     const rect = scene.getBoundingClientRect();
     let clientX = e.clientX;
-    if (e.touches && e.touches.length > 0) clientX = e.touches[0].clientX;
-    let x = (clientX - rect.left) / rect.width * 100;
-    x = Math.max(0, Math.min(100, x));
-    catchPlayerXPercent = x;
+    if (e.touches && e.touches.length) clientX = e.touches[0].clientX;
+    const x = ((clientX - rect.left) / rect.width) * 100;
+    catchPlayerXPercent = Math.max(4, Math.min(96, x));
   };
-  
   catchTouchHandler = (e) => {
     if (!catchGameActive) return;
     e.preventDefault();
     const rect = scene.getBoundingClientRect();
-    if (e.touches.length > 0) {
-      let x = (e.touches[0].clientX - rect.left) / rect.width * 100;
-      x = Math.max(0, Math.min(100, x));
-      catchPlayerXPercent = x;
+    if (e.touches.length) {
+      const x = ((e.touches[0].clientX - rect.left) / rect.width) * 100;
+      catchPlayerXPercent = Math.max(4, Math.min(96, x));
     }
   };
-  
   scene.addEventListener('mousemove', catchMoveHandler);
   scene.addEventListener('touchmove', catchTouchHandler, { passive: false });
 }
 
 function updateCatchPlayerPosition() {
-  const player = document.getElementById('gamePlayer');
-  if (player) {
-    player.style.left = `${catchPlayerXPercent}%`;
-    player.style.transform = 'translateX(-50%)';
+  const p = document.getElementById('gamePlayer');
+  if (p) {
+    p.style.left = catchPlayerXPercent + '%';
+    p.style.transform = 'translateX(-50%)';
   }
 }
 
@@ -2464,60 +2763,78 @@ function spawnCatchCoin() {
   if (!catchGameActive) return;
   const scene = document.getElementById('gameScene');
   if (!scene) return;
-  
   const coin = document.createElement('div');
   coin.className = 'game-coin';
-  const x = 5 + Math.random() * 90;
-  const duration = 1.5 + Math.random() * 1.5;
-  coin.style.left = `${x}%`;
-  coin.style.top = `-50px`;
-  coin.style.animation = `fall ${duration}s linear forwards`;
-  coin.innerHTML = `<img src="https://github.com/saintezz/brainrolltester/blob/main/bc.png?raw=true" alt="coin">`;
-  
   const isGood = Math.random() < 0.5;
+  coin.classList.add(isGood ? 'good' : 'evil');
   coin.dataset.good = isGood ? '1' : '0';
-  
+  coin.dataset.ready = '0';
+
+  const x = 6 + Math.random() * 88;
+  const duration = 1.6 + Math.random() * 1.4;
+  coin.style.left = x + '%';
+  coin.style.top = '-70px';
+  coin.style.animation = `fall ${duration}s linear forwards`;
+  coin.innerHTML = `<img src="https://github.com/saintezz/brainrolltester/blob/main/${isGood ? 'dobryy.png' : 'Zloy.png'}?raw=true" alt="coin">`;
+
+  scene.appendChild(coin);
+  catchCoins.push(coin);
+
+  setTimeout(() => coin.dataset.ready = '1', 60);
+
   coin.addEventListener('animationend', () => {
     coin.remove();
     catchCoins = catchCoins.filter(c => c !== coin);
   });
-  
-  scene.appendChild(coin);
-  catchCoins.push(coin);
+}
+
+function spawnPop(x, y, text, type) {
+  const scene = document.getElementById('gameScene');
+  if (!scene) return;
+  const pop = document.createElement('div');
+  pop.className = 'catch-pop ' + type;
+  pop.textContent = text;
+  pop.style.left = x + 'px';
+  pop.style.top = y + 'px';
+  scene.appendChild(pop);
+  setTimeout(() => pop.remove(), 750);
 }
 
 function checkCatchCollisions() {
   if (!catchGameActive) return;
   const scene = document.getElementById('gameScene');
-  if (!scene) return;
-  const sceneRect = scene.getBoundingClientRect();
-  const playerEl = document.getElementById('gamePlayer');
-  if (!playerEl) return;
-  const playerRect = playerEl.getBoundingClientRect();
-  
-  const playerLeft = playerRect.left - sceneRect.left;
-  const playerRight = playerRect.right - sceneRect.left;
-  const playerTop = playerRect.top - sceneRect.top;
-  const playerBottom = playerRect.bottom - sceneRect.top;
-  
+  const player = document.getElementById('gamePlayer');
+  if (!scene || !player) return;
+  const sRect = scene.getBoundingClientRect();
+  const pRect = player.getBoundingClientRect();
+
+  const pL = pRect.left - sRect.left;
+  const pR = pRect.right - sRect.left;
+  const pT = pRect.top - sRect.top;
+  const pB = pRect.bottom - sRect.top;
+
   for (let i = catchCoins.length - 1; i >= 0; i--) {
     const coin = catchCoins[i];
-    const coinRect = coin.getBoundingClientRect();
-    const coinLeft = coinRect.left - sceneRect.left;
-    const coinRight = coinRect.right - sceneRect.left;
-    const coinTop = coinRect.top - sceneRect.top;
-    const coinBottom = coinRect.bottom - sceneRect.top;
-    
-    if (coinRight >= playerLeft && coinLeft <= playerRight && coinBottom >= playerTop && coinTop <= playerBottom) {
+    const cRect = coin.getBoundingClientRect();
+    const cL = cRect.left - sRect.left;
+    const cR = cRect.right - sRect.left;
+    const cT = cRect.top - sRect.top;
+    const cB = cRect.bottom - sRect.top;
+
+    if (cR >= pL && cL <= pR && cB >= pT && cT <= pB) {
       const isGood = coin.dataset.good === '1';
+      const cx = (cL + cR) / 2;
+      const cy = (cT + cB) / 2;
       if (isGood) {
         catchScoreGood++;
         document.getElementById('scoreGood').textContent = catchScoreGood;
         playCoin(); vibrate(10);
+        spawnPop(cx, cy, '+1', 'good');
       } else {
         catchScoreEvil++;
         document.getElementById('scoreEvil').textContent = catchScoreEvil;
         playLose(); vibrate(15);
+        spawnPop(cx, cy, '-1', 'evil');
       }
       coin.remove();
       catchCoins = catchCoins.filter(c => c !== coin);
@@ -2525,12 +2842,12 @@ function checkCatchCollisions() {
   }
 }
 
-window.startCatchGame = async function() {
+window.startCatchGame = function () {
   if (catchGameActive) return;
-  const betInput = document.getElementById('catchBetInput');
+  const input = document.getElementById('catchBetInput');
   const msg = document.getElementById('catchMsg');
-  const bet = parseInt(betInput.value);
-  
+  const bet = parseInt(input?.value || '0', 10);
+
   if (!bet || bet < 1) {
     if (msg) { msg.className = 'msg err'; msg.textContent = 'Введите ставку'; }
     return;
@@ -2540,139 +2857,148 @@ window.startCatchGame = async function() {
     playLose(); vibrate(30);
     return;
   }
-  
-  if (msg) { msg.className = 'msg wait'; msg.textContent = 'Старт...'; }
-  
-  try {
-    const data = await api('/api/case/open', { case_id: 'witch', qty: 1 });
-  } catch (e) {}
-  
+
+  if (msg) { msg.className = 'msg'; msg.textContent = ''; }
+
+  // списываем ставку
   balance -= bet;
   saveCache();
   updateBalanceUI();
-  
+
   catchGameActive = true;
-  catchGameBet = bet;
+  catchBet = bet;
   catchScoreGood = 0;
   catchScoreEvil = 0;
-  catchTimerValue = 60; // 1 МИНУТА
+  catchTimerValue = CATCH_DURATION;
   catchPlayerXPercent = 50;
   catchCoins = [];
-  
+
   document.getElementById('scoreGood').textContent = '0';
   document.getElementById('scoreEvil').textContent = '0';
   document.getElementById('gameTimer').textContent = '01:00';
+  document.getElementById('gameTimer').classList.remove('low');
+  document.getElementById('gameResultOverlay').style.display = 'none';
   document.getElementById('catchMainBlock').style.display = 'none';
-  document.getElementById('gameResultOverlay').classList.remove('show');
   document.getElementById('gameScene').classList.add('active');
-  document.getElementById('coinFlip').classList.remove('flipping');
-  document.getElementById('gameResultTitle').classList.remove('show');
-  document.getElementById('gameResultProfit').classList.remove('show');
-  
+
   initCatchPlayerMovement();
   updateCatchPlayerPosition();
-  
-  if (msg) { msg.textContent = ''; }
-  
-  if (catchCoinSpawnInterval) clearInterval(catchCoinSpawnInterval);
-  catchCoinSpawnInterval = setInterval(spawnCatchCoin, 300); // каждые 300мс спавн монетки
-  
+
+  if (catchCoinsTimer) clearInterval(catchCoinsTimer);
+  catchCoinsTimer = setInterval(spawnCatchCoin, 280);
+
   if (catchGameLoop) cancelAnimationFrame(catchGameLoop);
-  function loop() {
+  const loop = () => {
     if (!catchGameActive) return;
     updateCatchPlayerPosition();
     checkCatchCollisions();
     catchGameLoop = requestAnimationFrame(loop);
-  }
+  };
   loop();
-  
+
   if (catchTimer) clearInterval(catchTimer);
   catchTimer = setInterval(() => {
     catchTimerValue--;
     const m = Math.floor(catchTimerValue / 60);
     const s = catchTimerValue % 60;
-    document.getElementById('gameTimer').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    if (catchTimerValue <= 0) {
-      endCatchGame();
-    }
+    const el = document.getElementById('gameTimer');
+    el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    if (catchTimerValue <= 10) el.classList.add('low');
+    if (catchTimerValue <= 0) endCatchGame();
   }, 1000);
 };
 
 function endCatchGame() {
   if (!catchGameActive) return;
   catchGameActive = false;
-  
-  if (catchCoinSpawnInterval) clearInterval(catchCoinSpawnInterval);
+
+  if (catchCoinsTimer) clearInterval(catchCoinsTimer);
   if (catchTimer) clearInterval(catchTimer);
   if (catchGameLoop) cancelAnimationFrame(catchGameLoop);
-  
+
   catchCoins.forEach(c => c.remove());
   catchCoins = [];
-  
+
   const scene = document.getElementById('gameScene');
   if (catchMoveHandler) scene.removeEventListener('mousemove', catchMoveHandler);
   if (catchTouchHandler) scene.removeEventListener('touchmove', catchTouchHandler);
-  
-  // ЛОГИКА ПОДСЧЕТА
-  let isWin = catchScoreGood > catchScoreEvil;
-  let isDraw = catchScoreGood === catchScoreEvil;
-  
-  const overlay = document.getElementById('gameResultOverlay');
-  const coinFlip = document.getElementById('coinFlip');
-  const title = document.getElementById('gameResultTitle');
-  const profitEl = document.getElementById('gameResultProfit');
-  
-  overlay.classList.add('show');
-  
-  // Запускаем анимацию монетки
-  setTimeout(() => {
-    coinFlip.classList.add('flipping');
-  }, 100);
 
-  setTimeout(() => {
-    // После того как монетка докрутилась
-    if (isDraw) {
-      // Если ничья, просто решаем по рандому для визуала, но возвращаем ставку
-      isWin = Math.random() < 0.5;
-      // Но по факту это ничья, просто показываем монетку
-      title.textContent = 'НИЧЬЯ';
-      title.className = 'game-result-title show draw';
-      profitEl.textContent = `Возврат ${catchGameBet}`;
-      balance += catchGameBet;
-      saveCache(); updateBalanceUI();
-      playCoin();
-    } else if (isWin) {
-      title.textContent = 'ПОБЕДА';
-      title.className = 'game-result-title show win';
-      profitEl.textContent = `+${catchGameBet}`;
-      balance += catchGameBet * 2;
-      saveCache(); updateBalanceUI();
-      playWin(); vibratePattern([30,50,30,50,60]);
-    } else {
-      title.textContent = 'ПОРАЖЕНИЕ';
-      title.className = 'game-result-title show lose';
-      profitEl.textContent = `-${catchGameBet}`;
-      // Ставка уже списана
-      playLose(); vibratePattern([50,30,100]);
-    }
-    profitEl.classList.add('show');
-    
-    // Ставим правильную картинку на монетку
-    if (isWin) {
-      coinFlip.style.transform = 'rotateY(0deg)'; // Добрая
-    } else {
-      coinFlip.style.transform = 'rotateY(180deg)'; // Злая
-    }
-    coinFlip.style.transition = 'transform 0.5s'; // Быстрый доворот
-  }, 2500); // Ждем 2.5 сек пока крутится
+  // Определяем результат
+  let kind = 'draw';
+  let profit = 0;
+  if (catchScoreGood > catchScoreEvil) { kind = 'win';  profit = catchBet * 2; }
+  else if (catchScoreGood < catchScoreEvil) { kind = 'lose'; profit = 0; }
+  else { kind = 'draw'; profit = catchBet; }
+
+  if (profit > 0) { balance += profit; saveCache(); updateBalanceUI(); }
+
+  showCatchResult(kind, profit);
 }
 
-window.closeCatchGame = function() {
+function showCatchResult(kind, profit) {
+  const overlay = document.getElementById('gameResultOverlay');
+  const coin = document.getElementById('resultCoin');
+  const caption = document.getElementById('resultCaption');
+  const title = document.getElementById('gameResultTitle');
+  const sub = document.getElementById('gameResultSub');
+  const profitEl = document.getElementById('gameResultProfit');
+
+  overlay.style.display = 'flex';
+
+  // сброс
+  coin.className = 'result-coin';
+  title.className = 'game-result-title';
+  title.textContent = '';
+  sub.textContent = '';
+  profitEl.innerHTML = '';
+  caption.textContent = 'Бросаем монетку…';
+
+  // фаза 1 — крутим
+  requestAnimationFrame(() => {
+    coin.classList.add('spin');
+  });
+
+  // фаза 2 — «падает» на нужную сторону
+  setTimeout(() => {
+    coin.classList.remove('spin');
+    const landedGood = kind !== 'lose';
+    coin.classList.add(landedGood ? 'landed-good' : 'landed-evil');
+
+    if (kind === 'win') { playWin(); vibratePattern([30,50,30,50,60]); }
+    else if (kind === 'draw') { playCoin(); }
+    else { playLose(); vibratePattern([50,30,100]); }
+
+    // фаза 3 — показываем подписи (без чисел добрых/злых)
+    setTimeout(() => {
+      if (kind === 'win') {
+        title.textContent = 'ПОБЕДА';
+        title.classList.add('win');
+        sub.textContent = 'Добрая монета на твоей стороне';
+        profitEl.innerHTML = `+${profit} <img src="${COIN_IMG}" alt="coin">`;
+      } else if (kind === 'draw') {
+        title.textContent = 'НИЧЬЯ';
+        title.classList.add('draw');
+        sub.textContent = 'Ставка возвращена';
+        profitEl.innerHTML = `${profit} <img src="${COIN_IMG}" alt="coin">`;
+      } else {
+        title.textContent = 'ПОРАЖЕНИЕ';
+        title.classList.add('lose');
+        sub.textContent = 'Злая монета оказалась сильнее';
+        profitEl.innerHTML = `-${catchBet} <img src="${COIN_IMG}" alt="coin">`;
+      }
+      caption.textContent = landedGood ? 'Выпала добрая монета' : 'Выпала злая монета';
+    }, 450);
+  }, 1400);
+}
+
+window.closeCatchGame = function () {
   document.getElementById('gameScene').classList.remove('active');
   document.getElementById('catchMainBlock').style.display = 'block';
-  document.getElementById('gameResultOverlay').classList.remove('show');
-  document.getElementById('catchBetInput').value = '';
-  document.getElementById('catchMsg').textContent = '';
+  document.getElementById('gameResultOverlay').style.display = 'none';
+  const input = document.getElementById('catchBetInput');
+  if (input) input.value = '';
+  const msg = document.getElementById('catchMsg');
+  if (msg) msg.textContent = '';
 };
 
 // ================== СТАРТ ==================
@@ -2696,14 +3022,13 @@ async function init() {
   maintenanceInterval = setInterval(checkMaintenance, 1000);
 
   if (statsInterval) clearInterval(statsInterval);
-  statsInterval = setInterval(fetchStats, 5000); // Обновляем стату каждые 5 сек
+  statsInterval = setInterval(fetchStats, 5000);
 
   if (announcementInterval) clearInterval(announcementInterval);
   announcementInterval = setInterval(checkAnnouncement, 1000);
 }
 window.addEventListener('load', () => {
   setTimeout(async () => {
-    // Проверка на Telegram (если нет Telegram WebApp, блокируем)
     if (!window.Telegram || !window.Telegram.WebApp) {
       document.getElementById('telegramWarning').style.display = 'flex';
       document.getElementById('mainApp').style.display = 'none';
