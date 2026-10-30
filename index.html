@@ -1322,8 +1322,6 @@ body{
                 </div>
             </div>
 
-            <!-- ФИЛЬТРЫ УБРАНЫ -->
-
             <div id="inventoryTabGrid" class="inventory-tab-grid"></div>
         </div>
     </div>
@@ -1412,7 +1410,7 @@ body{
 
 <script>
 // ================== КОНСТАНТЫ ==================
-const API_URL = 'https://brainrolltester.onrender.com';
+const API_URL = 'https://brainrotwin.onrender.com';
 const ADMIN_USERNAMES = ['saintezz7', 'vortyn1'];
 const COIN_IMG = 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png';
 const DEFAULT_AVATAR = 'https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg';
@@ -1518,7 +1516,10 @@ let USER = { nick: 'Гость', tg: '@guest', tgLink: '#', id: null, username: 
 let customNick = localStorage.getItem('ggbrainx_custom_nick') || null;
 let customAvatar = localStorage.getItem('ggbrainx_custom_avatar') || null;
 
-let balance = parseFloat(localStorage.getItem('ggbrainx_cached_balance') || '0');
+// Стартовый баланс 500, если в кэше ничего нет
+const cachedBal = localStorage.getItem('ggbrainx_cached_balance');
+let balance = cachedBal !== null ? parseFloat(cachedBal) : 500;
+
 let inventory = JSON.parse(localStorage.getItem('ggbrainx_cached_inventory') || '[]');
 
 let deposits = [];
@@ -1694,9 +1695,14 @@ function saveCache() {
   localStorage.setItem('ggbrainx_cached_inventory', JSON.stringify(inventory));
 }
 
+// Синхронизация баланса с сервером — теперь через /api/user/update
 async function syncBalanceToServer() {
   try {
-    await api('/api/balance/sync', { balance: Number(balance) });
+    await api('/api/user/update', {
+      custom_nick: customNick || '',
+      avatar: customAvatar || '',
+      balance: Number(balance)
+    });
   } catch (e) { }
 }
 
@@ -1720,7 +1726,18 @@ async function loadUserFromServer() {
   try {
     const res = await fetch(API_URL + '/api/user/' + encodeURIComponent(getTelegramId()));
     const data = await res.json();
-    if (data.ok && data.user) applyServerUser(data.user);
+    if (data.ok && data.user) {
+      const u = data.user;
+      const isNewUser =
+        (typeof u.balance !== 'number' || u.balance === 0) &&
+        (!Array.isArray(u.inventory) || u.inventory.length === 0);
+      if (isNewUser && balance === 500) {
+        // Новому пользователю выдаём стартовые 500 и синхронизируем
+        u.balance = 500;
+        setTimeout(() => syncBalanceToServer(), 200);
+      }
+      applyServerUser(u);
+    }
   } catch (e) { console.warn('[SYNC] сервер недоступен, используем кэш'); }
 }
 
@@ -2476,7 +2493,6 @@ function renderInventoryTab() {
     return;
   }
   
-  // Показываем все предметы, без фильтров
   const filtered = inventory.map((id, index) => ({ id, index, item: getItemById(id) })).filter(x => x.item);
 
   grid.innerHTML = filtered.map(({ id, index, item }) => {
@@ -2692,10 +2708,10 @@ function checkCatchCollisions() {
       const isGood = coin.dataset.good === '1';
       if (isGood) {
         catchScoreGood++;
-        vibrate(10); // Только вибрация, без звука
+        vibrate(10);
       } else {
         catchScoreEvil++;
-        vibrate(15); // Только вибрация, без звука
+        vibrate(15);
       }
       coin.remove();
       catchCoins = catchCoins.filter(c => c !== coin);
