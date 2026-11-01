@@ -15,6 +15,7 @@ const WITHDRAWS_FILE = path.join(DATA_DIR, 'withdraws.json');
 const MAINTENANCE_FILE = path.join(DATA_DIR, 'maintenance.json');
 const ANNOUNCEMENT_FILE = path.join(DATA_DIR, 'announcement.json');
 const STATS_FILE = path.join(DATA_DIR, 'stats.json');
+const BANS_FILE = path.join(DATA_DIR, 'bans.json');
 
 const ADMIN_USERNAMES = ['saintezz7', 'vortyn1'];
 
@@ -106,6 +107,8 @@ let maintenance = { enabled: false, since: null, by: '' };
 let currentAnnouncement = null;
 let stats = { total_upgrades: 0, total_cases: 0 };
 let onlineUsers = new Map();
+// Баны юзеров, которых ещё нет в базе (забанили по @username до первого входа)
+let pendingBans = {};
 
 function ensureDataDir() { try { if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (e) {} }
 function loadJSON(file, fallback) { try { if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (err) { console.error('[ERROR] Load', file, err.message); } return fallback; }
@@ -119,6 +122,7 @@ function loadAll() {
   maintenance = loadJSON(MAINTENANCE_FILE, { enabled: false, since: null, by: '' });
   currentAnnouncement = loadJSON(ANNOUNCEMENT_FILE, null);
   stats = loadJSON(STATS_FILE, { total_upgrades: 0, total_cases: 0 });
+  pendingBans = loadJSON(BANS_FILE, {});
 }
 function savePromos() { saveJSON(PROMO_FILE, promocodes); }
 function saveUsers() { saveJSON(USERS_FILE, users); }
@@ -127,6 +131,7 @@ function saveWithdraws() { saveJSON(WITHDRAWS_FILE, withdraws); }
 function saveMaintenance() { saveJSON(MAINTENANCE_FILE, maintenance); }
 function saveAnnouncement() { saveJSON(ANNOUNCEMENT_FILE, currentAnnouncement); }
 function saveStats() { saveJSON(STATS_FILE, stats); }
+function saveBans() { saveJSON(BANS_FILE, pendingBans); }
 
 function updateOnline(telegramId) {
   if (!telegramId) return;
@@ -146,7 +151,7 @@ function getOnlineCount() {
 }
 
 function setCORS(res) { res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS'); res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Telegram-Init-Data'); }
-function sendJSON(res, status, data) { setCORS(res); res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(data)); }
+function sendJSON(res, status, data) { setCORS(res); res.setHeader('Cache-Control', 'no-store'); res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(data)); }
 
 function readBody(req) {
   if (req.__body !== undefined) return Promise.resolve(req.__body);
@@ -185,18 +190,93 @@ function getTelegramUser(req, body) {
   if (body && body.telegram_id) return { id: String(body.telegram_id), username: body.username || '' };
   return null;
 }
+function normalizeTarget(target) { return String(target || '').trim().replace(/^@+/, ''); }
+function findUserByTarget(target) {
+  const t = normalizeTarget(target);
+  if (!t) return null;
+  if (users[t]) return { id: String(t), user: users[t] };
+  const low = t.toLowerCase();
+  for (const id in users) {
+    if (String(users[id].username || '').toLowerCase() === low) return { id: String(id), user: users[id] };
+  }
+  return null;
+}
+function isBannedUser(u) { return !!(u && u.ban && u.ban.active); }
+function banInfo(u) { return { reason: (u.ban && u.ban.reason) || 'Не указана', at: (u.ban && u.ban.at) || null, by: (u.ban && u.ban.by) || '' }; }
+function applyBanToUser(u, reason, admin) {
+  u.ban = { active: true, reason: reason || 'Не указана', at: new Date().toISOString(), by: admin || 'admin' };
+  u.unban_notice = null;
+  u.updated_at = new Date().toISOString();
+}
+function applyPendingBan(userId, u) {
+  if (!u) return false;
+  const un = String(u.username || '').toLowerCase();
+  if (!un || !pendingBans[un]) return false;
+  const p = pendingBans[un];
+  applyBanToUser(u, p.reason || 'Не указана', p.by || 'admin');
+  delete pendingBans[un];
+  saveBans();
+  saveUsers();
+  return true;
+}
 function ensureUser(telegramId, username) {
   if (!telegramId) telegramId = 'guest_' + Date.now();
   if (!users[telegramId]) {
-    users[telegramId] = { balance: START_BALANCE, inventory: [], username: username || '', roblox_name: '', custom_nick: '', avatar: '', accent: '', created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+    users[telegramId] = { balance: START_BALANCE, inventory: [], username: username || '', roblox_name: '', custom_nick: '', avatar: '', accent: '', promos_used: [], ban: null, unban_notice: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
   } else if (username && users[telegramId].username !== username) {
     users[telegramId].username = username; users[telegramId].updated_at = new Date().toISOString();
   }
-  return users[telegramId];
+  const u = users[telegramId];
+  if (!Array.isArray(u.promos_used)) u.promos_used = [];
+  applyPendingBan(telegramId, u);
+  return u;
 }
 function isAdmin(username) { return ADMIN_USERNAMES.includes((username || '').toLowerCase()); }
 function computePendingWithdrawIds(telegramId) { const s = new Set(); for (const w of withdraws) { if (w.status === 'pending' && String(w.telegram_id) === String(telegramId)) s.add(w.item_id); } return [...s]; }
-function publicUser(u, telegramId) { return { balance: u.balance || 0, inventory: Array.isArray(u.inventory) ? u.inventory : [], username: u.username || '', custom_nick: u.custom_nick || '', avatar: u.avatar || '', pending_withdraw_ids: computePendingWithdrawIds(telegramId) }; }
+function computePendingWithdrawDetails(telegramId) {
+  const map = {};
+  for (const w of withdraws) {
+    if (w.status === 'pending' && String(w.telegram_id) === String(telegramId)) {
+      map[w.item_id] = { time: w.time_slot, ts: w.created_at };
+    }
+  }
+  return map;
+}
+function publicUser(u, telegramId) {
+  const banned = isBannedUser(u);
+  return {
+    balance: u.balance || 0,
+    inventory: Array.isArray(u.inventory) ? u.inventory : [],
+    username: u.username || '',
+    custom_nick: u.custom_nick || '',
+    avatar: u.avatar || '',
+    pending_withdraw_ids: computePendingWithdrawIds(telegramId),
+    pending_withdraw_details: computePendingWithdrawDetails(telegramId),
+    banned,
+    ban: banned ? banInfo(u) : null,
+    unban_notice: (u.unban_notice && !u.unban_notice.seen) ? { reason: u.unban_notice.reason || 'Решение администрации', at: u.unban_notice.at || null } : null
+  };
+}
+function denyIfBanned(res, u) {
+  if (isBannedUser(u)) {
+    sendJSON(res, 403, { ok: false, error: 'BANNED', message: 'Вы заблокированы по решению администрации', ban: banInfo(u) });
+    return true;
+  }
+  return false;
+}
+function listActiveBans() {
+  const list = [];
+  for (const id in users) {
+    const u = users[id];
+    if (isBannedUser(u)) list.push({ id, username: u.username || '', reason: u.ban.reason || 'Не указана', at: u.ban.at || null, by: u.ban.by || '', pending: false });
+  }
+  for (const name in pendingBans) {
+    const p = pendingBans[name];
+    list.push({ id: null, username: name, reason: p.reason || 'Не указана', at: p.at || null, by: p.by || '', pending: true });
+  }
+  list.sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')));
+  return list;
+}
 
 const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { setCORS(res); res.writeHead(204); res.end(); return; }
@@ -230,6 +310,7 @@ const server = http.createServer(async (req, res) => {
         (req.method === 'GET' && req.url === '/api/maintenance') ||
         (req.method === 'GET' && req.url === '/api/stats') ||
         (req.method === 'GET' && req.url === '/api/announcement') ||
+        (req.method === 'GET' && req.url.startsWith('/api/admin/bans')) ||
         (req.method === 'POST' && req.url === '/api/admin/maintenance');
 
       if (!allowed) {
@@ -273,6 +354,64 @@ const server = http.createServer(async (req, res) => {
       return sendJSON(res, 200, { ok: true, announcement: currentAnnouncement });
     }
 
+    // ================== БАНЫ (АДМИН) ==================
+    if (req.method === 'POST' && req.url === '/api/admin/ban') {
+      const body = await readBody(req);
+      const admin = (body.admin_username || '').toLowerCase();
+      if (!isAdmin(admin)) return sendJSON(res, 403, { ok: false, error: 'Нет доступа' });
+      const target = normalizeTarget(body.target);
+      const reason = String(body.reason || '').trim() || 'Не указана';
+      if (!target) return sendJSON(res, 400, { ok: false, error: 'Введите юзера в тг' });
+      const found = findUserByTarget(target);
+      if (found) {
+        if ((found.user.username || '').toLowerCase() === admin) {
+          return sendJSON(res, 400, { ok: false, error: 'Нельзя забанить самого себя' });
+        }
+        applyBanToUser(found.user, reason, admin);
+        saveUsers();
+        return sendJSON(res, 200, { ok: true, banned: true, reason, user: { id: found.id, username: found.user.username || target } });
+      }
+      if (/^\d+$/.test(target)) return sendJSON(res, 404, { ok: false, error: 'Юзер с таким ID не найден' });
+      const low = target.toLowerCase();
+      if (!/^[a-z0-9_]{2,64}$/i.test(low)) return sendJSON(res, 400, { ok: false, error: 'Неверный юзернейм' });
+      pendingBans[low] = { reason, at: new Date().toISOString(), by: admin };
+      saveBans();
+      return sendJSON(res, 200, { ok: true, banned: true, pending: true, reason, user: { id: null, username: low } });
+    }
+    if (req.method === 'POST' && req.url === '/api/admin/unban') {
+      const body = await readBody(req);
+      const admin = (body.admin_username || '').toLowerCase();
+      if (!isAdmin(admin)) return sendJSON(res, 403, { ok: false, error: 'Нет доступа' });
+      const target = normalizeTarget(body.target);
+      const reason = String(body.reason || '').trim();
+      if (!target) return sendJSON(res, 400, { ok: false, error: 'Введите юзера в тг' });
+      const found = findUserByTarget(target);
+      if (found) {
+        const u = found.user;
+        if (!isBannedUser(u)) return sendJSON(res, 400, { ok: false, error: 'Этот юзер не забанен' });
+        const finalReason = reason || u.ban.reason || 'Решение администрации';
+        u.ban = { active: false, reason: u.ban.reason || 'Не указана', at: u.ban.at || null, by: u.ban.by || '', unbanned_at: new Date().toISOString(), unbanned_by: admin, unban_reason: finalReason };
+        u.unban_notice = { reason: finalReason, at: new Date().toISOString(), by: admin, seen: false };
+        u.updated_at = new Date().toISOString();
+        saveUsers();
+        return sendJSON(res, 200, { ok: true, unbanned: true, reason: finalReason, user: { id: found.id, username: u.username || target } });
+      }
+      const low = target.toLowerCase();
+      if (pendingBans[low]) {
+        const finalReason = reason || pendingBans[low].reason || 'Решение администрации';
+        delete pendingBans[low];
+        saveBans();
+        return sendJSON(res, 200, { ok: true, unbanned: true, pending: true, reason: finalReason, user: { id: null, username: low } });
+      }
+      return sendJSON(res, 404, { ok: false, error: 'Юзер не найден' });
+    }
+    if (req.method === 'GET' && req.url.startsWith('/api/admin/bans')) {
+      const reqUrl = new URL(req.url, 'http://localhost');
+      const admin = (reqUrl.searchParams.get('admin') || '').toLowerCase();
+      if (!isAdmin(admin)) return sendJSON(res, 403, { ok: false, error: 'Нет доступа' });
+      return sendJSON(res, 200, { ok: true, bans: listActiveBans() });
+    }
+
     if (req.method === 'POST' && req.url === '/api/create') {
       const body = await readBody(req);
       const { code, uses, type, value, admin_username } = body;
@@ -288,17 +427,29 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && req.url === '/api/activate') {
       const body = await readBody(req);
       const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
+      const u = ensureUser(user.id, user.username);
+      if (denyIfBanned(res, u)) return;
       const { code } = body;
       if (!code) return sendJSON(res, 400, { ok: false, error: 'Введите промокод' });
       const upperCode = code.trim().toUpperCase();
+
+      // 1 человек = 1 активация промокода. Проверка и запись идут синхронно,
+      // поэтому даже 10 быстрых нажатий подряд активируют промокод только один раз.
+      if (!Array.isArray(u.promos_used)) u.promos_used = [];
+      if (u.promos_used.includes(upperCode)) {
+        return sendJSON(res, 409, { ok: false, error: 'Вы уже активировали этот промокод. Один человек — одна активация.' });
+      }
+
       const promo = promocodes[upperCode];
       if (!promo) return sendJSON(res, 404, { ok: false, error: 'Промокод не найден' });
       if (promo.uses <= 0) return sendJSON(res, 410, { ok: false, error: 'Промокод больше не активен' });
-      promo.uses -= 1; savePromos();
-      const u = ensureUser(user.id, user.username);
+      promo.uses -= 1;
+      u.promos_used.push(upperCode);
       if (promo.type === 'balance') u.balance = (u.balance || 0) + promo.value;
       else if (promo.type === 'item') { if (!Array.isArray(u.inventory)) u.inventory = []; u.inventory.push(promo.value); }
-      u.updated_at = new Date().toISOString(); saveUsers();
+      u.updated_at = new Date().toISOString();
+      savePromos();
+      saveUsers();
       return sendJSON(res, 200, { ok: true, type: promo.type, value: promo.value, remaining: promo.uses });
     }
     if (req.method === 'GET' && req.url === '/api/promocodes') return sendJSON(res, 200, { ok: true, promocodes });
@@ -311,6 +462,7 @@ const server = http.createServer(async (req, res) => {
       const c = CASES[case_id]; if (!c) return sendJSON(res, 404, { ok: false, error: 'Кейс не найден' });
       const quantity = Math.max(1, Math.min(5, parseInt(qty) || 1));
       const u = ensureUser(user.id, user.username);
+      if (denyIfBanned(res, u)) return;
       const totalCost = c.price * quantity;
       if (u.balance < totalCost) return sendJSON(res, 400, { ok: false, error: 'Недостаточно монет' });
       u.balance -= totalCost;
@@ -337,6 +489,7 @@ const server = http.createServer(async (req, res) => {
       if (!src || !tgt) return sendJSON(res, 404, { ok: false, error: 'Предмет не найден' });
       if (tgt.price <= src.price) return sendJSON(res, 400, { ok: false, error: 'Цель должна быть дороже' });
       const u = ensureUser(user.id, user.username);
+      if (denyIfBanned(res, u)) return;
       const idx = u.inventory.indexOf(source_item_id);
       if (idx === -1) return sendJSON(res, 400, { ok: false, error: 'Исходный предмет не найден' });
       if (computePendingWithdrawIds(user.id).includes(source_item_id)) return sendJSON(res, 400, { ok: false, error: 'Предмет на выводе' });
@@ -361,6 +514,7 @@ const server = http.createServer(async (req, res) => {
       const { item_id } = body;
       const item = getItem(item_id); if (!item) return sendJSON(res, 404, { ok: false, error: 'Предмет не найден' });
       const u = ensureUser(user.id, user.username);
+      if (denyIfBanned(res, u)) return;
       if (u.balance < item.price) return sendJSON(res, 400, { ok: false, error: 'Недостаточно монет' });
       u.balance -= item.price; u.inventory.push(item_id);
       u.updated_at = new Date().toISOString(); saveUsers();
@@ -373,6 +527,7 @@ const server = http.createServer(async (req, res) => {
       const { item_id } = body;
       const item = getItem(item_id); if (!item) return sendJSON(res, 404, { ok: false, error: 'Предмет не найден' });
       const u = ensureUser(user.id, user.username);
+      if (denyIfBanned(res, u)) return;
       const idx = u.inventory.indexOf(item_id);
       if (idx === -1) return sendJSON(res, 400, { ok: false, error: 'Предмета нет в инвентаре' });
       if (computePendingWithdrawIds(user.id).includes(item_id)) return sendJSON(res, 400, { ok: false, error: 'Предмет на выводе' });
@@ -388,6 +543,7 @@ const server = http.createServer(async (req, res) => {
       const { item_id, roblox_name } = body;
       if (!item_id || !roblox_name) return sendJSON(res, 400, { ok: false, error: 'Не хватает данных' });
       const u = ensureUser(user.id, user.username);
+      if (denyIfBanned(res, u)) return;
       const dep = { id: 'dep_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8), telegram_id: user.id, username: user.username || '', item_id, item_name: getItem(item_id)?.name || '', item_price: getItem(item_id)?.price || 0, base_price: getItem(item_id)?.price || 0, roblox_name, status: 'pending', created_at: new Date().toISOString() };
       deposits.push(dep); saveDeposits();
       return sendJSON(res, 200, { ok: true, deposit: dep });
@@ -417,6 +573,7 @@ const server = http.createServer(async (req, res) => {
       const { item_id, roblox_name, time_slot, comment } = body;
       if (!item_id || !roblox_name || !time_slot) return sendJSON(res, 400, { ok: false, error: 'Не хватает данных' });
       const u = ensureUser(user.id, user.username);
+      if (denyIfBanned(res, u)) return;
       if (u.inventory.indexOf(item_id) === -1) return sendJSON(res, 400, { ok: false, error: 'Предмет не найден в инвентаре' });
       if (withdraws.some(w => w.status === 'pending' && String(w.telegram_id) === String(user.id) && w.item_id === item_id)) return sendJSON(res, 409, { ok: false, error: 'Предмет уже на выводе' });
       const wd = { id: 'wd_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8), telegram_id: user.id, username: user.username || '', item_id, item_name: getItem(item_id)?.name || '', item_price: getItem(item_id)?.price || 0, roblox_name, time_slot, comment: comment || '', status: 'pending', created_at: new Date().toISOString() };
@@ -442,10 +599,34 @@ const server = http.createServer(async (req, res) => {
       return sendJSON(res, 200, { ok: true, withdraw: wd });
     }
 
+    if (req.method === 'GET' && req.url.startsWith('/api/ban/status')) {
+      const reqUrl = new URL(req.url, 'http://localhost');
+      const id = String(reqUrl.searchParams.get('telegram_id') || '');
+      const uname = normalizeTarget(reqUrl.searchParams.get('username') || '');
+      if (!id) return sendJSON(res, 200, { ok: true, banned: false, ban: null, unban_notice: null });
+      const u = ensureUser(id, uname);
+      const banned = isBannedUser(u);
+      return sendJSON(res, 200, {
+        ok: true,
+        banned,
+        ban: banned ? banInfo(u) : null,
+        unban_notice: (u.unban_notice && !u.unban_notice.seen) ? { reason: u.unban_notice.reason || 'Решение администрации', at: u.unban_notice.at || null } : null
+      });
+    }
+    if (req.method === 'POST' && req.url === '/api/unban/ack') {
+      const body = await readBody(req);
+      const id = String(body.telegram_id || '');
+      const u = users[id];
+      if (u && u.unban_notice) { u.unban_notice.seen = true; saveUsers(); }
+      return sendJSON(res, 200, { ok: true });
+    }
+
     if (req.method === 'GET' && req.url.startsWith('/api/user/')) {
-      const id = decodeURIComponent(req.url.slice('/api/user/'.length));
+      const reqUrl = new URL(req.url, 'http://localhost');
+      const id = decodeURIComponent(reqUrl.pathname.slice('/api/user/'.length));
+      const uname = reqUrl.searchParams.get('username') || '';
       updateOnline(id);
-      const u = ensureUser(id); saveUsers();
+      const u = ensureUser(id, uname); saveUsers();
       return sendJSON(res, 200, { ok: true, user: publicUser(u, id) });
     }
     if (req.method === 'POST' && req.url === '/api/user/update') {
@@ -454,6 +635,7 @@ const server = http.createServer(async (req, res) => {
       updateOnline(user.id);
       const { custom_nick, avatar, balance } = body;
       const u = ensureUser(user.id, user.username);
+      if (denyIfBanned(res, u)) return;
       if (typeof custom_nick === 'string') u.custom_nick = custom_nick.slice(0, 20);
       if (typeof avatar === 'string') u.avatar = avatar;
       // 👇 Сохранение баланса с клиента (после мини-игр и т.п.)
