@@ -144,7 +144,7 @@ body{
   position:absolute;top:-30px;left:50%;transform:translateX(-50%);
   width:60px;height:60px;
   filter: drop-shadow(0 4px 14px rgba(62,200,255,1)) drop-shadow(0 0 8px rgba(200,240,255,.8));
-  background: url('https://github.com/saintezz/brainrolltester/blob/main/upgrad.png?raw=true') center/contain no-repeat;
+  background: url('https://github.com/saintezz/BrainrotWin/blob/main/upgrader.png?raw=true') center/contain no-repeat;
   border-radius:50%;
 }
 .arrow-pointer::before{display:none;}
@@ -675,6 +675,14 @@ body{
 }
 .mines-start-btn.cashout {
   background: linear-gradient(135deg, #2ee6c5, #0ea5e9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.mines-start-btn.cashout img {
+  width: 20px;
+  height: 20px;
 }
 
 /* ================== АДМИН: ТАБЫ / ЗАЯВКИ ================== */
@@ -801,7 +809,7 @@ body{
   </div>
   <button class="mobile-nav-btn active" id="mNavMenu" onclick="switchTab('menu'); toggleMobileMenu()">Главное меню</button>
   <button class="mobile-nav-btn" id="mNavUpgrade" onclick="switchTab('upgrade'); toggleMobileMenu()">Апгрейдер</button>
-  <button class="mobile-nav-btn" id="mNavCatch" onclick="switchTab('catch'); toggleMobileMenu()">МИНЫ</button>
+  <button class="mobile-nav-btn" id="mNavCatch" onclick="switchTab('catch'); toggleMobileMenu()">Мины</button>
   <button class="mobile-nav-btn" id="mNavInventory" onclick="switchTab('inventory'); toggleMobileMenu()">Инвентарь</button>
   <button class="mobile-nav-btn" id="mNavPromo" onclick="switchTab('promo'); toggleMobileMenu()">Промокоды</button>
   <button class="mobile-nav-btn" id="mNavProfile" onclick="switchTab('profile'); toggleMobileMenu()">Профиль</button>
@@ -1076,7 +1084,7 @@ body{
             <div class="top-nav-panel">
                 <button class="nav-btn active" id="navMenu" onclick="switchTab('menu')"><span>Главное меню</span></button>
                 <button class="nav-btn" id="navUpgrade" onclick="switchTab('upgrade')"><span>Апгрейдер</span></button>
-                <button class="nav-btn" id="navCatch" onclick="switchTab('catch')"><span>МИНЫ</span></button>
+                <button class="nav-btn" id="navCatch" onclick="switchTab('catch')"><span>Мины</span></button>
                 <button class="nav-btn" id="navInventory" onclick="switchTab('inventory')"><span>Инвентарь</span></button>
                 <button class="nav-btn" id="navPromo" onclick="switchTab('promo')"><span>Промокоды</span></button>
                 <button class="nav-btn" id="navProfile" onclick="switchTab('profile')"><span>Профиль</span></button>
@@ -1208,12 +1216,15 @@ body{
                     <span>Коэффициент</span>
                     <span id="minesCurrentMult">x1.04</span>
                 </div>
-                <div style="font-size:11px; color:var(--text-muted); font-weight:600; margin-bottom:-8px;">Ставка — из инвентаря (до 5 предметов)</div>
-                <div class="mines-info-row">
-                    <span>Инвентарь</span>
-                    <span id="minesInventoryStatus">пуст</span>
+                
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="margin-bottom: 4px;">Выбери предметы для ставки</label>
+                    <div class="shop-scroll" style="max-height: 150px; border: 1px solid var(--glass-border); border-radius: 8px; padding: 4px;">
+                        <div class="inventory-row" id="minesBetGrid" style="gap: 8px; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));"></div>
+                    </div>
                 </div>
-                <div class="mines-info-row" style="background:transparent; border:none; padding:0;">
+
+                <div class="mines-info-row" style="background:transparent; border:none; padding:0; margin-top: 4px;">
                     <span>Ставка:</span>
                     <span style="display:flex; align-items:center; gap:6px;"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" style="width:16px;height:16px;"> <span id="minesBetAmount">0</span></span>
                 </div>
@@ -1465,7 +1476,6 @@ let minesOpenedCount = 0;
 let minesMinesCount = 2;
 let minesBetItems = []; // array of item ids to bet
 let minesCurrentMultiplier = 1.04;
-let minesPotentialWin = 0;
 let minesWinAmount = 0;
 
 (function initTelegramUser() {
@@ -2714,12 +2724,69 @@ function initMinesGame() {
   minesField = [];
   minesOpenedCount = 0;
   minesBetItems = [];
+  minesWinAmount = 0;
   document.getElementById('minesStartBtn').textContent = 'ИГРАТЬ';
   document.getElementById('minesStartBtn').classList.remove('cashout');
-  document.getElementById('minesInventoryStatus').textContent = 'пуст';
   document.getElementById('minesBetAmount').textContent = '0';
   updateMinesChanceDisplay();
+  
+  // Render inventory for bet selection
+  renderMinesBetGrid();
 }
+
+function renderMinesBetGrid() {
+  const grid = document.getElementById('minesBetGrid');
+  if (!grid) return;
+  
+  if (!inventory || inventory.length === 0) {
+    grid.innerHTML = '<div style="font-size:10px; color:var(--text-muted); text-align:center; width:100%; padding:10px;">Инвентарь пуст</div>';
+    return;
+  }
+  
+  // Группируем одинаковые предметы
+  const groups = {};
+  inventory.forEach((id, idx) => {
+    if (!groups[id]) groups[id] = { id, item: getItemById(id), indexes: [] };
+    groups[id].indexes.push(idx);
+  });
+  
+  grid.innerHTML = Object.values(groups).map(g => {
+    const it = g.item; if (!it) return '';
+    const isSelected = minesBetItems.includes(it.id);
+    const count = g.indexes.length;
+    return `<div class="inv-tab-card" style="padding:6px; cursor:pointer; ${isSelected ? 'background:rgba(62,200,255,.2);' : ''}" onclick="toggleMinesBetItem('${it.id}')">
+      <img class="inv-main" style="width:32px; height:32px; margin-bottom:2px;" src="${it.img}" alt="${it.name}" loading="lazy" decoding="async" ${FALLBACK_ATTR}>
+      <div class="inv-name" style="font-size:9px; height:18px; margin-bottom:2px;">${it.name}</div>
+      <div class="inv-price" style="font-size:10px;"><img src="${COIN_IMG}" alt="coin" style="width:8px;height:8px;">${it.price} ${count > 1 ? `(x${count})` : ''}</div>
+    </div>`;
+  }).join('');
+}
+
+window.toggleMinesBetItem = function(itemId) {
+  if (minesGameActive) return;
+  
+  const index = minesBetItems.indexOf(itemId);
+  if (index !== -1) {
+    minesBetItems.splice(index, 1);
+  } else {
+    if (minesBetItems.length >= 5) {
+      alert('Можно выбрать не более 5 предметов для ставки!');
+      return;
+    }
+    minesBetItems.push(itemId);
+  }
+  
+  renderMinesBetGrid();
+  
+  let totalBetValue = 0;
+  minesBetItems.forEach(id => {
+    const it = getItemById(id);
+    if (it) totalBetValue += it.price;
+  });
+  document.getElementById('minesBetAmount').textContent = totalBetValue;
+  
+  playClick(); vibrate(8);
+};
 
 function changeMines(delta) {
   if (minesGameActive) return;
@@ -2754,8 +2821,6 @@ function updateMinesMultiplierButtons() {
 }
 
 function updateMinesChanceDisplay() {
-  // Calculate multiplier based on probability
-  // Simplified logic for visuals
   let mult = 1.04;
   if (minesMinesCount === 2) mult = 1.04;
   else if (minesMinesCount === 3) mult = 1.13;
@@ -2763,7 +2828,6 @@ function updateMinesChanceDisplay() {
   else if (minesMinesCount === 10) mult = 1.37;
   else if (minesMinesCount === 24) mult = 24.00;
   else {
-    // Approximate for others
     mult = 1 + (minesMinesCount * 0.05);
   }
   document.getElementById('minesCurrentMult').textContent = 'x' + mult.toFixed(2);
@@ -2772,7 +2836,6 @@ function updateMinesChanceDisplay() {
 
 function openMineCell(index) {
   if (!minesGameActive) {
-    // If game not active, maybe prompt to select items first
     return;
   }
   if (minesField[index].opened) return;
@@ -2788,7 +2851,9 @@ function openMineCell(index) {
       el.classList.add('opened', 'disabled');
       if (cell.type === 'bomb') {
         el.classList.add('bomb');
-        el.innerHTML = '<span style="font-size:32px;">💣</span>';
+        // Показываем рандомного брейнрота вместо бомбы
+        const randomItem = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+        el.innerHTML = `<img src="${randomItem.img}" ${FALLBACK_ATTR}>`;
       } else {
         const item = getItemById(cell.itemId);
         if (item) el.innerHTML = `<img src="${item.img}" ${FALLBACK_ATTR}>`;
@@ -2811,9 +2876,6 @@ function openMineCell(index) {
   playCoin();
   vibrate(10);
   
-  // Update potential win
-  updateMinesCurrentWin();
-  
   // Check if all safe cells opened (win)
   const totalSafe = 25 - minesMinesCount;
   if (minesOpenedCount === totalSafe) {
@@ -2822,38 +2884,14 @@ function openMineCell(index) {
   }
 }
 
-function updateMinesCurrentWin() {
-  if (minesBetItems.length === 0) return;
-  let totalValue = 0;
-  minesBetItems.forEach(id => {
-    const it = getItemById(id);
-    if (it) totalValue += it.price;
-  });
-  // For simplicity, we just use count of items as value
-  // Let's say bet value is sum of prices of items, capped at 5
-  const potential = totalValue * minesCurrentMultiplier;
-  minesPotentialWin = Math.floor(potential);
-}
-
 async function startMinesGame() {
   if (minesGameActive) {
-    // Cashout
     cashoutMines();
     return;
   }
   
-  // Check if user has items in inventory to bet
-  if (!inventory || inventory.length === 0) {
-    alert('У вас нет предметов для ставки!');
-    return;
-  }
-  
-  // For simplicity, let's just take the first 1-5 items as bet
-  // In a real scenario you'd let user select
-  minesBetItems = inventory.slice(0, Math.min(5, inventory.length));
-  
   if (minesBetItems.length === 0) {
-    alert('Недостаточно предметов для ставки!');
+    alert('Выберите предметы для ставки!');
     return;
   }
   
@@ -2869,7 +2907,21 @@ async function startMinesGame() {
     return;
   }
   
-  // Confirm with API? For now just simulate
+  // Remove bet items from inventory
+  const newInventory = [...inventory];
+  minesBetItems.forEach(betId => {
+    const idx = newInventory.indexOf(betId);
+    if (idx !== -1) newInventory.splice(idx, 1);
+  });
+  
+  // Simulate server call for simplicity we just update inventory
+  inventory = newInventory;
+  updateBalanceUI();
+  syncBalanceToServer();
+  renderInventory();
+  renderInventoryTab();
+  renderProfileInventory();
+  
   minesGameActive = true;
   minesOpenedCount = 0;
   
@@ -2882,19 +2934,18 @@ async function startMinesGame() {
   }
   
   // Fill field
-  const availableItems = ITEMS.filter(it => inventory.includes(it.id));
   for (let i = 0; i < totalCells; i++) {
     if (minesPositions.has(i)) {
       minesField.push({ id: i, type: 'bomb', opened: false });
     } else {
       // Pick random item for safe cell
-      const randomItem = availableItems.length > 0 ? availableItems[Math.floor(Math.random() * availableItems.length)] : ITEMS[Math.floor(Math.random() * ITEMS.length)];
+      const randomItem = ITEMS[Math.floor(Math.random() * ITEMS.length)];
       minesField.push({ id: i, type: 'brainrot', itemId: randomItem.id, opened: false });
     }
   }
   
   // Update UI
-  document.getElementById('minesStartBtn').textContent = 'ЗАБРАТЬ';
+  document.getElementById('minesStartBtn').innerHTML = `ЗАБРАТЬ <img src="${COIN_IMG}" style="width:20px; height:20px; display:inline-block; vertical-align:middle;">`;
   document.getElementById('minesStartBtn').classList.add('cashout');
   
   const board = document.getElementById('minesBoard');
@@ -2907,9 +2958,7 @@ async function startMinesGame() {
     board.appendChild(cell);
   }
   
-  document.getElementById('minesInventoryStatus').textContent = minesBetItems.length + ' предметов';
   document.getElementById('minesBetAmount').textContent = totalBetValue;
-  updateMinesChanceDisplay();
   
   playClick();
   vibrate(15);
@@ -2921,10 +2970,14 @@ function cashoutMines() {
   
   // Calculate winnings
   let totalBetValue = 0;
+  // bet items already removed from inventory, but we need to know value
+  // we can just use the potential win calculated during game
+  // for simplicity let's recalculate from minesBetItems
   minesBetItems.forEach(id => {
     const it = getItemById(id);
     if (it) totalBetValue += it.price;
   });
+  
   const winAmount = Math.floor(totalBetValue * minesCurrentMultiplier);
   
   // Add to balance
@@ -2944,8 +2997,11 @@ function cashoutMines() {
   
   document.getElementById('minesStartBtn').textContent = 'ИГРАТЬ';
   document.getElementById('minesStartBtn').classList.remove('cashout');
-  document.getElementById('minesInventoryStatus').textContent = 'пуст';
   document.getElementById('minesBetAmount').textContent = '0';
+  
+  // Reset bet items after game
+  minesBetItems = [];
+  renderMinesBetGrid();
   
   playWin();
   vibratePattern([30,50,30,50,60]);
