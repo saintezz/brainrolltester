@@ -155,12 +155,14 @@ function getOnlineCount() {
   return count;
 }
 
+// Функция получения начала текущих суток по МСК (UTC+3)
 function getMoscowDateStart() {
   const now = new Date();
   const mskOffset = 3 * 60 * 60 * 1000;
   const mskNow = new Date(now.getTime() + mskOffset);
-  const startMsk = new Date(Date.UTC(mskNow.getUTCFullYear(), mskNow.getUTCMonth(), mskNow.getUTCDate(), 0, 0, 0, 0));
-  return startMsk.getTime() - mskOffset;
+  // Начало суток в UTC, соответствующее 00:00 по МСК
+  const startMskUtc = Date.UTC(mskNow.getUTCFullYear(), mskNow.getUTCMonth(), mskNow.getUTCDate(), 0, 0, 0, 0);
+  return startMskUtc - mskOffset;
 }
 
 function setCORS(res) { res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS'); res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Telegram-Init-Data'); }
@@ -366,19 +368,50 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'GET' && req.url === '/api/live-drops') {
       const startDay = getMoscowDateStart();
+      
+      // Берем все дропы за сегодня по МСК
       const todayDrops = liveDrops.filter(d => d.timestamp >= startDay);
+      
+      // Сортируем по времени (сначала новые)
       todayDrops.sort((a, b) => b.timestamp - a.timestamp);
       
-      const topDrop = todayDrops.reduce((max, d) => (getItem(d.item_id)?.price || 0) > (getItem(max?.item_id)?.price || 0) ? d : max, null);
+      // Находим топ дроп по стоимости
+      let topDrop = null;
+      let maxPrice = -1;
+      for (const d of todayDrops) {
+        const item = getItem(d.item_id);
+        if (item && item.price > maxPrice) {
+          maxPrice = item.price;
+          topDrop = d;
+        }
+      }
       
-      const result = todayDrops.slice(0, 50).map(d => ({
-        ...d,
-        item_price: getItem(d.item_id)?.price || 0,
-        item_name: getItem(d.item_id)?.name || 'Unknown',
-        is_top: topDrop && d.id === topDrop.id
-      }));
+      // Ограничиваем список последних дропов 50 штуками
+      const result = todayDrops.slice(0, 50).map(d => {
+        const item = getItem(d.item_id);
+        return {
+          id: d.id,
+          user: d.user,
+          item_id: d.item_id,
+          item_name: item ? item.name : 'Unknown',
+          item_price: item ? item.price : 0,
+          timestamp: d.timestamp,
+          is_top: topDrop && d.id === topDrop.id
+        };
+      });
 
-      return sendJSON(res, 200, { ok: true, drops: result, top: topDrop ? { ...topDrop, item_price: getItem(topDrop.item_id)?.price || 0, item_name: getItem(topDrop.item_id)?.name || 'Unknown' } : null });
+      return sendJSON(res, 200, {
+        ok: true,
+        drops: result,
+        top: topDrop ? {
+          id: topDrop.id,
+          user: topDrop.user,
+          item_id: topDrop.item_id,
+          item_name: getItem(topDrop.item_id)?.name || 'Unknown',
+          item_price: getItem(topDrop.item_id)?.price || 0,
+          timestamp: topDrop.timestamp
+        } : null
+      });
     }
 
     if (req.method === 'POST' && req.url === '/api/admin/ban') {
@@ -491,7 +524,8 @@ const server = http.createServer(async (req, res) => {
         u.inventory.push(wonId); wonItems.push(wonId);
         liveDrops.push({ id: 'drop_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), user: user.username || user.id, item_id: wonId, timestamp: Date.now() });
       }
-      liveDrops = liveDrops.filter(d => d.timestamp > getMoscowDateStart() - 7*24*60*60*1000).slice(-500); // keep last 7 days, max 500
+      // Сохраняем только последние 7 дней, чтобы не переполнять файл
+      liveDrops = liveDrops.filter(d => d.timestamp > getMoscowDateStart() - 7*24*60*60*1000).slice(-500);
       saveDrops();
       u.updated_at = new Date().toISOString(); saveUsers();
       stats.total_cases += quantity; saveStats();
@@ -655,7 +689,6 @@ const server = http.createServer(async (req, res) => {
       const u = ensureUser(user.id, user.username);
       if (denyIfBanned(res, u)) return;
       
-      // SECURITY FIX: NEVER trust client balance
       if (typeof custom_nick === 'string') u.custom_nick = custom_nick.slice(0, 20);
       if (typeof avatar === 'string') u.avatar = avatar;
       
