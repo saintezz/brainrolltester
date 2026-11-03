@@ -144,7 +144,7 @@ body{
   position:absolute;top:-30px;left:50%;transform:translateX(-50%);
   width:60px;height:60px;
   filter: drop-shadow(0 4px 14px rgba(62,200,255,1)) drop-shadow(0 0 8px rgba(200,240,255,.8));
-  background: url('https://github.com/saintezz/BrainrotWin/blob/main/upgrader.png?raw=true') center/contain no-repeat;
+  background: url('https://github.com/saintezz/brainrolltester/blob/main/upgrad.png?raw=true') center/contain no-repeat;
   border-radius:50%;
 }
 .arrow-pointer::before{display:none;}
@@ -483,8 +483,8 @@ body{
   text-transform: uppercase;
 }
 
-/* ================== МИНЫ ================== */
-.mines-layout {
+/* ================== LIVE DROPS ================== */
+.live-drop-container {
   display: flex;
   gap: 20px;
   max-width: 1000px;
@@ -492,197 +492,136 @@ body{
   align-items: flex-start;
   flex-wrap: wrap;
 }
-.mines-board-wrap {
-  flex: 1 1 500px;
-  background: linear-gradient(145deg, #0c1e30, #071522);
-  border: 1px solid rgba(62,200,255,.4);
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 24px 60px -30px rgba(62,200,255,.6), inset 0 1px 0 rgba(200,240,255,.08);
-}
-.mines-board {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-}
-.mine-cell {
-  aspect-ratio: 1;
-  background: #0a1826;
-  border-radius: 10px;
-  border: 1px solid rgba(62,200,255,.2);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all .15s ease;
-  position: relative;
-  overflow: hidden;
-  box-shadow: inset 0 2px 10px rgba(0,0,0,.5);
-}
-.mine-cell:hover:not(.opened):not(.disabled) {
-  background: #122638;
-  border-color: var(--color-cyan);
-  transform: scale(1.02);
-}
-.mine-cell.opened {
-  background: rgba(62,200,255,.1);
-  border-color: rgba(62,200,255,.5);
-  cursor: default;
-  box-shadow: inset 0 0 15px rgba(62,200,255,.2);
-}
-.mine-cell.bomb {
-  background: rgba(255,123,138,.15);
-  border-color: var(--color-red);
-  box-shadow: inset 0 0 20px rgba(255,123,138,.3);
-}
-.mine-cell img {
-  width: 80%;
-  height: 80%;
-  object-fit: contain;
-  pointer-events: none;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,.5));
-  animation: popIn .3s ease-out;
-}
-@keyframes popIn {
-  from { transform: scale(0.5); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-.mines-controls {
+.live-drop-sidebar {
   flex: 0 1 300px;
   background: linear-gradient(145deg, #0c1e30, #071522);
   border: 1px solid rgba(62,200,255,.4);
   border-radius: 16px;
-  padding: 20px;
+  padding: 16px;
+  box-shadow: 0 24px 60px -30px rgba(62,200,255,.6);
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  box-shadow: 0 24px 60px -30px rgba(62,200,255,.6), inset 0 1px 0 rgba(200,240,255,.08);
+  gap: 12px;
 }
-.mines-control-title {
-  font-size: 14px;
+.live-drop-top {
+  background: radial-gradient(120% 90% at 50% 0%, rgba(255,224,102,.15), transparent 60%), var(--bg-surface);
+  border: 1px solid var(--color-gold);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.live-drop-top::before {
+  content: '👑';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 20px;
+  filter: drop-shadow(0 0 8px #ffe066);
+}
+.live-drop-top-label {
+  font-size: 10px;
   font-weight: 800;
-  color: var(--color-cyan);
+  color: var(--color-gold);
   text-transform: uppercase;
   letter-spacing: 1px;
+  margin-bottom: 8px;
+  text-shadow: 0 0 10px rgba(255,224,102,.5);
 }
-.mines-bet-input {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--bg-void);
-  border: 1px solid var(--glass-border);
-  border-radius: 10px;
-  padding: 6px;
+.live-drop-top img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.6));
 }
-.mines-bet-input input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 18px;
+.live-drop-top-name {
+  font-size: 14px;
   font-weight: 800;
-  text-align: center;
-  outline: none;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 4px;
 }
-.mines-bet-input button {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: rgba(62,200,255,.1);
-  border: 1px solid rgba(62,200,255,.4);
-  color: var(--color-cyan);
-  font-size: 18px;
+.live-drop-top-price {
+  font-size: 13px;
   font-weight: 900;
-  cursor: pointer;
+  color: var(--color-gold);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all .15s;
+  gap: 4px;
 }
-.mines-bet-input button:hover {
-  background: rgba(62,200,255,.25);
+.live-drop-top-price img {
+  width: 14px;
+  height: 14px;
+  margin: 0;
 }
-.mines-multipliers {
+
+.live-drop-list {
   display: flex;
+  flex-direction: column;
   gap: 6px;
-  flex-wrap: wrap;
+  max-height: 500px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding-right: 4px;
 }
-.mines-mult-btn {
-  flex: 1 1 calc(33% - 6px);
-  padding: 8px 4px;
-  border-radius: 6px;
-  background: rgba(140,210,255,.05);
+.live-drop-list::-webkit-scrollbar { width: 6px; }
+.live-drop-list::-webkit-scrollbar-thumb { background: rgba(140,210,255,0.2); border-radius: 6px; }
+
+.live-drop-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-surface);
   border: 1px solid var(--glass-border);
-  color: var(--text-muted);
+  border-radius: 12px;
+  padding: 10px;
+  transition: transform .15s, border-color .15s;
+}
+.live-drop-item:hover {
+  transform: translateX(4px);
+  border-color: var(--color-cyan);
+}
+.live-drop-item img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.live-drop-item-info {
+  flex: 1;
+  min-width: 0;
+}
+.live-drop-item-user {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-cyan);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.live-drop-item-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.live-drop-item-price {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   font-size: 12px;
   font-weight: 800;
-  cursor: pointer;
-  text-align: center;
-  transition: all .15s;
-}
-.mines-mult-btn:hover {
-  background: rgba(62,200,255,.15);
-  color: #fff;
-}
-.mines-mult-btn.active {
-  background: var(--color-cyan);
-  color: #04121a;
-  border-color: var(--color-cyan);
-  box-shadow: 0 0 16px -4px rgba(62,200,255,.8);
-}
-.mines-info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  background: var(--bg-void);
-  border-radius: 8px;
-  border: 1px solid var(--glass-border);
-  font-size: 13px;
-  font-weight: 600;
-}
-.mines-info-row span:last-child {
-  font-weight: 800;
   color: var(--color-cyan);
+  flex-shrink: 0;
 }
-.mines-start-btn {
-  width: 100%;
-  padding: 16px;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--color-cyan), var(--color-purple-deep));
-  color: #04121a;
-  font-size: 16px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all .15s;
-  box-shadow: 0 10px 30px -8px rgba(62,200,255,.9);
-  margin-top: auto;
-}
-.mines-start-btn:hover:not(:disabled) {
-  filter: brightness(1.15);
-  transform: translateY(-2px);
-}
-.mines-start-btn:disabled {
-  opacity: .5;
-  cursor: not-allowed;
-  background: var(--bg-surface-hover);
-  color: var(--text-muted);
-  box-shadow: none;
-}
-.mines-start-btn.cashout {
-  background: linear-gradient(135deg, #2ee6c5, #0ea5e9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-.mines-start-btn.cashout img {
-  width: 20px;
-  height: 20px;
+.live-drop-item-price img {
+  width: 12px;
+  height: 12px;
 }
 
 /* ================== АДМИН: ТАБЫ / ЗАЯВКИ ================== */
@@ -781,9 +720,9 @@ body{
   .ban-reason-block{margin-top:20px;padding:14px;}
   .ban-reason-value{font-size:15px;}
   
-  .mines-layout { flex-direction: column; }
-  .mines-board-wrap { width: 100%; flex: none; padding: 10px; }
-  .mines-controls { width: 100%; flex: none; }
+  .live-drop-container { flex-direction: column; }
+  .live-drop-sidebar { width: 100%; flex: none; }
+  .live-drop-list { max-height: 300px; }
 }
 </style>
 </head>
@@ -810,6 +749,7 @@ body{
   <button class="mobile-nav-btn active" id="mNavMenu" onclick="switchTab('menu'); toggleMobileMenu()">Главное меню</button>
   <button class="mobile-nav-btn" id="mNavUpgrade" onclick="switchTab('upgrade'); toggleMobileMenu()">Апгрейдер</button>
   <button class="mobile-nav-btn" id="mNavCatch" onclick="switchTab('catch'); toggleMobileMenu()">Мины</button>
+  <button class="mobile-nav-btn" id="mNavDrop" onclick="switchTab('drop'); toggleMobileMenu()">Live Drop</button>
   <button class="mobile-nav-btn" id="mNavInventory" onclick="switchTab('inventory'); toggleMobileMenu()">Инвентарь</button>
   <button class="mobile-nav-btn" id="mNavPromo" onclick="switchTab('promo'); toggleMobileMenu()">Промокоды</button>
   <button class="mobile-nav-btn" id="mNavProfile" onclick="switchTab('profile'); toggleMobileMenu()">Профиль</button>
@@ -1085,6 +1025,7 @@ body{
                 <button class="nav-btn active" id="navMenu" onclick="switchTab('menu')"><span>Главное меню</span></button>
                 <button class="nav-btn" id="navUpgrade" onclick="switchTab('upgrade')"><span>Апгрейдер</span></button>
                 <button class="nav-btn" id="navCatch" onclick="switchTab('catch')"><span>Мины</span></button>
+                <button class="nav-btn" id="navDrop" onclick="switchTab('drop')"><span>Live Drop</span></button>
                 <button class="nav-btn" id="navInventory" onclick="switchTab('inventory')"><span>Инвентарь</span></button>
                 <button class="nav-btn" id="navPromo" onclick="switchTab('promo')"><span>Промокоды</span></button>
                 <button class="nav-btn" id="navProfile" onclick="switchTab('profile')"><span>Профиль</span></button>
@@ -1229,6 +1170,26 @@ body{
                     <span style="display:flex; align-items:center; gap:6px;"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" style="width:16px;height:16px;"> <span id="minesBetAmount">0</span></span>
                 </div>
                 <button class="mines-start-btn" id="minesStartBtn" onclick="startMinesGame()">ИГРАТЬ</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-panel" id="panelDrop">
+        <div class="live-drop-container">
+            <div class="live-drop-sidebar">
+                <div class="live-drop-top" id="liveDropTop">
+                    <div class="live-drop-top-label">Топ-дроп дня</div>
+                    <img src="" id="liveDropTopImg" alt="Top Drop">
+                    <div class="live-drop-top-name" id="liveDropTopName">—</div>
+                    <div class="live-drop-top-price">
+                        <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin">
+                        <span id="liveDropTopPrice">0</span>
+                    </div>
+                </div>
+                <div style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Последние дропы</div>
+                <div class="live-drop-list" id="liveDropList">
+                    <!-- items loaded via JS -->
+                </div>
             </div>
         </div>
     </div>
@@ -1468,15 +1429,7 @@ const SPIN_DURATION_FAST = 5000;
 const CIRCUMFERENCE = 2 * Math.PI * 130;
 
 let invFilter = 'all';
-
-// ================== MINES STATE ==================
-let minesGameActive = false;
-let minesField = []; // { id, type: 'brainrot'|'bomb', itemId }
-let minesOpenedCount = 0;
-let minesMinesCount = 2;
-let minesBetItems = []; // array of item ids to bet
-let minesCurrentMultiplier = 1.04;
-let minesWinAmount = 0;
+let dropInterval = null;
 
 (function initTelegramUser() {
   try {
@@ -1551,6 +1504,58 @@ function renderAnnouncement(ann) {
   container.appendChild(el);
 }
 
+// ================== LIVE DROPS ==================
+async function checkLiveDrops() {
+  try {
+    const res = await fetch(API_URL + '/api/live-drops');
+    const data = await res.json();
+    if (data.ok) {
+      renderLiveDrops(data.drops, data.top);
+    }
+  } catch (e) {}
+}
+
+function renderLiveDrops(drops, top) {
+  const topImg = document.getElementById('liveDropTopImg');
+  const topName = document.getElementById('liveDropTopName');
+  const topPrice = document.getElementById('liveDropTopPrice');
+  
+  if (top && topImg && topName && topPrice) {
+    const item = getItemById(top.item_id);
+    if (item) {
+      topImg.src = item.img;
+      topImg.onerror = () => { topImg.src = FALLBACK_IMG; };
+      topName.textContent = item.name;
+      topPrice.textContent = item.price.toLocaleString('ru-RU');
+    }
+  } else if (topImg && topName && topPrice) {
+    topImg.src = FALLBACK_IMG;
+    topName.textContent = '—';
+    topPrice.textContent = '0';
+  }
+
+  const list = document.getElementById('liveDropList');
+  if (!list) return;
+
+  if (!drops || drops.length === 0) {
+    list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">Пока нет дропов</div>';
+    return;
+  }
+
+  list.innerHTML = drops.map(d => {
+    const item = getItemById(d.item_id);
+    if (!item) return '';
+    return `<div class="live-drop-item">
+      <img src="${item.img}" alt="${item.name}" loading="lazy" decoding="async" ${FALLBACK_ATTR}>
+      <div class="live-drop-item-info">
+        <div class="live-drop-item-user">@${d.user}</div>
+        <div class="live-drop-item-name">${item.name}</div>
+      </div>
+      <div class="live-drop-item-price"><img src="${COIN_IMG}" alt="coin">${item.price.toLocaleString('ru-RU')}</div>
+    </div>`;
+  }).join('');
+}
+
 // ================== ТЕХПЕРЕРЫВ ==================
 function applyMaintenanceState(enabled) {
   maintenanceEnabled = !!enabled;
@@ -1597,19 +1602,6 @@ async function api(path, body) {
     showBanOverlay(data.ban || null);
   }
   return data;
-}
-
-function saveCache() {
-}
-
-async function syncBalanceToServer() {
-  try {
-    await api('/api/user/update', {
-      custom_nick: customNick || '',
-      avatar: customAvatar || '',
-      balance: Number(balance)
-    });
-  } catch (e) { }
 }
 
 function applyServerUser(data) {
@@ -1805,6 +1797,7 @@ window.switchTab = function(tab) {
   if (tab === 'upgrade') { renderInventory(); renderShop(); updateUpgradeScreen(); }
   if (tab === 'catch') { initMinesGame(); }
   if (tab === 'inventory') renderInventoryTab();
+  if (tab === 'drop') { checkLiveDrops(); }
 };
 
 // ================== ПРОФИЛЬ ==================
@@ -2708,18 +2701,24 @@ window.activateAutoPromo = function() { const promo = getCurrentAutoPromo(); act
 function updateTopupPromoDisplay() { const infoBlock = document.getElementById('activePromoInfo'); const bonusSpan = document.getElementById('activePromoBonus'); if (activePromo) { if (infoBlock) infoBlock.style.display = 'block'; if (bonusSpan) bonusSpan.textContent = '+' + activePromo.bonus + '%'; } else if (infoBlock) infoBlock.style.display = 'none'; updateTopupPrice(); }
 
 // ================== ИГРА «МИНЫ» ==================
+let minesGameActive = false;
+let minesField = [];
+let minesOpenedCount = 0;
+let minesMinesCount = 2;
+let minesBetItems = [];
+let minesCurrentMultiplier = 1.04;
+let minesWinAmount = 0;
+
 function initMinesGame() {
   const board = document.getElementById('minesBoard');
   if (!board) return;
   
-  // Generate 5x5 board
   let cellsHtml = '';
   for (let i = 0; i < 25; i++) {
     cellsHtml += `<div class="mine-cell" id="mineCell_${i}" onclick="openMineCell(${i})"></div>`;
   }
   board.innerHTML = cellsHtml;
   
-  // Reset state
   minesGameActive = false;
   minesField = [];
   minesOpenedCount = 0;
@@ -2730,7 +2729,6 @@ function initMinesGame() {
   document.getElementById('minesBetAmount').textContent = '0';
   updateMinesChanceDisplay();
   
-  // Render inventory for bet selection
   renderMinesBetGrid();
 }
 
@@ -2743,7 +2741,6 @@ function renderMinesBetGrid() {
     return;
   }
   
-  // Группируем одинаковые предметы
   const groups = {};
   inventory.forEach((id, idx) => {
     if (!groups[id]) groups[id] = { id, item: getItemById(id), indexes: [] };
@@ -2835,23 +2832,18 @@ function updateMinesChanceDisplay() {
 }
 
 function openMineCell(index) {
-  if (!minesGameActive) {
-    return;
-  }
+  if (!minesGameActive) return;
   if (minesField[index].opened) return;
   if (minesField[index].type === 'bomb') {
-    // Lost
     minesGameActive = false;
     document.getElementById('minesStartBtn').textContent = 'ИГРАТЬ';
     document.getElementById('minesStartBtn').classList.remove('cashout');
     
-    // Reveal all
     minesField.forEach((cell, i) => {
       const el = document.getElementById('mineCell_' + i);
       el.classList.add('opened', 'disabled');
       if (cell.type === 'bomb') {
         el.classList.add('bomb');
-        // Показываем рандомного брейнрота вместо бомбы
         const randomItem = ITEMS[Math.floor(Math.random() * ITEMS.length)];
         el.innerHTML = `<img src="${randomItem.img}" ${FALLBACK_ATTR}>`;
       } else {
@@ -2864,7 +2856,6 @@ function openMineCell(index) {
     return;
   }
   
-  // Safe cell
   minesField[index].opened = true;
   minesOpenedCount++;
   const el = document.getElementById('mineCell_' + index);
@@ -2876,10 +2867,8 @@ function openMineCell(index) {
   playCoin();
   vibrate(10);
   
-  // Check if all safe cells opened (win)
   const totalSafe = 25 - minesMinesCount;
   if (minesOpenedCount === totalSafe) {
-    // Win all
     cashoutMines();
   }
 }
@@ -2895,7 +2884,6 @@ async function startMinesGame() {
     return;
   }
   
-  // Calculate total bet value
   let totalBetValue = 0;
   minesBetItems.forEach(id => {
     const it = getItemById(id);
@@ -2907,14 +2895,12 @@ async function startMinesGame() {
     return;
   }
   
-  // Remove bet items from inventory
   const newInventory = [...inventory];
   minesBetItems.forEach(betId => {
     const idx = newInventory.indexOf(betId);
     if (idx !== -1) newInventory.splice(idx, 1);
   });
   
-  // Simulate server call for simplicity we just update inventory
   inventory = newInventory;
   updateBalanceUI();
   syncBalanceToServer();
@@ -2925,7 +2911,6 @@ async function startMinesGame() {
   minesGameActive = true;
   minesOpenedCount = 0;
   
-  // Generate field
   minesField = [];
   const totalCells = 25;
   const minesPositions = new Set();
@@ -2933,18 +2918,15 @@ async function startMinesGame() {
     minesPositions.add(Math.floor(Math.random() * totalCells));
   }
   
-  // Fill field
   for (let i = 0; i < totalCells; i++) {
     if (minesPositions.has(i)) {
       minesField.push({ id: i, type: 'bomb', opened: false });
     } else {
-      // Pick random item for safe cell
       const randomItem = ITEMS[Math.floor(Math.random() * ITEMS.length)];
       minesField.push({ id: i, type: 'brainrot', itemId: randomItem.id, opened: false });
     }
   }
   
-  // Update UI
   document.getElementById('minesStartBtn').innerHTML = `ЗАБРАТЬ <img src="${COIN_IMG}" style="width:20px; height:20px; display:inline-block; vertical-align:middle;">`;
   document.getElementById('minesStartBtn').classList.add('cashout');
   
@@ -2968,11 +2950,7 @@ function cashoutMines() {
   if (!minesGameActive) return;
   minesGameActive = false;
   
-  // Calculate winnings
   let totalBetValue = 0;
-  // bet items already removed from inventory, but we need to know value
-  // we can just use the potential win calculated during game
-  // for simplicity let's recalculate from minesBetItems
   minesBetItems.forEach(id => {
     const it = getItemById(id);
     if (it) totalBetValue += it.price;
@@ -2980,12 +2958,10 @@ function cashoutMines() {
   
   const winAmount = Math.floor(totalBetValue * minesCurrentMultiplier);
   
-  // Add to balance
   balance += winAmount;
   updateBalanceUI();
   syncBalanceToServer();
   
-  // Clear board
   const board = document.getElementById('minesBoard');
   board.innerHTML = '';
   for (let i = 0; i < 25; i++) {
@@ -2999,7 +2975,6 @@ function cashoutMines() {
   document.getElementById('minesStartBtn').classList.remove('cashout');
   document.getElementById('minesBetAmount').textContent = '0';
   
-  // Reset bet items after game
   minesBetItems = [];
   renderMinesBetGrid();
   
@@ -3024,6 +2999,7 @@ async function init() {
   await loadUserFromServer();
   await checkBanStatus();
   await checkAnnouncement();
+  await checkLiveDrops();
   
   if (maintenanceInterval) clearInterval(maintenanceInterval);
   maintenanceInterval = setInterval(checkMaintenance, 1000);
@@ -3033,6 +3009,13 @@ async function init() {
 
   if (banPollInterval) clearInterval(banPollInterval);
   banPollInterval = setInterval(checkBanStatus, 8000);
+
+  if (dropInterval) clearInterval(dropInterval);
+  dropInterval = setInterval(() => {
+    if (document.getElementById('panelDrop')?.classList.contains('active')) {
+      checkLiveDrops();
+    }
+  }, 5000);
 }
 window.addEventListener('load', () => {
   setTimeout(async () => {
