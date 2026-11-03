@@ -95,6 +95,8 @@ const CASES = {
 const MAX_CHANCE = 80;
 const MIN_CHANCE = 0.01;
 
+const DICE_COLORS = ['blue', 'red', 'yellow', 'orange', 'green', 'purple'];
+
 function getItem(id) { return ITEMS[id] || CASE_ONLY_ITEMS[id] || null; }
 function calcUpgradeChance(sourcePrice, targetPrice) {
   if (!sourcePrice || !targetPrice || targetPrice <= sourcePrice) return 0;
@@ -107,7 +109,6 @@ let maintenance = { enabled: false, since: null, by: '' };
 let currentAnnouncement = null;
 let stats = { total_upgrades: 0, total_cases: 0 };
 let onlineUsers = new Map();
-// Баны юзеров, которых ещё нет в базе (забанили по @username до первого входа)
 let pendingBans = {};
 
 function ensureDataDir() { try { if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (e) {} }
@@ -278,6 +279,13 @@ function listActiveBans() {
   return list;
 }
 
+// DICE HELPER
+function getDiceColorFromValue(val) {
+  // 0 - green, 1-18 red, 19-36 black... wait, standard roulette is not what we need here.
+  // The prompt says 6 colors. Let's make it fully random among 6 colors for each die.
+  return DICE_COLORS[val];
+}
+
 const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { setCORS(res); res.writeHead(204); res.end(); return; }
 
@@ -433,8 +441,6 @@ const server = http.createServer(async (req, res) => {
       if (!code) return sendJSON(res, 400, { ok: false, error: 'Введите промокод' });
       const upperCode = code.trim().toUpperCase();
 
-      // 1 человек = 1 активация промокода. Проверка и запись идут синхронно,
-      // поэтому даже 10 быстрых нажатий подряд активируют промокод только один раз.
       if (!Array.isArray(u.promos_used)) u.promos_used = [];
       if (u.promos_used.includes(upperCode)) {
         return sendJSON(res, 409, { ok: false, error: 'Вы уже активировали этот промокод. Один человек — одна активация.' });
@@ -638,12 +644,97 @@ const server = http.createServer(async (req, res) => {
       if (denyIfBanned(res, u)) return;
       if (typeof custom_nick === 'string') u.custom_nick = custom_nick.slice(0, 20);
       if (typeof avatar === 'string') u.avatar = avatar;
-      // 👇 Сохранение баланса с клиента (после мини-игр и т.п.)
       if (typeof balance === 'number' && isFinite(balance) && balance >= 0) {
         u.balance = balance;
       }
       u.updated_at = new Date().toISOString(); saveUsers();
       return sendJSON(res, 200, { ok: true, user: publicUser(u, user.id) });
+    }
+
+    // ================== DICE ROLL ==================
+    if (req.method === 'POST' && req.url === '/api/dice/roll') {
+      const body = await readBody(req);
+      const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
+      updateOnline(user.id);
+
+      const u = ensureUser(user.id, user.username);
+      if (denyIfBanned(res, u)) return;
+
+      const { color, item_ids } = body;
+      if (!color || !DICE_COLORS.includes(color)) {
+        return sendJSON(res, 400, { ok: false, error: 'Выберите корректный цвет' });
+      }
+      if (!Array.isArray(item_ids) || item_ids.length === 0 || item_ids.length > 3) {
+        return sendJSON(res, 400, { ok: false, error: 'Выберите от 1 до 3 брейнротов' });
+      }
+
+      // Check if all items exist in user's inventory and are not on withdraw
+      const pendingWithdraws = computePendingWithdrawIds(user.id);
+      for (const id of item_ids) {
+        if (!u.inventory.includes(id)) {
+          return sendJSON(res, 400, { ok: false, error: `Предмет ${id} не найден в инвентаре` });
+        }
+        if (pendingWithdraws.includes(id)) {
+          return sendJSON(res, 400, { ok: false, error: `Предмет ${id} находится на выводе` });
+        }
+      }
+
+      // Remove items from inventory immediately
+      for (const id of item_ids) {
+        const idx = u.inventory.indexOf(id);
+        if (idx !== -1) u.inventory.splice(idx, 1);
+      }
+
+      // Generate 4 random colors using crypto for fairness
+      const resultColors = [];
+      for (let i = 0; i < 4; i++) {
+        const randVal = crypto.randomInt(0, DICE_COLORS.length);
+        resultColors.push(DICE_COLORS[randVal]);
+      }
+
+      // Count matches
+      const matchCount = resultColors.filter(c => c === color).length;
+
+      let won = false;
+      let multiplier = 0;
+
+      // Check win conditions based on provided rules
+      if (matchCount === 1) { won = true; multiplier = 2; }
+      else if (matchCount === 4) { won = true; multiplier = 3; }
+      else if (new Set(resultColors).size === 4) { // All 4 are different (Bonus)
+        won = true; multiplier = 10;
+      }
+
+      let rewardCount = 0;
+      if (won) {
+        // If matchCount is 1, user gets the item back + 1 copy (x2)
+        // If matchCount is 4, user gets item back + 2 copies (x3)
+        // If Bonus (all different), user gets item back + 9 copies (x10)
+        // multiplier represents total return count. So for x2, we add (2 - 1) = 1 copy per selected item.
+        const copiesToAdd = multiplier - 1;
+        rewardCount = copiesToAdd * item_ids.length;
+
+        // Return original items + extra copies
+        for (const id of item_ids) {
+          for (let i = 0; i < multiplier; i++) {
+            u.inventory.push(id);
+          }
+        }
+      }
+
+      u.updated_at = new Date().toISOString();
+      saveUsers();
+
+      return sendJSON(res, 200, {
+        ok: true,
+        result: resultColors,
+        match_count: matchCount,
+        won: won,
+        multiplier: multiplier,
+        reward_count: rewardCount,
+        new_balance: u.balance,
+        inventory: u.inventory
+      });
     }
 
     sendJSON(res, 404, { ok: false, error: 'Метод не найден' });
@@ -652,8 +743,6 @@ const server = http.createServer(async (req, res) => {
 
 loadAll();
 
-// Одноразовая миграция: тем пользователям, у которых вообще нет поля balance, ставим START_BALANCE.
-// Если поле balance уже есть — НЕ трогаем (это и ломало ранее синхронизацию).
 (function migrateBalances() {
   let changed = 0;
   for (const id in users) {
