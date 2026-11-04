@@ -48,9 +48,9 @@ body{
 .sidebar {
   width: 320px;
   flex-shrink: 0;
-  background: linear-gradient(180deg, rgba(10,24,38,0.95), rgba(5,13,22,0.98));
-  border-right: 1px solid var(--glass-border);
-  padding: 16px;
+  background: #10161c;
+  border-right: 1px solid rgba(255,255,255,0.05);
+  padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -67,59 +67,61 @@ body{
   flex-direction: column;
 }
 
-.app{
-  width:100%; max-width:100%; margin:0 auto; padding: 0 20px 20px;
-  flex:1 0 auto; position:relative; z-index:1;
-  display: flex; flex-direction: column;
-}
-
-/* ===== LIVE DROP SIDEBAR STYLES ===== */
-.live-drop-top {
-  background: radial-gradient(120% 90% at 50% 0%, rgba(255,224,102,.15), transparent 60%), var(--bg-surface);
-  border: 1px solid var(--color-gold);
-  border-radius: 12px;
-  padding: 16px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.live-drop-top-label {
-  font-size: 10px;
-  font-weight: 800;
-  color: var(--color-gold);
-  text-transform: uppercase;
-  letter-spacing: 1px;
+/* ===== LIVE DROP SIDEBAR STYLES (MATCHING PHOTO) ===== */
+.live-drop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
-  text-shadow: 0 0 10px rgba(255,224,102,.5);
+  padding: 0 4px;
 }
-.live-drop-top img {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
-  margin-bottom: 8px;
-  filter: drop-shadow(0 4px 10px rgba(0,0,0,.6));
-}
-.live-drop-top-name {
-  font-size: 14px;
-  font-weight: 800;
-  color: #fff;
-  line-height: 1.2;
-  margin-bottom: 4px;
-}
-.live-drop-top-price {
-  font-size: 13px;
-  font-weight: 900;
-  color: var(--color-gold);
+.live-drop-header-left {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
+}
+.live-drop-header-online {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-cyan);
+}
+.live-drop-header-online-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-cyan);
+  box-shadow: 0 0 8px var(--color-cyan);
+}
+.live-drop-header-tabs {
+  display: flex;
   gap: 4px;
 }
-.live-drop-top-price img {
-  width: 14px;
-  height: 14px;
-  margin: 0;
+.live-drop-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.live-drop-tab.active {
+  background: var(--color-cyan);
+  color: #000;
+  border-color: var(--color-cyan);
+}
+.live-drop-tab:hover:not(.active) {
+  color: #fff;
+  background: rgba(255,255,255,0.05);
+}
+.live-drop-tab-icon {
+  font-size: 14px;
+  line-height: 1;
 }
 
 .live-drop-list {
@@ -132,22 +134,41 @@ body{
   padding-right: 4px;
 }
 .live-drop-list::-webkit-scrollbar { width: 6px; }
-.live-drop-list::-webkit-scrollbar-thumb { background: rgba(140,210,255,0.2); border-radius: 6px; }
+.live-drop-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 6px; }
 
 .live-drop-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--bg-surface);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 10px;
-  transition: transform .15s, border-color .15s;
+  background: #161e26;
+  border: 1px solid rgba(255,255,255,0.03);
+  border-radius: 8px;
+  padding: 8px;
+  transition: background 0.15s, border-color 0.15s;
   flex-shrink: 0;
+  position: relative;
 }
 .live-drop-item:hover {
-  transform: translateX(4px);
-  border-color: var(--color-cyan);
+  background: #1c252e;
+  border-color: rgba(255,255,255,0.1);
+}
+.live-drop-item.is-top {
+  border-color: var(--color-gold);
+  background: linear-gradient(135deg, rgba(255,224,102,0.1), #161e26);
+}
+.live-drop-item.is-top::before {
+  content: 'Топ-дроп дня';
+  position: absolute;
+  top: -8px;
+  left: 8px;
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--color-gold);
+  background: #161e26;
+  padding: 0 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 4px;
 }
 .live-drop-item img {
   width: 40px;
@@ -168,12 +189,18 @@ body{
   text-overflow: ellipsis;
 }
 .live-drop-item-name {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.live-drop-item-rarity {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
 }
 .live-drop-item-price {
   display: flex;
@@ -181,12 +208,15 @@ body{
   gap: 4px;
   font-size: 12px;
   font-weight: 800;
-  color: var(--color-cyan);
+  color: var(--color-gold);
   flex-shrink: 0;
 }
 .live-drop-item-price img {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  padding: 2px;
 }
 
 /* ===== MAIN APP STYLES ===== */
@@ -704,9 +734,6 @@ body{
     gap: 12px;
     padding: 12px;
   }
-  .live-drop-top {
-    min-width: 200px;
-  }
   .live-drop-list {
     flex-direction: row;
     overflow-x: auto;
@@ -1049,16 +1076,18 @@ body{
 
 <div class="app-wrapper">
     <div class="sidebar" id="liveDropSidebar">
-        <div class="live-drop-top" id="liveDropTop">
-            <div class="live-drop-top-label">Топ-дроп дня</div>
-            <img src="" id="liveDropTopImg" alt="Top Drop">
-            <div class="live-drop-top-name" id="liveDropTopName">—</div>
-            <div class="live-drop-top-price">
-                <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin">
-                <span id="liveDropTopPrice">0</span>
+        <div class="live-drop-header">
+            <div class="live-drop-header-left">
+                <div class="live-drop-header-online">
+                    <span class="live-drop-header-online-dot"></span>
+                    <span id="onlineCount">1</span> ОНЛАЙН
+                </div>
+            </div>
+            <div class="live-drop-header-tabs">
+                <button class="live-drop-tab active">Все</button>
+                <button class="live-drop-tab live-drop-tab-icon">🔥</button>
             </div>
         </div>
-        <div style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; flex-shrink:0;">Последние дропы</div>
         <div class="live-drop-list" id="liveDropList">
             <!-- items loaded via JS -->
         </div>
@@ -1547,24 +1576,6 @@ async function checkLiveDrops() {
 }
 
 function renderLiveDrops(drops, top) {
-  const topImg = document.getElementById('liveDropTopImg');
-  const topName = document.getElementById('liveDropTopName');
-  const topPrice = document.getElementById('liveDropTopPrice');
-  
-  if (top && topImg && topName && topPrice) {
-    const item = getItemById(top.item_id);
-    if (item) {
-      topImg.src = item.img;
-      topImg.onerror = () => { topImg.src = FALLBACK_IMG; };
-      topName.textContent = item.name;
-      topPrice.textContent = item.price.toLocaleString('ru-RU');
-    }
-  } else if (topImg && topName && topPrice) {
-    topImg.src = FALLBACK_IMG;
-    topName.textContent = '—';
-    topPrice.textContent = '0';
-  }
-
   const list = document.getElementById('liveDropList');
   if (!list) return;
 
@@ -1576,15 +1587,25 @@ function renderLiveDrops(drops, top) {
   list.innerHTML = drops.map(d => {
     const item = getItemById(d.item_id);
     if (!item) return '';
-    return `<div class="live-drop-item">
+    const rarity = getRarityName(item.price);
+    return `<div class="live-drop-item ${d.is_top ? 'is-top' : ''}">
       <img src="${item.img}" alt="${item.name}" loading="lazy" decoding="async" ${FALLBACK_ATTR}>
       <div class="live-drop-item-info">
         <div class="live-drop-item-user">@${d.user}</div>
         <div class="live-drop-item-name">${item.name}</div>
+        <div class="live-drop-item-rarity">${rarity}</div>
       </div>
       <div class="live-drop-item-price"><img src="${COIN_IMG}" alt="coin">${item.price.toLocaleString('ru-RU')}</div>
     </div>`;
   }).join('');
+}
+
+function getRarityName(price) {
+  if (price < 100) return 'Обычный';
+  if (price < 500) return 'Необычный';
+  if (price < 1500) return 'Редкий';
+  if (price < 10000) return 'Эпический';
+  return 'Легендарный';
 }
 
 // ================== ТЕХПЕРЕРЫВ ==================
@@ -2495,6 +2516,7 @@ async function performUpgrade(durationMs) {
     }
     applyServerUser({ balance: data.new_balance, inventory: data.inventory });
     updateUpgradeScreen();
+    checkLiveDrops();
   }, durationMs + 100);
 }
 window.upgrade = function() {
@@ -2601,6 +2623,7 @@ window.confirmOpenCase = async function() {
       const cb = document.getElementById('caseOpenBalance'); if (cb) cb.textContent = balance.toLocaleString('ru-RU');
       renderInventory(); renderInventoryTab(); renderProfileInventory();
       if (currentCaseId) openCaseDetail(currentCaseId);
+      checkLiveDrops();
     }, 10000);
   }, 100);
 };
@@ -2861,51 +2884,129 @@ function updateMinesChanceDisplay() {
   minesCurrentMultiplier = mult;
 }
 
-function openMineCell(index) {
+async function openMineCell(index) {
   if (!minesGameActive) return;
   if (minesField[index].opened) return;
-  if (minesField[index].type === 'bomb') {
-    minesGameActive = false;
-    document.getElementById('minesStartBtn').textContent = 'ИГРАТЬ';
-    document.getElementById('minesStartBtn').classList.remove('cashout');
-    
-    minesField.forEach((cell, i) => {
-      const el = document.getElementById('mineCell_' + i);
-      el.classList.add('opened', 'disabled');
-      if (cell.type === 'bomb') {
-        el.classList.add('bomb');
-        const randomItem = ITEMS[Math.floor(Math.random() * ITEMS.length)];
-        el.innerHTML = `<img src="${randomItem.img}" ${FALLBACK_ATTR}>`;
-      } else {
-        const item = getItemById(cell.itemId);
-        if (item) el.innerHTML = `<img src="${item.img}" ${FALLBACK_ATTR}>`;
-      }
+
+  playClick();
+  try {
+    const res = await fetch(API_URL + '/api/mines/open', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Telegram-Init-Data': window.Telegram?.WebApp?.initData || '' },
+      body: JSON.stringify({ telegram_id: getTelegramId(), cell_index: index })
     });
+    const data = await res.json();
+
+    if (!data.ok) {
+      if (data.error) alert(data.error);
+      return;
+    }
+
+    if (data.is_bomb) {
+      minesGameActive = false;
+      document.getElementById('minesStartBtn').textContent = 'ИГРАТЬ';
+      document.getElementById('minesStartBtn').classList.remove('cashout');
+      
+      data.opened.forEach(idx => {
+        const el = document.getElementById('mineCell_' + idx);
+        el.classList.add('opened', 'disabled');
+        if (minesField[idx] && minesField[idx].type === 'bomb') {
+          el.classList.add('bomb');
+          const randomItem = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+          el.innerHTML = `<img src="${randomItem.img}" ${FALLBACK_ATTR}>`;
+        }
+      });
+      // Открываем все бомбы на поле
+      for (let i=0; i<25; i++) {
+        if (minesField[i] && minesField[i].type === 'bomb' && !data.opened.includes(i)) {
+          const el = document.getElementById('mineCell_' + i);
+          el.classList.add('opened', 'disabled', 'bomb');
+          const randomItem = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+          el.innerHTML = `<img src="${randomItem.img}" ${FALLBACK_ATTR}>`;
+        }
+      }
+
+      playLose();
+      vibratePattern([50,30,100]);
+      return;
+    }
+
+    // Безопасная ячейка
+    minesField[index].opened = true;
+    minesOpenedCount++;
+    const el = document.getElementById('mineCell_' + index);
+    el.classList.add('opened', 'disabled');
+    const item = getItemById(minesField[index].itemId);
+    if (item) {
+      el.innerHTML = `<img src="${item.img}" alt="${item.name}" ${FALLBACK_ATTR}>`;
+    }
+    playCoin();
+    vibrate(10);
+
+    if (data.win_amount !== undefined && data.win_amount > 0) {
+      // Выигрыш всего
+      minesGameActive = false;
+      document.getElementById('minesStartBtn').textContent = 'ИГРАТЬ';
+      document.getElementById('minesStartBtn').classList.remove('cashout');
+      
+      balance = data.new_balance;
+      updateBalanceUI();
+      renderInventory(); renderInventoryTab(); renderProfileInventory();
+      
+      playWin();
+      vibratePattern([30,50,30,50,60]);
+      alert(`Вы выиграли ${data.win_amount} монет!`);
+    }
+  } catch (e) {
+    console.error(e);
     playLose();
-    vibratePattern([50,30,100]);
-    return;
-  }
-  
-  minesField[index].opened = true;
-  minesOpenedCount++;
-  const el = document.getElementById('mineCell_' + index);
-  el.classList.add('opened', 'disabled');
-  const item = getItemById(minesField[index].itemId);
-  if (item) {
-    el.innerHTML = `<img src="${item.img}" alt="${item.name}" ${FALLBACK_ATTR}>`;
-  }
-  playCoin();
-  vibrate(10);
-  
-  const totalSafe = 25 - minesMinesCount;
-  if (minesOpenedCount === totalSafe) {
-    cashoutMines();
   }
 }
 
 async function startMinesGame() {
   if (minesGameActive) {
-    cashoutMines();
+    // Кэшаут
+    playClick();
+    try {
+      const res = await fetch(API_URL + '/api/mines/cashout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Telegram-Init-Data': window.Telegram?.WebApp?.initData || '' },
+        body: JSON.stringify({ telegram_id: getTelegramId() })
+      });
+      const data = await res.json();
+      if (!data.ok) {
+        if (data.error) alert(data.error);
+        return;
+      }
+
+      minesGameActive = false;
+      balance = data.new_balance;
+      updateBalanceUI();
+      renderInventory(); renderInventoryTab(); renderProfileInventory();
+      
+      const board = document.getElementById('minesBoard');
+      board.innerHTML = '';
+      for (let i = 0; i < 25; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'mine-cell disabled';
+        cell.id = 'mineCell_' + i;
+        board.appendChild(cell);
+      }
+      
+      document.getElementById('minesStartBtn').textContent = 'ИГРАТЬ';
+      document.getElementById('minesStartBtn').classList.remove('cashout');
+      document.getElementById('minesBetAmount').textContent = '0';
+      
+      minesBetItems = [];
+      renderMinesBetGrid();
+      
+      playWin();
+      vibratePattern([30,50,30,50,60]);
+      alert(`Вы выиграли ${data.win_amount} монет!`);
+    } catch (e) {
+      console.error(e);
+      playLose();
+    }
     return;
   }
   
@@ -2924,93 +3025,65 @@ async function startMinesGame() {
     alert('Ставка слишком мала!');
     return;
   }
-  
-  const newInventory = [...inventory];
-  minesBetItems.forEach(betId => {
-    const idx = newInventory.indexOf(betId);
-    if (idx !== -1) newInventory.splice(idx, 1);
-  });
-  
-  inventory = newInventory;
-  updateBalanceUI();
-  syncBalanceToServer();
-  renderInventory();
-  renderInventoryTab();
-  renderProfileInventory();
-  
-  minesGameActive = true;
-  minesOpenedCount = 0;
-  
-  minesField = [];
-  const totalCells = 25;
-  const minesPositions = new Set();
-  while (minesPositions.size < minesMinesCount) {
-    minesPositions.add(Math.floor(Math.random() * totalCells));
-  }
-  
-  for (let i = 0; i < totalCells; i++) {
-    if (minesPositions.has(i)) {
-      minesField.push({ id: i, type: 'bomb', opened: false });
-    } else {
-      const randomItem = ITEMS[Math.floor(Math.random() * ITEMS.length)];
-      minesField.push({ id: i, type: 'brainrot', itemId: randomItem.id, opened: false });
-    }
-  }
-  
-  document.getElementById('minesStartBtn').innerHTML = `ЗАБРАТЬ <img src="${COIN_IMG}" style="width:20px; height:20px; display:inline-block; vertical-align:middle;">`;
-  document.getElementById('minesStartBtn').classList.add('cashout');
-  
-  const board = document.getElementById('minesBoard');
-  board.innerHTML = '';
-  for (let i = 0; i < totalCells; i++) {
-    const cell = document.createElement('div');
-    cell.className = 'mine-cell';
-    cell.id = 'mineCell_' + i;
-    cell.onclick = () => openMineCell(i);
-    board.appendChild(cell);
-  }
-  
-  document.getElementById('minesBetAmount').textContent = totalBetValue;
-  
-  playClick();
-  vibrate(15);
-}
 
-function cashoutMines() {
-  if (!minesGameActive) return;
-  minesGameActive = false;
-  
-  let totalBetValue = 0;
-  minesBetItems.forEach(id => {
-    const it = getItemById(id);
-    if (it) totalBetValue += it.price;
-  });
-  
-  const winAmount = Math.floor(totalBetValue * minesCurrentMultiplier);
-  
-  balance += winAmount;
-  updateBalanceUI();
-  syncBalanceToServer();
-  
-  const board = document.getElementById('minesBoard');
-  board.innerHTML = '';
-  for (let i = 0; i < 25; i++) {
-    const cell = document.createElement('div');
-    cell.className = 'mine-cell disabled';
-    cell.id = 'mineCell_' + i;
-    board.appendChild(cell);
+  playClick();
+  try {
+    const res = await fetch(API_URL + '/api/mines/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Telegram-Init-Data': window.Telegram?.WebApp?.initData || '' },
+      body: JSON.stringify({ telegram_id: getTelegramId(), item_ids: minesBetItems, mines_count: minesMinesCount })
+    });
+    const data = await res.json();
+
+    if (!data.ok) {
+      if (data.error) alert(data.error);
+      return;
+    }
+
+    inventory = data.inventory;
+    updateBalanceUI();
+    renderInventory(); renderInventoryTab(); renderProfileInventory();
+    
+    minesGameActive = true;
+    minesOpenedCount = 0;
+    
+    minesField = [];
+    const totalCells = 25;
+    const bombCount = minesMinesCount;
+    const bombsPositions = new Set();
+    while (bombsPositions.size < bombCount) {
+      bombsPositions.add(Math.floor(Math.random() * totalCells));
+    }
+    
+    for (let i = 0; i < totalCells; i++) {
+      if (bombsPositions.has(i)) {
+        minesField.push({ id: i, type: 'bomb', opened: false });
+      } else {
+        const randomItem = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+        minesField.push({ id: i, type: 'brainrot', itemId: randomItem.id, opened: false });
+      }
+    }
+    
+    document.getElementById('minesStartBtn').innerHTML = `ЗАБРАТЬ <img src="${COIN_IMG}" style="width:20px; height:20px; display:inline-block; vertical-align:middle;">`;
+    document.getElementById('minesStartBtn').classList.add('cashout');
+    
+    const board = document.getElementById('minesBoard');
+    board.innerHTML = '';
+    for (let i = 0; i < totalCells; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'mine-cell';
+      cell.id = 'mineCell_' + i;
+      cell.onclick = () => openMineCell(i);
+      board.appendChild(cell);
+    }
+    
+    document.getElementById('minesBetAmount').textContent = totalBetValue;
+    
+    vibrate(15);
+  } catch (e) {
+    console.error(e);
+    playLose();
   }
-  
-  document.getElementById('minesStartBtn').textContent = 'ИГРАТЬ';
-  document.getElementById('minesStartBtn').classList.remove('cashout');
-  document.getElementById('minesBetAmount').textContent = '0';
-  
-  minesBetItems = [];
-  renderMinesBetGrid();
-  
-  playWin();
-  vibratePattern([30,50,30,50,60]);
-  alert(`Вы выиграли ${winAmount} монет!`);
 }
 
 // ================== СТАРТ ==================
