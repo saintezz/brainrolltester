@@ -166,12 +166,13 @@ function getMoscowDateStart() {
 }
 
 function pushLiveDrop(user, itemId) {
-  liveDrops.push({ 
+  const drop = { 
     id: 'drop_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), 
     user: user.username || user.id, 
     item_id: itemId, 
     timestamp: Date.now() 
-  });
+  };
+  liveDrops.push(drop);
   liveDrops = liveDrops.filter(d => d.timestamp > getMoscowDateStart() - 7*24*60*60*1000).slice(-500);
   saveDrops();
 }
