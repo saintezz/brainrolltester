@@ -39,184 +39,17 @@ body{
 }
 #toastContainer{display: none;}
 
-/* ===== LAYOUT WITH SIDEBAR ===== */
+/* ===== LAYOUT ===== */
 .app-wrapper {
   display: flex;
   width: 100%;
   min-height: 100vh;
-}
-.sidebar {
-  width: 320px;
-  flex-shrink: 0;
-  background: #10161c;
-  border-right: 1px solid rgba(255,255,255,0.05);
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  height: 100vh;
-  position: sticky;
-  top: 0;
-  overflow-y: auto;
-  z-index: 100;
 }
 .app-content {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-}
-
-/* ===== LIVE DROP SIDEBAR STYLES (MATCHING PHOTO) ===== */
-.live-drop-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  padding: 0 4px;
-}
-.live-drop-header-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.live-drop-header-online {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--color-cyan);
-}
-.live-drop-header-online-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--color-cyan);
-  box-shadow: 0 0 8px var(--color-cyan);
-}
-.live-drop-header-tabs {
-  display: flex;
-  gap: 4px;
-}
-.live-drop-tab {
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.live-drop-tab.active {
-  background: var(--color-cyan);
-  color: #000;
-  border-color: var(--color-cyan);
-}
-.live-drop-tab:hover:not(.active) {
-  color: #fff;
-  background: rgba(255,255,255,0.05);
-}
-.live-drop-tab-icon {
-  font-size: 14px;
-  line-height: 1;
-}
-
-.live-drop-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  overflow-y: auto;
-  flex: 1;
-  scrollbar-width: thin;
-  padding-right: 4px;
-}
-.live-drop-list::-webkit-scrollbar { width: 6px; }
-.live-drop-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 6px; }
-
-.live-drop-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: #161e26;
-  border: 1px solid rgba(255,255,255,0.03);
-  border-radius: 8px;
-  padding: 8px;
-  transition: background 0.15s, border-color 0.15s;
-  flex-shrink: 0;
-  position: relative;
-}
-.live-drop-item:hover {
-  background: #1c252e;
-  border-color: rgba(255,255,255,0.1);
-}
-.live-drop-item.is-top {
-  border-color: var(--color-gold);
-  background: linear-gradient(135deg, rgba(255,224,102,0.1), #161e26);
-}
-.live-drop-item.is-top::before {
-  content: 'Топ-дроп дня';
-  position: absolute;
-  top: -8px;
-  left: 8px;
-  font-size: 9px;
-  font-weight: 800;
-  color: var(--color-gold);
-  background: #161e26;
-  padding: 0 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-radius: 4px;
-}
-.live-drop-item img {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-.live-drop-item-info {
-  flex: 1;
-  min-width: 0;
-}
-.live-drop-item-user {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--color-cyan);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.live-drop-item-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 2px;
-}
-.live-drop-item-rarity {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-.live-drop-item-price {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--color-gold);
-  flex-shrink: 0;
-}
-.live-drop-item-price img {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--color-gold);
-  padding: 2px;
 }
 
 /* ===== MAIN APP STYLES ===== */
@@ -315,7 +148,6 @@ body{
 .chance-big{font-size:40px;font-weight:800;color:#fff;line-height:1;text-shadow: 0 0 26px rgba(111,233,255,1);letter-spacing:.5px;}
 .chance-label{margin-top:7px;font-size:9px;font-weight:600;color:var(--text-muted);letter-spacing:3.5px;text-transform:uppercase;}
 
-/* Стрелка апгрейдера */
 .arrow-container{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;transform-origin:center center;will-change:transform;}
 .arrow-pointer{
   position:absolute;top:-30px;left:50%;transform:translateX(-50%);
@@ -362,6 +194,189 @@ body{
 .segmented-control .segment{flex: 1;text-align: center;padding: 13px;font-size: 12px;font-weight:700;color: var(--text-muted);cursor: pointer;border-radius: 8px;transition: all .2s;border: 1px solid transparent;text-transform: uppercase;letter-spacing:.6px;}
 .segmented-control .segment.active{color: #04121a;background:var(--color-cyan);border: 1px solid rgba(62,200,255,.5);box-shadow: 0 6px 18px -6px rgba(62,200,255,1);}
 
+/* ================== МИНЫ ================== */
+.mines-layout {
+  display: flex;
+  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 10px 0 20px;
+  align-items: flex-start;
+}
+.mines-board-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  background: linear-gradient(145deg, #0c1e30, #071522);
+  border: 1px solid rgba(62,200,255,0.32);
+  border-radius: 20px;
+  box-shadow: 0 10px 26px -10px rgba(0,0,0,0.7);
+}
+.mines-board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 460px;
+  aspect-ratio: 1;
+}
+.mine-cell {
+  background: radial-gradient(circle at 50% 35%, #122638, #0a1826);
+  border: 1px solid rgba(62,200,255,0.35);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  box-shadow: inset 0 1px 0 rgba(200,240,255,.08), 0 4px 10px -6px rgba(0,0,0,.8);
+  overflow: hidden;
+}
+.mine-cell:hover:not(.opened):not(.disabled) {
+  border-color: var(--color-cyan);
+  transform: translateY(-2px);
+  box-shadow: 0 0 18px -4px rgba(62,200,255,.8);
+}
+.mine-cell img {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+  pointer-events: none;
+}
+.mine-cell.opened {
+  background: #0a1826;
+  border-color: rgba(62,200,255,0.6);
+}
+.mine-cell.bomb {
+  background: radial-gradient(circle at 50% 40%, rgba(255,123,138,.3), #1a0a10);
+  border-color: var(--color-red);
+  box-shadow: 0 0 20px -4px rgba(255,123,138,.8);
+}
+.mine-cell.disabled {
+  cursor: default;
+  pointer-events: none;
+}
+.mines-controls {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 16px;
+}
+.mines-control-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.mines-bet-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mines-bet-input button {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-surface-hover);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all .15s;
+}
+.mines-bet-input button:hover {
+  border-color: var(--color-cyan);
+  color: var(--color-cyan);
+}
+.mines-bet-input input {
+  flex: 1;
+  height: 40px;
+  text-align: center;
+  border-radius: 10px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-void);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  outline: none;
+}
+.mines-multipliers {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.mines-mult-btn {
+  flex: 1;
+  min-width: 44px;
+  padding: 8px 6px;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-void);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+  cursor: pointer;
+  transition: all .15s;
+}
+.mines-mult-btn:hover {
+  color: #fff;
+  border-color: var(--color-cyan);
+}
+.mines-mult-btn.active {
+  background: var(--color-cyan);
+  border-color: var(--color-cyan);
+  color: #04121a;
+  box-shadow: 0 0 18px -4px rgba(62,200,255,.9);
+}
+.mines-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--bg-void);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.mines-info-row span:last-child {
+  color: var(--color-cyan);
+  font-weight: 900;
+}
+.mines-start-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, var(--color-cyan), var(--color-purple-deep));
+  color: #04121a;
+  font-size: 15px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all .15s;
+  box-shadow: 0 12px 30px -12px rgba(62,200,255,1);
+}
+.mines-start-btn:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+.mines-start-btn.cashout {
+  background: linear-gradient(135deg, var(--color-emerald), #0ea5e9);
+}
+
 /* ================== ИНВЕНТАРЬ ================== */
 .inventory-page { padding: 4px 0 20px; }
 .inventory-hero { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 14px; padding: 0 4px; flex-wrap: wrap; }
@@ -397,7 +412,6 @@ body{
 .inv-tab-card.on-withdraw .inv-onwithdraw-badge{position:absolute;top:8px;right:8px;z-index:5;font-size:9px;font-weight:900;letter-spacing:.5px;color:#fff;background:var(--bg-void);border:1px solid var(--glass-border);padding:4px 7px;border-radius:6px;text-transform:uppercase;pointer-events:none;}
 .inv-tab-card.on-withdraw .inv-tab-actions{display:none;}
 
-/* общий inv-row/shop (для апгрейдера) */
 .inventory-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;padding:4px 0 12px;}
 .shop-scroll{max-height:480px;overflow-y:auto;padding:4px 0 12px;scrollbar-width:thin;}
 .shop-scroll::-webkit-scrollbar{width:8px}
@@ -717,34 +731,6 @@ body{
 .unban-reason-value{font-size:16px;font-weight:800;line-height:1.45;overflow-wrap:anywhere;padding:14px;border-radius:12px;background:rgba(140,210,255,.05);border:1px solid var(--glass-border);}
 
 /* ================== MOBILE ================== */
-@media (max-width: 1100px) {
-  .app-wrapper {
-    flex-direction: column;
-  }
-  .sidebar {
-    width: 100%;
-    height: auto;
-    max-height: 40vh;
-    position: relative;
-    border-right: none;
-    border-bottom: 1px solid var(--glass-border);
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    gap: 12px;
-    padding: 12px;
-  }
-  .live-drop-list {
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    flex: 1;
-  }
-  .live-drop-item {
-    min-width: 180px;
-  }
-}
-
 @media (max-width: 768px) {
   .top-nav-panel { display: none; }
   .burger-btn { display: block; }
@@ -783,6 +769,19 @@ body{
   .ban-icon{width:64px;height:64px;font-size:30px;margin-bottom:16px;}
   .ban-reason-block{margin-top:20px;padding:14px;}
   .ban-reason-value{font-size:15px;}
+  .mines-layout {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .mines-controls {
+    width: 100%;
+  }
+  .mines-board {
+    max-width: 100%;
+  }
+  .mine-cell {
+    border-radius: 10px;
+  }
 }
 </style>
 </head>
@@ -1075,24 +1074,6 @@ body{
 </div>
 
 <div class="app-wrapper">
-    <div class="sidebar" id="liveDropSidebar">
-        <div class="live-drop-header">
-            <div class="live-drop-header-left">
-                <div class="live-drop-header-online">
-                    <span class="live-drop-header-online-dot"></span>
-                    <span id="onlineCount">1</span> ОНЛАЙН
-                </div>
-            </div>
-            <div class="live-drop-header-tabs">
-                <button class="live-drop-tab active">Все</button>
-                <button class="live-drop-tab">ТОП</button>
-            </div>
-        </div>
-        <div class="live-drop-list" id="liveDropList">
-            <!-- items loaded via JS -->
-        </div>
-    </div>
-
     <div class="app-content">
         <div class="app" id="mainApp">
             <div class="top-bar">
@@ -1213,9 +1194,7 @@ body{
             <div class="tab-panel" id="panelCatch">
                 <div class="mines-layout">
                     <div class="mines-board-wrap">
-                        <div class="mines-board" id="minesBoard">
-                            <!-- 25 cells generated by JS -->
-                        </div>
+                        <div class="mines-board" id="minesBoard"></div>
                     </div>
                     <div class="mines-controls">
                         <div class="mines-control-title">Мин на поле</div>
@@ -1235,14 +1214,12 @@ body{
                             <span>Коэффициент</span>
                             <span id="minesCurrentMult">x1.04</span>
                         </div>
-                        
                         <div class="form-group" style="margin-bottom: 0;">
                             <label class="form-label" style="margin-bottom: 4px;">Выбери предметы для ставки</label>
                             <div class="shop-scroll" style="max-height: 150px; border: 1px solid var(--glass-border); border-radius: 8px; padding: 4px;">
                                 <div class="inventory-row" id="minesBetGrid" style="gap: 8px; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));"></div>
                             </div>
                         </div>
-
                         <div class="mines-info-row" style="background:transparent; border:none; padding:0; margin-top: 4px;">
                             <span>Ставка:</span>
                             <span style="display:flex; align-items:center; gap:6px;"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" style="width:16px;height:16px;"> <span id="minesBetAmount">0</span></span>
@@ -1489,7 +1466,6 @@ const SPIN_DURATION_FAST = 5000;
 const CIRCUMFERENCE = 2 * Math.PI * 130;
 
 let invFilter = 'all';
-let dropInterval = null;
 
 (function initTelegramUser() {
   try {
@@ -1564,50 +1540,6 @@ function renderAnnouncement(ann) {
   container.appendChild(el);
 }
 
-// ================== LIVE DROPS ==================
-async function checkLiveDrops() {
-  try {
-    const res = await fetch(API_URL + '/api/live-drops');
-    const data = await res.json();
-    if (data.ok) {
-      renderLiveDrops(data.drops, data.top);
-    }
-  } catch (e) {}
-}
-
-function renderLiveDrops(drops, top) {
-  const list = document.getElementById('liveDropList');
-  if (!list) return;
-
-  if (!drops || drops.length === 0) {
-    list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">Пока нет дропов</div>';
-    return;
-  }
-
-  list.innerHTML = drops.map(d => {
-    const item = getItemById(d.item_id);
-    if (!item) return '';
-    const rarity = getRarityName(item.price);
-    return `<div class="live-drop-item ${d.is_top ? 'is-top' : ''}">
-      <img src="${item.img}" alt="${item.name}" loading="lazy" decoding="async" ${FALLBACK_ATTR}>
-      <div class="live-drop-item-info">
-        <div class="live-drop-item-user">@${d.user}</div>
-        <div class="live-drop-item-name">${item.name}</div>
-        <div class="live-drop-item-rarity">${rarity}</div>
-      </div>
-      <div class="live-drop-item-price"><img src="${COIN_IMG}" alt="coin">${item.price.toLocaleString('ru-RU')}</div>
-    </div>`;
-  }).join('');
-}
-
-function getRarityName(price) {
-  if (price < 100) return 'Обычный';
-  if (price < 500) return 'Необычный';
-  if (price < 1500) return 'Редкий';
-  if (price < 10000) return 'Эпический';
-  return 'Легендарный';
-}
-
 // ================== ТЕХПЕРЕРЫВ ==================
 function applyMaintenanceState(enabled) {
   maintenanceEnabled = !!enabled;
@@ -1679,6 +1611,7 @@ function applyServerUser(data) {
   applyCustomAvatar();
   applyUserToProfile();
   if (document.getElementById('panelInventory')?.classList.contains('active')) renderInventoryTab();
+  if (document.getElementById('panelCatch')?.classList.contains('active')) renderMinesBetGrid();
 }
 
 async function loadUserFromServer() {
@@ -2516,7 +2449,6 @@ async function performUpgrade(durationMs) {
     }
     applyServerUser({ balance: data.new_balance, inventory: data.inventory });
     updateUpgradeScreen();
-    checkLiveDrops();
   }, durationMs + 100);
 }
 window.upgrade = function() {
@@ -2623,7 +2555,6 @@ window.confirmOpenCase = async function() {
       const cb = document.getElementById('caseOpenBalance'); if (cb) cb.textContent = balance.toLocaleString('ru-RU');
       renderInventory(); renderInventoryTab(); renderProfileInventory();
       if (currentCaseId) openCaseDetail(currentCaseId);
-      checkLiveDrops();
     }, 10000);
   }, 100);
 };
@@ -2781,6 +2712,7 @@ function initMinesGame() {
   document.getElementById('minesStartBtn').classList.remove('cashout');
   document.getElementById('minesBetAmount').textContent = '0';
   updateMinesChanceDisplay();
+  updateMinesMultiplierButtons();
   
   renderMinesBetGrid();
 }
@@ -2916,7 +2848,6 @@ async function openMineCell(index) {
           el.innerHTML = `<img src="${randomItem.img}" ${FALLBACK_ATTR}>`;
         }
       });
-      // Открываем все бомбы на поле
       for (let i=0; i<25; i++) {
         if (minesField[i] && minesField[i].type === 'bomb' && !data.opened.includes(i)) {
           const el = document.getElementById('mineCell_' + i);
@@ -2931,7 +2862,6 @@ async function openMineCell(index) {
       return;
     }
 
-    // Безопасная ячейка
     minesField[index].opened = true;
     minesOpenedCount++;
     const el = document.getElementById('mineCell_' + index);
@@ -2944,7 +2874,6 @@ async function openMineCell(index) {
     vibrate(10);
 
     if (data.win_amount !== undefined && data.win_amount > 0) {
-      // Выигрыш всего
       minesGameActive = false;
       document.getElementById('minesStartBtn').textContent = 'ИГРАТЬ';
       document.getElementById('minesStartBtn').classList.remove('cashout');
@@ -2965,7 +2894,6 @@ async function openMineCell(index) {
 
 async function startMinesGame() {
   if (minesGameActive) {
-    // Кэшаут
     playClick();
     try {
       const res = await fetch(API_URL + '/api/mines/cashout', {
@@ -3102,7 +3030,6 @@ async function init() {
   await loadUserFromServer();
   await checkBanStatus();
   await checkAnnouncement();
-  await checkLiveDrops();
   
   if (maintenanceInterval) clearInterval(maintenanceInterval);
   maintenanceInterval = setInterval(checkMaintenance, 1000);
@@ -3112,11 +3039,6 @@ async function init() {
 
   if (banPollInterval) clearInterval(banPollInterval);
   banPollInterval = setInterval(checkBanStatus, 8000);
-
-  if (dropInterval) clearInterval(dropInterval);
-  dropInterval = setInterval(() => {
-    checkLiveDrops();
-  }, 5000);
 }
 window.addEventListener('load', () => {
   setTimeout(async () => {
