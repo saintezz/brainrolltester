@@ -5,7 +5,6 @@ const crypto = require('crypto');
 
 const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
-
 const BOT_TOKEN = process.env.BOT_TOKEN || 'ЗАМЕНИТЕ_НА_ВАШ_ТОКЕН';
 
 const PROMO_FILE = path.join(DATA_DIR, 'promocodes.json');
@@ -16,9 +15,9 @@ const MAINTENANCE_FILE = path.join(DATA_DIR, 'maintenance.json');
 const ANNOUNCEMENT_FILE = path.join(DATA_DIR, 'announcement.json');
 const STATS_FILE = path.join(DATA_DIR, 'stats.json');
 const BANS_FILE = path.join(DATA_DIR, 'bans.json');
+const DROPS_FILE = path.join(DATA_DIR, 'drops.json');
 
 const ADMIN_USERNAMES = ['saintezz7', 'vortyn1'];
-
 const START_BALANCE = 500;
 
 const ITEMS = {
@@ -26,18 +25,23 @@ const ITEMS = {
   nuclearo: { name: 'Nuclearo Dinausauro', price: 12 },
   witchbroom: { name: 'Witch Broom', price: 29 },
   cupid: { name: 'Cupid Wings', price: 34 },
+  cashorcard: { name: 'Cash or Card', price: 34 },
   garama: { name: 'Garama and Madundung', price: 41 },
   waverider: { name: 'Waverider', price: 41 },
   burguro: { name: 'Burguro and Fryuro', price: 70 },
+  sammyni: { name: 'Sammyni Fattini', price: 70 },
   popcuru: { name: 'Popcuru and Fizzuru', price: 87 },
   celestial: { name: 'Celestial Pegasus', price: 93 },
   lafoodcombinasion: { name: 'La Food Combinasion', price: 103 },
+  fragrama: { name: 'Fragrama and Chocrama', price: 129 },
   cooki: { name: 'Cooki and Milki', price: 130 },
   jolly: { name: 'Jolly Jolly Sahur', price: 132 },
   cerberus: { name: 'Cerberus', price: 155 },
   globba: { name: 'Globba Steppa', price: 164 },
+  reinito: { name: 'Reinito Sleighto', price: 170 },
   dugdugdug: { name: 'Dug Dug Dug', price: 201 },
   losamigos: { name: 'Los Amigos', price: 220 },
+  cloverat: { name: 'Cloverat Clapat', price: 245 },
   guest666: { name: 'Guest 666', price: 324 },
   losadmins: { name: 'Los Admins', price: 370 },
   rubiko: { name: 'Rubiko and Kubiko', price: 395 },
@@ -49,11 +53,13 @@ const ITEMS = {
   ketupas: { name: 'Ketupas Bros', price: 641 },
   skelly: { name: 'Skelly and Coffy', price: 866 },
   dragon: { name: 'Dragon Cannelloni', price: 890 },
+  grabitron: { name: 'Grabatron', price: 1125 },
   hydra: { name: 'Hydra Dragon Cannelloni', price: 1220 },
   tirilikalika: { name: 'Tirilikalika Tirilikalaka', price: 1255 },
   moby: { name: 'Moby Bros', price: 1600 },
   gingergeart: { name: 'Ginger Gerat', price: 1920 },
   kraken: { name: 'Kraken', price: 2030 },
+  lasupreme: { name: 'La Supreme Combination', price: 2203 },
   digi: { name: 'Digi Narwhal', price: 3492 },
   kalikabros: { name: 'Kalika Bros', price: 3490 },
   dragonaquanini: { name: 'Dragon Aquanini', price: 3701 },
@@ -95,14 +101,7 @@ const CASES = {
 const MAX_CHANCE = 80;
 const MIN_CHANCE = 0.01;
 
-const DICE_COLORS = ['blue', 'red', 'yellow', 'orange', 'green', 'purple'];
-
-function getItem(id) { return ITEMS[id] || CASE_ONLY_ITEMS[id] || null; }
-function calcUpgradeChance(sourcePrice, targetPrice) {
-  if (!sourcePrice || !targetPrice || targetPrice <= sourcePrice) return 0;
-  let pct = MAX_CHANCE / (targetPrice / sourcePrice);
-  return Math.max(MIN_CHANCE, Math.min(MAX_CHANCE, pct));
-}
+const activeMinesGames = {};
 
 let promocodes = {}, users = {}, deposits = [], withdraws = [];
 let maintenance = { enabled: false, since: null, by: '' };
@@ -110,6 +109,7 @@ let currentAnnouncement = null;
 let stats = { total_upgrades: 0, total_cases: 0 };
 let onlineUsers = new Map();
 let pendingBans = {};
+let liveDrops = [];
 
 function ensureDataDir() { try { if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (e) {} }
 function loadJSON(file, fallback) { try { if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (err) { console.error('[ERROR] Load', file, err.message); } return fallback; }
@@ -124,6 +124,7 @@ function loadAll() {
   currentAnnouncement = loadJSON(ANNOUNCEMENT_FILE, null);
   stats = loadJSON(STATS_FILE, { total_upgrades: 0, total_cases: 0 });
   pendingBans = loadJSON(BANS_FILE, {});
+  liveDrops = loadJSON(DROPS_FILE, []);
 }
 function savePromos() { saveJSON(PROMO_FILE, promocodes); }
 function saveUsers() { saveJSON(USERS_FILE, users); }
@@ -133,6 +134,14 @@ function saveMaintenance() { saveJSON(MAINTENANCE_FILE, maintenance); }
 function saveAnnouncement() { saveJSON(ANNOUNCEMENT_FILE, currentAnnouncement); }
 function saveStats() { saveJSON(STATS_FILE, stats); }
 function saveBans() { saveJSON(BANS_FILE, pendingBans); }
+function saveDrops() { saveJSON(DROPS_FILE, liveDrops); }
+
+function getItem(id) { return ITEMS[id] || CASE_ONLY_ITEMS[id] || null; }
+function calcUpgradeChance(sourcePrice, targetPrice) {
+  if (!sourcePrice || !targetPrice || targetPrice <= sourcePrice) return 0;
+  let pct = MAX_CHANCE / (targetPrice / sourcePrice);
+  return Math.max(MIN_CHANCE, Math.min(MAX_CHANCE, pct));
+}
 
 function updateOnline(telegramId) {
   if (!telegramId) return;
@@ -142,13 +151,30 @@ function getOnlineCount() {
   const now = Date.now();
   let count = 0;
   for (const [id, time] of onlineUsers) {
-    if (now - time < 60000) {
-      count++;
-    } else {
-      onlineUsers.delete(id);
-    }
+    if (now - time < 60000) count++;
+    else onlineUsers.delete(id);
   }
   return count;
+}
+
+function getMoscowDateStart() {
+  const now = new Date();
+  const mskOffset = 3 * 60 * 60 * 1000;
+  const mskNow = new Date(now.getTime() + mskOffset);
+  const startMskUtc = Date.UTC(mskNow.getUTCFullYear(), mskNow.getUTCMonth(), mskNow.getUTCDate(), 0, 0, 0, 0);
+  return startMskUtc - mskOffset;
+}
+
+function pushLiveDrop(user, itemId) {
+  const drop = { 
+    id: 'drop_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), 
+    user: user.username || user.id, 
+    item_id: itemId, 
+    timestamp: Date.now() 
+  };
+  liveDrops.push(drop);
+  liveDrops = liveDrops.filter(d => d.timestamp > getMoscowDateStart() - 7*24*60*60*1000).slice(-500);
+  saveDrops();
 }
 
 function setCORS(res) { res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS'); res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Telegram-Init-Data'); }
@@ -279,13 +305,6 @@ function listActiveBans() {
   return list;
 }
 
-// DICE HELPER
-function getDiceColorFromValue(val) {
-  // 0 - green, 1-18 red, 19-36 black... wait, standard roulette is not what we need here.
-  // The prompt says 6 colors. Let's make it fully random among 6 colors for each die.
-  return DICE_COLORS[val];
-}
-
 const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { setCORS(res); res.writeHead(204); res.end(); return; }
 
@@ -318,6 +337,7 @@ const server = http.createServer(async (req, res) => {
         (req.method === 'GET' && req.url === '/api/maintenance') ||
         (req.method === 'GET' && req.url === '/api/stats') ||
         (req.method === 'GET' && req.url === '/api/announcement') ||
+        (req.method === 'GET' && req.url === '/api/live-drops') ||
         (req.method === 'GET' && req.url.startsWith('/api/admin/bans')) ||
         (req.method === 'POST' && req.url === '/api/admin/maintenance');
 
@@ -325,7 +345,6 @@ const server = http.createServer(async (req, res) => {
         const initUser = validateTelegramInitData(req.headers['x-telegram-init-data']);
         const bodyUser = req.__body || {};
         const effectiveUsername = (initUser?.username || bodyUser.username || '').toLowerCase();
-
         if (!isAdmin(effectiveUsername)) {
           return sendJSON(res, 503, { ok: false, error: 'MAINTENANCE', message: 'Технический перерыв' });
         }
@@ -349,20 +368,56 @@ const server = http.createServer(async (req, res) => {
       const body = await readBody(req);
       const admin = (body.admin_username || '').toLowerCase();
       if (!isAdmin(admin)) return sendJSON(res, 403, { ok: false, error: 'Нет доступа' });
-      
       if (currentAnnouncement && (Date.now() - currentAnnouncement.timestamp <= 10000)) {
         return sendJSON(res, 429, { ok: false, error: 'Подождите, пока текущий анонс не закончится' });
       }
-
       const text = (body.text || '').trim();
       if (!text) return sendJSON(res, 400, { ok: false, error: 'Текст не может быть пустым' });
-      
       currentAnnouncement = { text, timestamp: Date.now(), by: admin, username: admin };
       saveAnnouncement();
       return sendJSON(res, 200, { ok: true, announcement: currentAnnouncement });
     }
 
-    // ================== БАНЫ (АДМИН) ==================
+    if (req.method === 'GET' && req.url === '/api/live-drops') {
+      const startDay = getMoscowDateStart();
+      const todayDrops = liveDrops.filter(d => d.timestamp >= startDay);
+      todayDrops.sort((a, b) => b.timestamp - a.timestamp);
+      let topDrop = null;
+      let maxPrice = -1;
+      for (const d of todayDrops) {
+        const item = getItem(d.item_id);
+        if (item && item.price > maxPrice) {
+          maxPrice = item.price;
+          topDrop = d;
+        }
+      }
+      const result = todayDrops.slice(0, 50).map(d => {
+        const item = getItem(d.item_id);
+        return {
+          id: d.id,
+          user: d.user,
+          item_id: d.item_id,
+          item_name: item ? item.name : 'Unknown',
+          item_price: item ? item.price : 0,
+          timestamp: d.timestamp,
+          is_top: topDrop && d.id === topDrop.id
+        };
+      });
+
+      return sendJSON(res, 200, {
+        ok: true,
+        drops: result,
+        top: topDrop ? {
+          id: topDrop.id,
+          user: topDrop.user,
+          item_id: topDrop.item_id,
+          item_name: getItem(topDrop.item_id)?.name || 'Unknown',
+          item_price: getItem(topDrop.item_id)?.price || 0,
+          timestamp: topDrop.timestamp
+        } : null
+      });
+    }
+
     if (req.method === 'POST' && req.url === '/api/admin/ban') {
       const body = await readBody(req);
       const admin = (body.admin_username || '').toLowerCase();
@@ -372,9 +427,7 @@ const server = http.createServer(async (req, res) => {
       if (!target) return sendJSON(res, 400, { ok: false, error: 'Введите юзера в тг' });
       const found = findUserByTarget(target);
       if (found) {
-        if ((found.user.username || '').toLowerCase() === admin) {
-          return sendJSON(res, 400, { ok: false, error: 'Нельзя забанить самого себя' });
-        }
+        if ((found.user.username || '').toLowerCase() === admin) return sendJSON(res, 400, { ok: false, error: 'Нельзя забанить самого себя' });
         applyBanToUser(found.user, reason, admin);
         saveUsers();
         return sendJSON(res, 200, { ok: true, banned: true, reason, user: { id: found.id, username: found.user.username || target } });
@@ -440,19 +493,15 @@ const server = http.createServer(async (req, res) => {
       const { code } = body;
       if (!code) return sendJSON(res, 400, { ok: false, error: 'Введите промокод' });
       const upperCode = code.trim().toUpperCase();
-
       if (!Array.isArray(u.promos_used)) u.promos_used = [];
-      if (u.promos_used.includes(upperCode)) {
-        return sendJSON(res, 409, { ok: false, error: 'Вы уже активировали этот промокод. Один человек — одна активация.' });
-      }
-
+      if (u.promos_used.includes(upperCode)) return sendJSON(res, 409, { ok: false, error: 'Вы уже активировали этот промокод. Один человек — одна активация.' });
       const promo = promocodes[upperCode];
       if (!promo) return sendJSON(res, 404, { ok: false, error: 'Промокод не найден' });
       if (promo.uses <= 0) return sendJSON(res, 410, { ok: false, error: 'Промокод больше не активен' });
       promo.uses -= 1;
       u.promos_used.push(upperCode);
       if (promo.type === 'balance') u.balance = (u.balance || 0) + promo.value;
-      else if (promo.type === 'item') { if (!Array.isArray(u.inventory)) u.inventory = []; u.inventory.push(promo.value); }
+      else if (promo.type === 'item') { if (!Array.isArray(u.inventory)) u.inventory = []; u.inventory.push(promo.value); pushLiveDrop(user, promo.value); }
       u.updated_at = new Date().toISOString();
       savePromos();
       saveUsers();
@@ -477,12 +526,10 @@ const server = http.createServer(async (req, res) => {
         const rng = Math.random() * 100; let acc = 0; let wonId = c.rewards[0].id;
         for (const r of c.rewards) { acc += r.chance; if (rng <= acc) { wonId = r.id; break; } }
         u.inventory.push(wonId); wonItems.push(wonId);
+        pushLiveDrop(user, wonId);
       }
       u.updated_at = new Date().toISOString(); saveUsers();
-      
-      stats.total_cases += quantity;
-      saveStats();
-      
+      stats.total_cases += quantity; saveStats();
       return sendJSON(res, 200, { ok: true, won: wonItems, new_balance: u.balance, inventory: u.inventory });
     }
 
@@ -503,13 +550,11 @@ const server = http.createServer(async (req, res) => {
       const chance = calcUpgradeChance(src.price, tgt.price);
       const success = Math.random() * 100 <= chance;
       if (success) { 
-        u.inventory.push(target_item_id); 
+        u.inventory.push(target_item_id);
+        pushLiveDrop(user, target_item_id);
       }
       u.updated_at = new Date().toISOString(); saveUsers();
-      
-      stats.total_upgrades += 1;
-      saveStats();
-      
+      stats.total_upgrades += 1; saveStats();
       return sendJSON(res, 200, { ok: true, success, chance, won_item: success ? target_item_id : null, new_balance: u.balance, inventory: u.inventory });
     }
 
@@ -523,6 +568,7 @@ const server = http.createServer(async (req, res) => {
       if (denyIfBanned(res, u)) return;
       if (u.balance < item.price) return sendJSON(res, 400, { ok: false, error: 'Недостаточно монет' });
       u.balance -= item.price; u.inventory.push(item_id);
+      pushLiveDrop(user, item_id);
       u.updated_at = new Date().toISOString(); saveUsers();
       return sendJSON(res, 200, { ok: true, new_balance: u.balance, inventory: u.inventory });
     }
@@ -540,6 +586,119 @@ const server = http.createServer(async (req, res) => {
       u.inventory.splice(idx, 1); u.balance += item.price;
       u.updated_at = new Date().toISOString(); saveUsers();
       return sendJSON(res, 200, { ok: true, new_balance: u.balance, inventory: u.inventory });
+    }
+
+    if (req.method === 'POST' && req.url === '/api/mines/start') {
+      const body = await readBody(req);
+      const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
+      const { item_ids, mines_count } = body;
+      if (!Array.isArray(item_ids) || item_ids.length === 0 || item_ids.length > 5) return sendJSON(res, 400, { ok: false, error: 'Выберите от 1 до 5 предметов' });
+      const u = ensureUser(user.id, user.username);
+      if (denyIfBanned(res, u)) return;
+      
+      const pendingW = computePendingWithdrawIds(user.id);
+      let totalBetValue = 0;
+      for (const id of item_ids) {
+        if (!u.inventory.includes(id)) return sendJSON(res, 400, { ok: false, error: 'Предмет не найден в инвентаре' });
+        if (pendingW.includes(id)) return sendJSON(res, 400, { ok: false, error: 'Предмет на выводе' });
+        totalBetValue += getItem(id).price;
+      }
+      if (totalBetValue <= 0) return sendJSON(res, 400, { ok: false, error: 'Ставка слишком мала' });
+
+      item_ids.forEach(id => {
+        const idx = u.inventory.indexOf(id);
+        if (idx !== -1) u.inventory.splice(idx, 1);
+      });
+
+      const minesPositions = new Set();
+      while (minesPositions.size < Math.min(24, Math.max(1, parseInt(mines_count) || 2))) {
+        minesPositions.add(Math.floor(Math.random() * 25));
+      }
+
+      activeMinesGames[user.id] = {
+        bet_items: item_ids,
+        total_bet_value: totalBetValue,
+        mines_count: minesPositions.size,
+        mines_positions: [...minesPositions],
+        opened: [],
+        started_at: Date.now()
+      };
+
+      u.updated_at = new Date().toISOString(); saveUsers();
+      return sendJSON(res, 200, { ok: true, inventory: u.inventory });
+    }
+
+    if (req.method === 'POST' && req.url === '/api/mines/open') {
+      const body = await readBody(req);
+      const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
+      const { cell_index } = body;
+      const game = activeMinesGames[user.id];
+      if (!game) return sendJSON(res, 400, { ok: false, error: 'Игра не найдена' });
+      if (game.opened.includes(cell_index)) return sendJSON(res, 400, { ok: false, error: 'Ячейка уже открыта' });
+
+      const isBomb = game.mines_positions.includes(cell_index);
+      game.opened.push(cell_index);
+
+      if (isBomb) {
+        delete activeMinesGames[user.id];
+        return sendJSON(res, 200, { 
+          ok: true, 
+          is_bomb: true, 
+          win_amount: 0, 
+          opened: game.opened, 
+          inventory: users[user.id].inventory 
+        });
+      } else {
+        const totalSafe = 25 - game.mines_count;
+        if (game.opened.length === totalSafe) {
+          let mult = 1.04;
+          if (game.mines_count === 2) mult = 1.04;
+          else if (game.mines_count === 3) mult = 1.13;
+          else if (game.mines_count === 5) mult = 1.24;
+          else if (game.mines_count === 10) mult = 1.37;
+          else if (game.mines_count === 24) mult = 24.00;
+          else mult = 1 + (game.mines_count * 0.05);
+          
+          const winAmount = Math.floor(game.total_bet_value * mult);
+          const u = users[user.id];
+          u.balance += winAmount;
+          
+          saveUsers();
+          delete activeMinesGames[user.id];
+          return sendJSON(res, 200, { 
+            ok: true, 
+            is_bomb: false, 
+            win_amount: winAmount, 
+            opened: game.opened, 
+            inventory: u.inventory, 
+            new_balance: u.balance 
+          });
+        }
+        return sendJSON(res, 200, { ok: true, is_bomb: false, opened: game.opened });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/api/mines/cashout') {
+      const body = await readBody(req);
+      const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
+      const game = activeMinesGames[user.id];
+      if (!game) return sendJSON(res, 400, { ok: false, error: 'Игра не найдена' });
+
+      let mult = 1.04;
+      if (game.mines_count === 2) mult = 1.04;
+      else if (game.mines_count === 3) mult = 1.13;
+      else if (game.mines_count === 5) mult = 1.24;
+      else if (game.mines_count === 10) mult = 1.37;
+      else if (game.mines_count === 24) mult = 24.00;
+      else mult = 1 + (game.mines_count * 0.05);
+
+      const winAmount = Math.floor(game.total_bet_value * mult);
+      const u = users[user.id];
+      u.balance += winAmount;
+      
+      saveUsers();
+      delete activeMinesGames[user.id];
+      return sendJSON(res, 200, { ok: true, win_amount: winAmount, new_balance: u.balance, inventory: u.inventory });
     }
 
     if (req.method === 'POST' && req.url === '/api/deposit/create') {
@@ -639,102 +798,15 @@ const server = http.createServer(async (req, res) => {
       const body = await readBody(req);
       const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
       updateOnline(user.id);
-      const { custom_nick, avatar, balance } = body;
+      const { custom_nick, avatar } = body;
       const u = ensureUser(user.id, user.username);
       if (denyIfBanned(res, u)) return;
+      
       if (typeof custom_nick === 'string') u.custom_nick = custom_nick.slice(0, 20);
       if (typeof avatar === 'string') u.avatar = avatar;
-      if (typeof balance === 'number' && isFinite(balance) && balance >= 0) {
-        u.balance = balance;
-      }
+      
       u.updated_at = new Date().toISOString(); saveUsers();
       return sendJSON(res, 200, { ok: true, user: publicUser(u, user.id) });
-    }
-
-    // ================== DICE ROLL ==================
-    if (req.method === 'POST' && req.url === '/api/dice/roll') {
-      const body = await readBody(req);
-      const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
-      updateOnline(user.id);
-
-      const u = ensureUser(user.id, user.username);
-      if (denyIfBanned(res, u)) return;
-
-      const { color, item_ids } = body;
-      if (!color || !DICE_COLORS.includes(color)) {
-        return sendJSON(res, 400, { ok: false, error: 'Выберите корректный цвет' });
-      }
-      if (!Array.isArray(item_ids) || item_ids.length === 0 || item_ids.length > 3) {
-        return sendJSON(res, 400, { ok: false, error: 'Выберите от 1 до 3 брейнротов' });
-      }
-
-      // Check if all items exist in user's inventory and are not on withdraw
-      const pendingWithdraws = computePendingWithdrawIds(user.id);
-      for (const id of item_ids) {
-        if (!u.inventory.includes(id)) {
-          return sendJSON(res, 400, { ok: false, error: `Предмет ${id} не найден в инвентаре` });
-        }
-        if (pendingWithdraws.includes(id)) {
-          return sendJSON(res, 400, { ok: false, error: `Предмет ${id} находится на выводе` });
-        }
-      }
-
-      // Remove items from inventory immediately
-      for (const id of item_ids) {
-        const idx = u.inventory.indexOf(id);
-        if (idx !== -1) u.inventory.splice(idx, 1);
-      }
-
-      // Generate 4 random colors using crypto for fairness
-      const resultColors = [];
-      for (let i = 0; i < 4; i++) {
-        const randVal = crypto.randomInt(0, DICE_COLORS.length);
-        resultColors.push(DICE_COLORS[randVal]);
-      }
-
-      // Count matches
-      const matchCount = resultColors.filter(c => c === color).length;
-
-      let won = false;
-      let multiplier = 0;
-
-      // Check win conditions based on provided rules
-      if (matchCount === 1) { won = true; multiplier = 2; }
-      else if (matchCount === 4) { won = true; multiplier = 3; }
-      else if (new Set(resultColors).size === 4) { // All 4 are different (Bonus)
-        won = true; multiplier = 10;
-      }
-
-      let rewardCount = 0;
-      if (won) {
-        // If matchCount is 1, user gets the item back + 1 copy (x2)
-        // If matchCount is 4, user gets item back + 2 copies (x3)
-        // If Bonus (all different), user gets item back + 9 copies (x10)
-        // multiplier represents total return count. So for x2, we add (2 - 1) = 1 copy per selected item.
-        const copiesToAdd = multiplier - 1;
-        rewardCount = copiesToAdd * item_ids.length;
-
-        // Return original items + extra copies
-        for (const id of item_ids) {
-          for (let i = 0; i < multiplier; i++) {
-            u.inventory.push(id);
-          }
-        }
-      }
-
-      u.updated_at = new Date().toISOString();
-      saveUsers();
-
-      return sendJSON(res, 200, {
-        ok: true,
-        result: resultColors,
-        match_count: matchCount,
-        won: won,
-        multiplier: multiplier,
-        reward_count: rewardCount,
-        new_balance: u.balance,
-        inventory: u.inventory
-      });
     }
 
     sendJSON(res, 404, { ok: false, error: 'Метод не найден' });
