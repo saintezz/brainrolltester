@@ -165,6 +165,19 @@ function getMoscowDateStart() {
   return startMskUtc - mskOffset;
 }
 
+// Функция добавления дропа в лайв-ленту
+function pushLiveDrop(user, itemId) {
+  liveDrops.push({ 
+    id: 'drop_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), 
+    user: user.username || user.id, 
+    item_id: itemId, 
+    timestamp: Date.now() 
+  });
+  // Сохраняем только последние 7 дней, чтобы не переполнять файл
+  liveDrops = liveDrops.filter(d => d.timestamp > getMoscowDateStart() - 7*24*60*60*1000).slice(-500);
+  saveDrops();
+}
+
 function setCORS(res) { res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS'); res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Telegram-Init-Data'); }
 function sendJSON(res, status, data) { setCORS(res); res.setHeader('Cache-Control', 'no-store'); res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(data)); }
 
@@ -497,7 +510,7 @@ const server = http.createServer(async (req, res) => {
       promo.uses -= 1;
       u.promos_used.push(upperCode);
       if (promo.type === 'balance') u.balance = (u.balance || 0) + promo.value;
-      else if (promo.type === 'item') { if (!Array.isArray(u.inventory)) u.inventory = []; u.inventory.push(promo.value); }
+      else if (promo.type === 'item') { if (!Array.isArray(u.inventory)) u.inventory = []; u.inventory.push(promo.value); pushLiveDrop(user, promo.value); }
       u.updated_at = new Date().toISOString();
       savePromos();
       saveUsers();
@@ -522,11 +535,8 @@ const server = http.createServer(async (req, res) => {
         const rng = Math.random() * 100; let acc = 0; let wonId = c.rewards[0].id;
         for (const r of c.rewards) { acc += r.chance; if (rng <= acc) { wonId = r.id; break; } }
         u.inventory.push(wonId); wonItems.push(wonId);
-        liveDrops.push({ id: 'drop_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), user: user.username || user.id, item_id: wonId, timestamp: Date.now() });
+        pushLiveDrop(user, wonId);
       }
-      // Сохраняем только последние 7 дней, чтобы не переполнять файл
-      liveDrops = liveDrops.filter(d => d.timestamp > getMoscowDateStart() - 7*24*60*60*1000).slice(-500);
-      saveDrops();
       u.updated_at = new Date().toISOString(); saveUsers();
       stats.total_cases += quantity; saveStats();
       return sendJSON(res, 200, { ok: true, won: wonItems, new_balance: u.balance, inventory: u.inventory });
@@ -550,9 +560,7 @@ const server = http.createServer(async (req, res) => {
       const success = Math.random() * 100 <= chance;
       if (success) { 
         u.inventory.push(target_item_id);
-        liveDrops.push({ id: 'drop_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), user: user.username || user.id, item_id: target_item_id, timestamp: Date.now() });
-        liveDrops = liveDrops.filter(d => d.timestamp > getMoscowDateStart() - 7*24*60*60*1000).slice(-500);
-        saveDrops();
+        pushLiveDrop(user, target_item_id);
       }
       u.updated_at = new Date().toISOString(); saveUsers();
       stats.total_upgrades += 1; saveStats();
@@ -569,6 +577,7 @@ const server = http.createServer(async (req, res) => {
       if (denyIfBanned(res, u)) return;
       if (u.balance < item.price) return sendJSON(res, 400, { ok: false, error: 'Недостаточно монет' });
       u.balance -= item.price; u.inventory.push(item_id);
+      pushLiveDrop(user, item_id);
       u.updated_at = new Date().toISOString(); saveUsers();
       return sendJSON(res, 200, { ok: true, new_balance: u.balance, inventory: u.inventory });
     }
