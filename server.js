@@ -111,6 +111,14 @@ let onlineUsers = new Map();
 let pendingBans = {};
 let liveDrops = [];
 
+// Флаги для отложенного сохранения (оптимизация)
+let usersDirty = false;
+let promosDirty = false;
+setInterval(() => {
+  if (usersDirty) { saveUsers(); usersDirty = false; }
+  if (promosDirty) { savePromos(); promosDirty = false; }
+}, 5000); // Сохраняем раз в 5 секунд, если были изменения
+
 function ensureDataDir() { try { if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (e) {} }
 function loadJSON(file, fallback) { try { if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (err) { console.error('[ERROR] Load', file, err.message); } return fallback; }
 function saveJSON(file, data) { try { ensureDataDir(); fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf8'); } catch (err) { console.error('[ERROR] Save', file, err.message); } }
@@ -126,8 +134,8 @@ function loadAll() {
   pendingBans = loadJSON(BANS_FILE, {});
   liveDrops = loadJSON(DROPS_FILE, []);
 }
-function savePromos() { saveJSON(PROMO_FILE, promocodes); }
-function saveUsers() { saveJSON(USERS_FILE, users); }
+function savePromos() { saveJSON(PROMO_FILE, promocodes); promosDirty = false; }
+function saveUsers() { saveJSON(USERS_FILE, users); usersDirty = false; }
 function saveDeposits() { saveJSON(DEPOSITS_FILE, deposits); }
 function saveWithdraws() { saveJSON(WITHDRAWS_FILE, withdraws); }
 function saveMaintenance() { saveJSON(MAINTENANCE_FILE, maintenance); }
@@ -243,15 +251,17 @@ function applyPendingBan(userId, u) {
   applyBanToUser(u, p.reason || 'Не указана', p.by || 'admin');
   delete pendingBans[un];
   saveBans();
-  saveUsers();
+  usersDirty = true;
   return true;
 }
 function ensureUser(telegramId, username) {
   if (!telegramId) telegramId = 'guest_' + Date.now();
   if (!users[telegramId]) {
     users[telegramId] = { balance: START_BALANCE, inventory: [], username: username || '', roblox_name: '', custom_nick: '', avatar: '', accent: '', promos_used: [], ban: null, unban_notice: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+    usersDirty = true;
   } else if (username && users[telegramId].username !== username) {
     users[telegramId].username = username; users[telegramId].updated_at = new Date().toISOString();
+    usersDirty = true;
   }
   const u = users[telegramId];
   if (!Array.isArray(u.promos_used)) u.promos_used = [];
@@ -437,7 +447,7 @@ const server = http.createServer(async (req, res) => {
       if (found) {
         if ((found.user.username || '').toLowerCase() === admin) return sendJSON(res, 400, { ok: false, error: 'Нельзя забанить самого себя' });
         applyBanToUser(found.user, reason, admin);
-        saveUsers();
+        usersDirty = true;
         return sendJSON(res, 200, { ok: true, banned: true, reason, user: { id: found.id, username: found.user.username || target } });
       }
       if (/^\d+$/.test(target)) return sendJSON(res, 404, { ok: false, error: 'Юзер с таким ID не найден' });
@@ -462,7 +472,7 @@ const server = http.createServer(async (req, res) => {
         u.ban = { active: false, reason: u.ban.reason || 'Не указана', at: u.ban.at || null, by: u.ban.by || '', unbanned_at: new Date().toISOString(), unbanned_by: admin, unban_reason: finalReason };
         u.unban_notice = { reason: finalReason, at: new Date().toISOString(), by: admin, seen: false };
         u.updated_at = new Date().toISOString();
-        saveUsers();
+        usersDirty = true;
         return sendJSON(res, 200, { ok: true, unbanned: true, reason: finalReason, user: { id: found.id, username: u.username || target } });
       }
       const low = target.toLowerCase();
@@ -493,6 +503,45 @@ const server = http.createServer(async (req, res) => {
       savePromos();
       return sendJSON(res, 200, { ok: true, promo: promocodes[upperCode] });
     }
+
+    // ================== СОЗДАНИЕ ПРОМОКОДА ПОЛЬЗОВАТЕЛЕМ ==================
+    if (req.method === 'POST' && req.url === '/api/promo/create_by_user') {
+      const body = await readBody(req);
+      const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
+      const u = ensureUser(user.id, user.username);
+      if (denyIfBanned(res, u)) return;
+      
+      const { code, amount, uses } = body;
+      if (!code || code.trim().length < 3) return sendJSON(res, 400, { ok: false, error: 'Название минимум 3 символа' });
+      const upperCode = code.trim().toUpperCase();
+      if (promocodes[upperCode]) return sendJSON(res, 409, { ok: false, error: 'Промокод с таким названием уже существует' });
+      
+      const parsedAmount = parseInt(amount);
+      const parsedUses = parseInt(uses);
+      
+      if (!parsedAmount || parsedAmount < 1) return sendJSON(res, 400, { ok: false, error: 'Сумма минимум 1 монета' });
+      if (!parsedUses || parsedUses < 1) return sendJSON(res, 400, { ok: false, error: 'Активаций минимум 1' });
+      
+      const totalCost = parsedAmount * parsedUses;
+      if (u.balance < totalCost) return sendJSON(res, 400, { ok: false, error: `Недостаточно монет. Нужно: ${totalCost}` });
+      
+      u.balance -= totalCost;
+      u.updated_at = new Date().toISOString();
+      usersDirty = true;
+      
+      promocodes[upperCode] = { 
+        code: upperCode, 
+        uses: parsedUses, 
+        type: 'balance', 
+        value: parsedAmount, 
+        createdAt: new Date().toISOString(),
+        created_by: user.username || user.id
+      };
+      savePromos();
+      
+      return sendJSON(res, 200, { ok: true, new_balance: u.balance, promo: promocodes[upperCode] });
+    }
+
     if (req.method === 'POST' && req.url === '/api/activate') {
       const body = await readBody(req);
       const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
@@ -512,7 +561,7 @@ const server = http.createServer(async (req, res) => {
       else if (promo.type === 'item') { if (!Array.isArray(u.inventory)) u.inventory = []; u.inventory.push(promo.value); pushLiveDrop(user, promo.value); }
       u.updated_at = new Date().toISOString();
       savePromos();
-      saveUsers();
+      usersDirty = true;
       return sendJSON(res, 200, { ok: true, type: promo.type, value: promo.value, remaining: promo.uses });
     }
     if (req.method === 'GET' && req.url === '/api/promocodes') return sendJSON(res, 200, { ok: true, promocodes });
@@ -536,7 +585,7 @@ const server = http.createServer(async (req, res) => {
         u.inventory.push(wonId); wonItems.push(wonId);
         pushLiveDrop(user, wonId);
       }
-      u.updated_at = new Date().toISOString(); saveUsers();
+      u.updated_at = new Date().toISOString(); usersDirty = true;
       stats.total_cases += quantity; saveStats();
       return sendJSON(res, 200, { ok: true, won: wonItems, new_balance: u.balance, inventory: u.inventory });
     }
@@ -561,7 +610,7 @@ const server = http.createServer(async (req, res) => {
         u.inventory.push(target_item_id);
         pushLiveDrop(user, target_item_id);
       }
-      u.updated_at = new Date().toISOString(); saveUsers();
+      u.updated_at = new Date().toISOString(); usersDirty = true;
       stats.total_upgrades += 1; saveStats();
       return sendJSON(res, 200, { ok: true, success, chance, won_item: success ? target_item_id : null, new_balance: u.balance, inventory: u.inventory });
     }
@@ -577,7 +626,7 @@ const server = http.createServer(async (req, res) => {
       if (u.balance < item.price) return sendJSON(res, 400, { ok: false, error: 'Недостаточно монет' });
       u.balance -= item.price; u.inventory.push(item_id);
       pushLiveDrop(user, item_id);
-      u.updated_at = new Date().toISOString(); saveUsers();
+      u.updated_at = new Date().toISOString(); usersDirty = true;
       return sendJSON(res, 200, { ok: true, new_balance: u.balance, inventory: u.inventory });
     }
     if (req.method === 'POST' && req.url === '/api/shop/sell') {
@@ -592,7 +641,7 @@ const server = http.createServer(async (req, res) => {
       if (idx === -1) return sendJSON(res, 400, { ok: false, error: 'Предмета нет в инвентаре' });
       if (computePendingWithdrawIds(user.id).includes(item_id)) return sendJSON(res, 400, { ok: false, error: 'Предмет на выводе' });
       u.inventory.splice(idx, 1); u.balance += item.price;
-      u.updated_at = new Date().toISOString(); saveUsers();
+      u.updated_at = new Date().toISOString(); usersDirty = true;
       return sendJSON(res, 200, { ok: true, new_balance: u.balance, inventory: u.inventory });
     }
 
@@ -609,7 +658,7 @@ const server = http.createServer(async (req, res) => {
       
       const pendingW = computePendingWithdrawIds(user.id);
       let totalBetValue = 0;
-      const sortedIndexes = [...item_indexes].sort((a,b) => b-a); // Удаляем с конца, чтобы не сбить индексы
+      const sortedIndexes = [...item_indexes].sort((a,b) => b-a);
       
       for (const idx of sortedIndexes) {
         if (idx < 0 || idx >= u.inventory.length) return sendJSON(res, 400, { ok: false, error: 'Неверный индекс предмета' });
@@ -619,12 +668,10 @@ const server = http.createServer(async (req, res) => {
       }
       if (totalBetValue <= 0) return sendJSON(res, 400, { ok: false, error: 'Ставка слишком мала' });
 
-      // Удаляем предметы из инвентаря
       sortedIndexes.forEach(idx => {
         u.inventory.splice(idx, 1);
       });
 
-      // Генерируем бомбы для 1 этажа
       const bombsCount = difficulty;
       const bombs = [];
       while (bombs.length < bombsCount) {
@@ -638,11 +685,11 @@ const server = http.createServer(async (req, res) => {
         difficulty: difficulty,
         current_floor: 1,
         bombs: bombs,
-        opened_count: 0, // Счетчик открытых ячеек на текущем этаже
+        opened_count: 0,
         started_at: Date.now()
       };
 
-      u.updated_at = new Date().toISOString(); saveUsers();
+      u.updated_at = new Date().toISOString(); usersDirty = true;
       return sendJSON(res, 200, { ok: true, inventory: u.inventory, bombs: bombs });
     }
 
@@ -664,22 +711,19 @@ const server = http.createServer(async (req, res) => {
           inventory: users[user.id].inventory 
         });
       } else {
-        // Успех
         game.opened_count = (game.opened_count || 0) + 1;
         
-        // Если открыто 5 ячеек, переходим на следующий этаж
         if (game.opened_count >= 5) {
           game.current_floor++;
           game.opened_count = 0;
           
           if (game.current_floor > 5) {
-            // Дошли до конца, автоматический кэшаут
             const mults = TOWER_MULTIPLIERS[game.difficulty];
             const mult = mults[5];
             const winAmount = Math.floor(game.total_bet_value * mult);
             const u = users[user.id];
             u.balance += winAmount;
-            saveUsers();
+            usersDirty = true;
             delete activeTowerGames[user.id];
             return sendJSON(res, 200, { 
               ok: true, 
@@ -690,7 +734,6 @@ const server = http.createServer(async (req, res) => {
             });
           }
 
-          // Генерируем новые бомбы для следующего этажа
           const bombsCount = game.difficulty;
           const newBombs = [];
           while (newBombs.length < bombsCount) {
@@ -719,7 +762,7 @@ const server = http.createServer(async (req, res) => {
       const u = users[user.id];
       u.balance += winAmount;
       
-      saveUsers();
+      usersDirty = true;
       delete activeTowerGames[user.id];
       return sendJSON(res, 200, { ok: true, win_amount: winAmount, new_balance: u.balance, inventory: u.inventory });
     }
@@ -750,7 +793,7 @@ const server = http.createServer(async (req, res) => {
       const dep = deposits.find(d => d.id === id); if (!dep) return sendJSON(res, 404, { ok: false, error: 'Заявка не найдена' });
       if (dep.status !== 'pending') return sendJSON(res, 409, { ok: false, error: 'Уже обработана' });
       dep.status = status; dep.processed_at = new Date().toISOString(); dep.processed_by = admin || 'admin';
-      if (status === 'accepted') { const u = ensureUser(dep.telegram_id, dep.username); u.balance = (u.balance || 0) + dep.item_price; saveUsers(); }
+      if (status === 'accepted') { const u = ensureUser(dep.telegram_id, dep.username); u.balance = (u.balance || 0) + dep.item_price; usersDirty = true; }
       saveDeposits();
       return sendJSON(res, 200, { ok: true, deposit: dep });
     }
@@ -783,7 +826,7 @@ const server = http.createServer(async (req, res) => {
       if (wd.status !== 'pending') return sendJSON(res, 409, { ok: false, error: 'Уже обработана' });
       wd.status = status; wd.processed_at = new Date().toISOString(); wd.processed_by = admin || 'admin';
       const u = ensureUser(wd.telegram_id, wd.username);
-      if (status === 'accepted') { const i = u.inventory.indexOf(wd.item_id); if (i !== -1) u.inventory.splice(i, 1); u.updated_at = new Date().toISOString(); saveUsers(); }
+      if (status === 'accepted') { const i = u.inventory.indexOf(wd.item_id); if (i !== -1) u.inventory.splice(i, 1); u.updated_at = new Date().toISOString(); usersDirty = true; }
       saveWithdraws();
       return sendJSON(res, 200, { ok: true, withdraw: wd });
     }
@@ -806,7 +849,7 @@ const server = http.createServer(async (req, res) => {
       const body = await readBody(req);
       const id = String(body.telegram_id || '');
       const u = users[id];
-      if (u && u.unban_notice) { u.unban_notice.seen = true; saveUsers(); }
+      if (u && u.unban_notice) { u.unban_notice.seen = true; usersDirty = true; }
       return sendJSON(res, 200, { ok: true });
     }
 
@@ -815,7 +858,7 @@ const server = http.createServer(async (req, res) => {
       const id = decodeURIComponent(reqUrl.pathname.slice('/api/user/'.length));
       const uname = reqUrl.searchParams.get('username') || '';
       updateOnline(id);
-      const u = ensureUser(id, uname); saveUsers();
+      const u = ensureUser(id, uname); usersDirty = true;
       return sendJSON(res, 200, { ok: true, user: publicUser(u, id) });
     }
     if (req.method === 'POST' && req.url === '/api/user/update') {
@@ -829,7 +872,7 @@ const server = http.createServer(async (req, res) => {
       if (typeof custom_nick === 'string') u.custom_nick = custom_nick.slice(0, 20);
       if (typeof avatar === 'string') u.avatar = avatar;
       
-      u.updated_at = new Date().toISOString(); saveUsers();
+      u.updated_at = new Date().toISOString(); usersDirty = true;
       return sendJSON(res, 200, { ok: true, user: publicUser(u, user.id) });
     }
 
