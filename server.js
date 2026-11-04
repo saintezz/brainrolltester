@@ -101,7 +101,7 @@ const CASES = {
 const MAX_CHANCE = 80;
 const MIN_CHANCE = 0.01;
 
-const activeMinesGames = {};
+const activeTowerGames = {};
 
 let promocodes = {}, users = {}, deposits = [], withdraws = [];
 let maintenance = { enabled: false, since: null, by: '' };
@@ -304,6 +304,14 @@ function listActiveBans() {
   list.sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')));
   return list;
 }
+
+// ================== БАШНЯ ЛОГИКА ==================
+const TOWER_MULTIPLIERS = {
+  1: [0, 1.1, 1.3, 1.5, 1.7, 2.0],
+  2: [0, 1.3, 1.6, 1.9, 2.0, 2.1],
+  3: [0, 2.6, 3.9, 4.3, 4.6, 5.0],
+  4: [0, 4.2, 9.2, 20.0, 100.0, 1000.0]
+};
 
 const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { setCORS(res); res.writeHead(204); res.end(); return; }
@@ -588,119 +596,126 @@ const server = http.createServer(async (req, res) => {
       return sendJSON(res, 200, { ok: true, new_balance: u.balance, inventory: u.inventory });
     }
 
-    if (req.method === 'POST' && req.url === '/api/mines/start') {
+    // ================== БАШНЯ API ==================
+    if (req.method === 'POST' && req.url === '/api/tower/start') {
       const body = await readBody(req);
       const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
-      const { item_ids, mines_count } = body;
-      if (!Array.isArray(item_ids) || item_ids.length === 0 || item_ids.length > 5) return sendJSON(res, 400, { ok: false, error: 'Выберите от 1 до 5 предметов' });
+      const { item_indexes, difficulty } = body;
+      if (!Array.isArray(item_indexes) || item_indexes.length === 0 || item_indexes.length > 5) return sendJSON(res, 400, { ok: false, error: 'Выберите от 1 до 5 предметов' });
+      if (!TOWER_MULTIPLIERS[difficulty]) return sendJSON(res, 400, { ok: false, error: 'Неверная сложность' });
+
       const u = ensureUser(user.id, user.username);
       if (denyIfBanned(res, u)) return;
       
       const pendingW = computePendingWithdrawIds(user.id);
       let totalBetValue = 0;
-      for (const id of item_ids) {
-        if (!u.inventory.includes(id)) return sendJSON(res, 400, { ok: false, error: 'Предмет не найден в инвентаре' });
-        if (pendingW.includes(id)) return sendJSON(res, 400, { ok: false, error: 'Предмет на выводе' });
-        totalBetValue += getItem(id).price;
+      const sortedIndexes = [...item_indexes].sort((a,b) => b-a); // Удаляем с конца, чтобы не сбить индексы
+      
+      for (const idx of sortedIndexes) {
+        if (idx < 0 || idx >= u.inventory.length) return sendJSON(res, 400, { ok: false, error: 'Неверный индекс предмета' });
+        const itemId = u.inventory[idx];
+        if (pendingW.includes(itemId)) return sendJSON(res, 400, { ok: false, error: 'Предмет на выводе' });
+        totalBetValue += getItem(itemId).price;
       }
       if (totalBetValue <= 0) return sendJSON(res, 400, { ok: false, error: 'Ставка слишком мала' });
 
-      item_ids.forEach(id => {
-        const idx = u.inventory.indexOf(id);
-        if (idx !== -1) u.inventory.splice(idx, 1);
+      // Удаляем предметы из инвентаря
+      sortedIndexes.forEach(idx => {
+        u.inventory.splice(idx, 1);
       });
 
-      const minesPositions = new Set();
-      while (minesPositions.size < Math.min(24, Math.max(1, parseInt(mines_count) || 2))) {
-        minesPositions.add(Math.floor(Math.random() * 25));
+      // Генерируем бомбы для 1 этажа
+      const bombsCount = difficulty; // 1, 2, 3, 4
+      const bombs = [];
+      while (bombs.length < bombsCount) {
+        const r = Math.floor(Math.random() * 5);
+        if (!bombs.includes(r)) bombs.push(r);
       }
 
-      activeMinesGames[user.id] = {
-        bet_items: item_ids,
+      activeTowerGames[user.id] = {
+        bet_items: item_indexes,
         total_bet_value: totalBetValue,
-        mines_count: minesPositions.size,
-        mines_positions: [...minesPositions],
-        opened: [],
+        difficulty: difficulty,
+        current_floor: 1,
+        bombs: bombs,
         started_at: Date.now()
       };
 
       u.updated_at = new Date().toISOString(); saveUsers();
-      return sendJSON(res, 200, { ok: true, inventory: u.inventory });
+      return sendJSON(res, 200, { ok: true, inventory: u.inventory, bombs: bombs });
     }
 
-    if (req.method === 'POST' && req.url === '/api/mines/open') {
+    if (req.method === 'POST' && req.url === '/api/tower/open') {
       const body = await readBody(req);
       const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
       const { cell_index } = body;
-      const game = activeMinesGames[user.id];
+      const game = activeTowerGames[user.id];
       if (!game) return sendJSON(res, 400, { ok: false, error: 'Игра не найдена' });
-      if (game.opened.includes(cell_index)) return sendJSON(res, 400, { ok: false, error: 'Ячейка уже открыта' });
 
-      const isBomb = game.mines_positions.includes(cell_index);
-      game.opened.push(cell_index);
+      const isBomb = game.bombs.includes(cell_index);
 
       if (isBomb) {
-        delete activeMinesGames[user.id];
+        delete activeTowerGames[user.id];
         return sendJSON(res, 200, { 
           ok: true, 
           is_bomb: true, 
-          win_amount: 0, 
-          opened: game.opened, 
+          win_amount: 0,
           inventory: users[user.id].inventory 
         });
       } else {
-        const totalSafe = 25 - game.mines_count;
-        if (game.opened.length === totalSafe) {
-          let mult = 1.04;
-          if (game.mines_count === 2) mult = 1.04;
-          else if (game.mines_count === 3) mult = 1.13;
-          else if (game.mines_count === 5) mult = 1.24;
-          else if (game.mines_count === 10) mult = 1.37;
-          else if (game.mines_count === 24) mult = 24.00;
-          else mult = 1 + (game.mines_count * 0.05);
-          
+        // Успех
+        game.current_floor++;
+        
+        if (game.current_floor > 5) {
+          // Дошли до конца, автоматический кэшаут
+          const mults = TOWER_MULTIPLIERS[game.difficulty];
+          const mult = mults[5];
           const winAmount = Math.floor(game.total_bet_value * mult);
           const u = users[user.id];
           u.balance += winAmount;
-          
           saveUsers();
-          delete activeMinesGames[user.id];
+          delete activeTowerGames[user.id];
           return sendJSON(res, 200, { 
             ok: true, 
             is_bomb: false, 
             win_amount: winAmount, 
-            opened: game.opened, 
             inventory: u.inventory, 
             new_balance: u.balance 
           });
         }
-        return sendJSON(res, 200, { ok: true, is_bomb: false, opened: game.opened });
+
+        // Генерируем новые бомбы для следующего этажа
+        const bombsCount = game.difficulty;
+        const newBombs = [];
+        while (newBombs.length < bombsCount) {
+          const r = Math.floor(Math.random() * 5);
+          if (!newBombs.includes(r)) newBombs.push(r);
+        }
+        game.bombs = newBombs;
+
+        return sendJSON(res, 200, { ok: true, is_bomb: false, current_floor: game.current_floor, bombs: newBombs });
       }
     }
 
-    if (req.method === 'POST' && req.url === '/api/mines/cashout') {
+    if (req.method === 'POST' && req.url === '/api/tower/cashout') {
       const body = await readBody(req);
       const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
-      const game = activeMinesGames[user.id];
+      const game = activeTowerGames[user.id];
       if (!game) return sendJSON(res, 400, { ok: false, error: 'Игра не найдена' });
 
-      let mult = 1.04;
-      if (game.mines_count === 2) mult = 1.04;
-      else if (game.mines_count === 3) mult = 1.13;
-      else if (game.mines_count === 5) mult = 1.24;
-      else if (game.mines_count === 10) mult = 1.37;
-      else if (game.mines_count === 24) mult = 24.00;
-      else mult = 1 + (game.mines_count * 0.05);
-
+      const mults = TOWER_MULTIPLIERS[game.difficulty];
+      const mult = mults[game.current_floor - 1] || 1;
       const winAmount = Math.floor(game.total_bet_value * mult);
+      
       const u = users[user.id];
       u.balance += winAmount;
       
       saveUsers();
-      delete activeMinesGames[user.id];
+      delete activeTowerGames[user.id];
       return sendJSON(res, 200, { ok: true, win_amount: winAmount, new_balance: u.balance, inventory: u.inventory });
     }
 
+    // ================== ОСТАЛЬНОЕ API ==================
     if (req.method === 'POST' && req.url === '/api/deposit/create') {
       const body = await readBody(req);
       const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
