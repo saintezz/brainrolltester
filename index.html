@@ -38,11 +38,158 @@ body{
   padding:0;position:relative; overflow-x:hidden;overflow-y:auto; -webkit-font-smoothing:antialiased;
 }
 #toastContainer{display: none;}
+
+/* ===== LAYOUT WITH SIDEBAR ===== */
+.app-wrapper {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+.sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, rgba(10,24,38,0.95), rgba(5,13,22,0.98));
+  border-right: 1px solid var(--glass-border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  z-index: 100;
+}
+.app-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .app{
   width:100%; max-width:100%; margin:0 auto; padding: 0 20px 20px;
   flex:1 0 auto; position:relative; z-index:1;
   display: flex; flex-direction: column;
 }
+
+/* ===== LIVE DROP SIDEBAR STYLES ===== */
+.live-drop-top {
+  background: radial-gradient(120% 90% at 50% 0%, rgba(255,224,102,.15), transparent 60%), var(--bg-surface);
+  border: 1px solid var(--color-gold);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.live-drop-top-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--color-gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  text-shadow: 0 0 10px rgba(255,224,102,.5);
+}
+.live-drop-top img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.6));
+}
+.live-drop-top-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.live-drop-top-price {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--color-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.live-drop-top-price img {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+
+.live-drop-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  padding-right: 4px;
+}
+.live-drop-list::-webkit-scrollbar { width: 6px; }
+.live-drop-list::-webkit-scrollbar-thumb { background: rgba(140,210,255,0.2); border-radius: 6px; }
+
+.live-drop-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 10px;
+  transition: transform .15s, border-color .15s;
+  flex-shrink: 0;
+}
+.live-drop-item:hover {
+  transform: translateX(4px);
+  border-color: var(--color-cyan);
+}
+.live-drop-item img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.live-drop-item-info {
+  flex: 1;
+  min-width: 0;
+}
+.live-drop-item-user {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-cyan);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.live-drop-item-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.live-drop-item-price {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--color-cyan);
+  flex-shrink: 0;
+}
+.live-drop-item-price img {
+  width: 12px;
+  height: 12px;
+}
+
+/* ===== MAIN APP STYLES ===== */
 .burger-btn{display: none;background: transparent;border: none;color: #fff;cursor: pointer;padding: 8px;position: absolute;left: 14px;top: 14px;z-index: 500;}
 .burger-btn svg{width: 28px; height: 28px; stroke: currentColor;}
 .mobile-menu-overlay{display: none;position: fixed;inset: 0;background: rgba(0,0,0,.88);z-index: 600;}
@@ -483,181 +630,6 @@ body{
   text-transform: uppercase;
 }
 
-/* ================== LIVE DROPS (БОКОВАЯ ПАНЕЛЬ) ================== */
-.live-drop-sidebar {
-  position: fixed;
-  top: 20px;
-  left: 0;
-  width: 320px;
-  height: calc(100% - 40px);
-  background: linear-gradient(180deg, rgba(10,24,38,0.95), rgba(5,13,22,0.98));
-  border-right: 1px solid var(--glass-border);
-  border-radius: 0 16px 16px 0;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 999;
-  box-shadow: 4px 0 30px rgba(0,0,0,0.5);
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-  overflow-y: auto;
-}
-.live-drop-sidebar.open {
-  transform: translateX(0);
-}
-.live-drop-top {
-  background: radial-gradient(120% 90% at 50% 0%, rgba(255,224,102,.15), transparent 60%), var(--bg-surface);
-  border: 1px solid var(--color-gold);
-  border-radius: 12px;
-  padding: 16px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.live-drop-top-label {
-  font-size: 10px;
-  font-weight: 800;
-  color: var(--color-gold);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-  text-shadow: 0 0 10px rgba(255,224,102,.5);
-}
-.live-drop-top img {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
-  margin-bottom: 8px;
-  filter: drop-shadow(0 4px 10px rgba(0,0,0,.6));
-}
-.live-drop-top-name {
-  font-size: 14px;
-  font-weight: 800;
-  color: #fff;
-  line-height: 1.2;
-  margin-bottom: 4px;
-}
-.live-drop-top-price {
-  font-size: 13px;
-  font-weight: 900;
-  color: var(--color-gold);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-.live-drop-top-price img {
-  width: 14px;
-  height: 14px;
-  margin: 0;
-}
-
-.live-drop-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  overflow-y: auto;
-  flex: 1;
-  scrollbar-width: thin;
-  padding-right: 4px;
-}
-.live-drop-list::-webkit-scrollbar { width: 6px; }
-.live-drop-list::-webkit-scrollbar-thumb { background: rgba(140,210,255,0.2); border-radius: 6px; }
-
-.live-drop-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--bg-surface);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 10px;
-  transition: transform .15s, border-color .15s;
-  flex-shrink: 0;
-}
-.live-drop-item:hover {
-  transform: translateX(4px);
-  border-color: var(--color-cyan);
-}
-.live-drop-item img {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-.live-drop-item-info {
-  flex: 1;
-  min-width: 0;
-}
-.live-drop-item-user {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--color-cyan);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.live-drop-item-name {
-  font-size: 12px;
-  font-weight: 600;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.live-drop-item-price {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--color-cyan);
-  flex-shrink: 0;
-}
-.live-drop-item-price img {
-  width: 12px;
-  height: 12px;
-}
-
-@media (max-width: 1024px) {
-  .live-drop-sidebar {
-    width: 260px;
-    padding: 12px;
-  }
-  .live-drop-top img {
-    width: 60px;
-    height: 60px;
-  }
-}
-
-@media (max-width: 768px) {
-  .live-drop-sidebar {
-    width: 100%;
-    height: auto;
-    max-height: 40vh;
-    bottom: 0;
-    top: auto;
-    left: 0;
-    border-radius: 16px 16px 0 0;
-    border-right: none;
-    border-top: 1px solid var(--glass-border);
-    transform: translateY(100%);
-  }
-  .live-drop-sidebar.open {
-    transform: translateY(0);
-  }
-  .live-drop-list {
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-  }
-  .live-drop-item {
-    min-width: 200px;
-  }
-}
-
 /* ================== АДМИН: ТАБЫ / ЗАЯВКИ ================== */
 .admin-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
 .admin-tab{flex:0 1 auto;padding:10px 14px;border-radius:8px;border:1px solid var(--glass-border);background:var(--bg-surface);color:var(--text-muted);font-family:var(--font-main);font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
@@ -715,6 +687,37 @@ body{
 .unban-reason-value{font-size:16px;font-weight:800;line-height:1.45;overflow-wrap:anywhere;padding:14px;border-radius:12px;background:rgba(140,210,255,.05);border:1px solid var(--glass-border);}
 
 /* ================== MOBILE ================== */
+@media (max-width: 1100px) {
+  .app-wrapper {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    max-height: 40vh;
+    position: relative;
+    border-right: none;
+    border-bottom: 1px solid var(--glass-border);
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 12px;
+    padding: 12px;
+  }
+  .live-drop-top {
+    min-width: 200px;
+  }
+  .live-drop-list {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex: 1;
+  }
+  .live-drop-item {
+    min-width: 180px;
+  }
+}
+
 @media (max-width: 768px) {
   .top-nav-panel { display: none; }
   .burger-btn { display: block; }
@@ -1044,276 +1047,279 @@ body{
     <div class="case-possible-grid" id="casePossibleGrid"></div>
 </div>
 
-<!-- LIVE DROP SIDEBAR -->
-<div class="live-drop-sidebar" id="liveDropSidebar">
-    <div class="live-drop-top" id="liveDropTop">
-        <div class="live-drop-top-label">Топ-дроп дня</div>
-        <img src="" id="liveDropTopImg" alt="Top Drop">
-        <div class="live-drop-top-name" id="liveDropTopName">—</div>
-        <div class="live-drop-top-price">
-            <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin">
-            <span id="liveDropTopPrice">0</span>
-        </div>
-    </div>
-    <div style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; flex-shrink:0;">Последние дропы</div>
-    <div class="live-drop-list" id="liveDropList">
-        <!-- items loaded via JS -->
-    </div>
-</div>
-
-<div class="app" id="mainApp">
-    <div class="top-bar">
-        <div class="top-left">
-            <div class="logo-container">
-                <img src="https://github.com/saintezz/BrainrotWin/blob/main/%D0%B7%D0%B8%D0%BC%D0%B0.png?raw=true" alt="BrainRoll" class="logo-img">
-            </div>
-            <div class="top-nav-panel">
-                <button class="nav-btn active" id="navMenu" onclick="switchTab('menu')"><span>Главное меню</span></button>
-                <button class="nav-btn" id="navUpgrade" onclick="switchTab('upgrade')"><span>Апгрейдер</span></button>
-                <button class="nav-btn" id="navCatch" onclick="switchTab('catch')"><span>Мины</span></button>
-                <button class="nav-btn" id="navInventory" onclick="switchTab('inventory')"><span>Инвентарь</span></button>
-                <button class="nav-btn" id="navPromo" onclick="switchTab('promo')"><span>Промокоды</span></button>
-                <button class="nav-btn" id="navProfile" onclick="switchTab('profile')"><span>Профиль</span></button>
+<div class="app-wrapper">
+    <div class="sidebar" id="liveDropSidebar">
+        <div class="live-drop-top" id="liveDropTop">
+            <div class="live-drop-top-label">Топ-дроп дня</div>
+            <img src="" id="liveDropTopImg" alt="Top Drop">
+            <div class="live-drop-top-name" id="liveDropTopName">—</div>
+            <div class="live-drop-top-price">
+                <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin">
+                <span id="liveDropTopPrice">0</span>
             </div>
         </div>
-        <div class="top-right">
-            <div class="balance-wrap" id="balanceBox">
-                <div class="balance">
-                    <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin" class="coin-icon">
-                    <span id="balanceDisplay">0</span>
-                </div>
-                <button class="topup-btn" onclick="openTopup()">+</button>
-            </div>
-            <div class="icon-btn avatar-btn" onclick="switchTab('profile')">
-                <img id="topAvatarImg" src="https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg" alt="avatar">
-            </div>
+        <div style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; flex-shrink:0;">Последние дропы</div>
+        <div class="live-drop-list" id="liveDropList">
+            <!-- items loaded via JS -->
         </div>
     </div>
 
-    <div class="tab-panel active" id="panelMenu">
-        <div class="promo-banner">
-            <div class="banner-left">
-                <div class="title">АВТО-ПРОМОКОД</div>
-                <div class="main-title">НОВЫЙ БОНУС К ДЕПОЗИТУ</div>
-                <div class="sub-title">КАЖДЫЕ 2 ЧАСА</div>
-            </div>
-            <div class="banner-center">
-                <div class="banner-timer-block">
-                    <div class="bt-label">ОСТАЛОСЬ</div>
-                    <div class="bt-value" id="autoPromoTimer">01:45:46</div>
+    <div class="app-content">
+        <div class="app" id="mainApp">
+            <div class="top-bar">
+                <div class="top-left">
+                    <div class="logo-container">
+                        <img src="https://github.com/saintezz/BrainrotWin/blob/main/%D0%B7%D0%B8%D0%BC%D0%B0.png?raw=true" alt="BrainRoll" class="logo-img">
+                    </div>
+                    <div class="top-nav-panel">
+                        <button class="nav-btn active" id="navMenu" onclick="switchTab('menu')"><span>Главное меню</span></button>
+                        <button class="nav-btn" id="navUpgrade" onclick="switchTab('upgrade')"><span>Апгрейдер</span></button>
+                        <button class="nav-btn" id="navCatch" onclick="switchTab('catch')"><span>Мины</span></button>
+                        <button class="nav-btn" id="navInventory" onclick="switchTab('inventory')"><span>Инвентарь</span></button>
+                        <button class="nav-btn" id="navPromo" onclick="switchTab('promo')"><span>Промокоды</span></button>
+                        <button class="nav-btn" id="navProfile" onclick="switchTab('profile')"><span>Профиль</span></button>
+                    </div>
                 </div>
-                <div class="banner-bonus-block">
-                    <div class="bb-label">БОНУС</div>
-                    <div class="bb-value" id="autoPromoBonus">+15%</div>
-                </div>
-            </div>
-            <div class="banner-right">
-                <div class="promo-code-display">
-                    <span class="pcd-code" id="autoPromoCode">JACKPOT</span>
-                    <button class="pcd-copy" onclick="copyAutoPromoCode()" title="Копировать">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                    </button>
-                </div>
-                <button class="activate-btn" onclick="activateAutoPromo()">АКТИВИРОВАТЬ</button>
-            </div>
-        </div>
-        <div class="cases-title-main">Кейсы</div>
-        <div class="cases-grid" id="menuCasesGrid"></div>
-    </div>
-
-    <div class="tab-panel" id="panelUpgrade">
-        <div class="upg-container">
-            <div class="progress-section">
-                <div class="progress-wrapper" id="wheelWrapper">
-                    <svg class="progress-svg" viewBox="0 0 340 340">
-                        <defs>
-                            <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#6fe9ff"/>
-                                <stop offset="50%" stop-color="#3ec8ff"/>
-                                <stop offset="100%" stop-color="#0ea5e9"/>
-                            </linearGradient>
-                        </defs>
-                        <circle class="progress-outer-ring" cx="170" cy="170" r="149"></circle>
-                        <circle class="progress-track" cx="170" cy="170" r="130"></circle>
-                        <circle class="progress-track-inner" cx="170" cy="170" r="130"></circle>
-                        <circle class="progress-bar no-chance" id="progressBar" cx="170" cy="170" r="130"></circle>
-                    </svg>
-                    <div class="progress-ticks" id="progressTicks"></div>
-                    <div class="arrow-container" id="arrowContainer"><div class="arrow-pointer"></div></div>
-                    <div class="progress-center">
-                        <div class="chance-big" id="chanceBig">?%</div>
-                        <div class="chance-label">ШАНС</div>
+                <div class="top-right">
+                    <div class="balance-wrap" id="balanceBox">
+                        <div class="balance">
+                            <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin" class="coin-icon">
+                            <span id="balanceDisplay">0</span>
+                        </div>
+                        <button class="topup-btn" onclick="openTopup()">+</button>
+                    </div>
+                    <div class="icon-btn avatar-btn" onclick="switchTab('profile')">
+                        <img id="topAvatarImg" src="https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg" alt="avatar">
                     </div>
                 </div>
             </div>
-            <div class="items-row">
-                <div class="upg-card" id="upgCardLeft" onclick="document.getElementById('invAnchor').scrollIntoView({behavior: 'smooth'})">
-                    <div class="txt">ВЫБЕРИТЕ В ИНВЕНТАРЕ</div>
-                </div>
-                <div class="swap-arrow">»</div>
-                <div class="upg-card" id="upgCardRight" onclick="openTargetList()">
-                    <div class="txt">ВЫБРАТЬ ЦЕЛЬ</div>
-                    <div class="txt sub">Нажми на меня</div>
-                </div>
-            </div>
-            <div class="stage-controls">
-                <button class="upgrade-main-btn" id="upgradeBtn" onclick="upgrade()" disabled><span>АПГРЕЙД</span></button>
-                <button class="fast-btn" id="fastUpgradeBtn" onclick="toggleFastMode()" title="Быстрый режим">
-                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                </button>
-            </div>
-            <div class="segmented-control" style="margin-top: 12px;">
-                <div class="segment active" id="segmentMyItems" onclick="switchUpgradeTab('my')">МОИ ПРЕДМЕТЫ</div>
-                <div class="segment" id="segmentShop" onclick="switchUpgradeTab('shop')">МАГАЗИН</div>
-            </div>
-            <div id="inventorySection" style="display: block; margin-top: 14px;">
-                <div class="section-title" id="invAnchor">Инвентарь</div>
-                <div class="inventory-row" id="inventoryRow"></div>
-            </div>
-            <div id="shopSection" style="display: none; margin-top: 14px;">
-                <div class="section-title">Магазин</div>
-                <div class="shop-scroll"><div class="shop-grid" id="shopRow"></div></div>
-            </div>
-        </div>
-    </div>
 
-    <div class="tab-panel" id="panelCatch">
-        <div class="mines-layout">
-            <div class="mines-board-wrap">
-                <div class="mines-board" id="minesBoard">
-                    <!-- 25 cells generated by JS -->
-                </div>
-            </div>
-            <div class="mines-controls">
-                <div class="mines-control-title">Мин на поле</div>
-                <div class="mines-bet-input">
-                    <button onclick="changeMines(-1)">-</button>
-                    <input type="number" id="minesCountInput" value="2" min="1" max="24" readonly>
-                    <button onclick="changeMines(1)">+</button>
-                </div>
-                <div class="mines-multipliers" id="minesMultipliers">
-                    <div class="mines-mult-btn" onclick="setMinesMultiplier(2)">2</div>
-                    <div class="mines-mult-btn" onclick="setMinesMultiplier(3)">3</div>
-                    <div class="mines-mult-btn" onclick="setMinesMultiplier(5)">5</div>
-                    <div class="mines-mult-btn" onclick="setMinesMultiplier(10)">10</div>
-                    <div class="mines-mult-btn" onclick="setMinesMultiplier(24)">24</div>
-                </div>
-                <div class="mines-info-row">
-                    <span>Коэффициент</span>
-                    <span id="minesCurrentMult">x1.04</span>
-                </div>
-                
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label" style="margin-bottom: 4px;">Выбери предметы для ставки</label>
-                    <div class="shop-scroll" style="max-height: 150px; border: 1px solid var(--glass-border); border-radius: 8px; padding: 4px;">
-                        <div class="inventory-row" id="minesBetGrid" style="gap: 8px; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));"></div>
+            <div class="tab-panel active" id="panelMenu">
+                <div class="promo-banner">
+                    <div class="banner-left">
+                        <div class="title">АВТО-ПРОМОКОД</div>
+                        <div class="main-title">НОВЫЙ БОНУС К ДЕПОЗИТУ</div>
+                        <div class="sub-title">КАЖДЫЕ 2 ЧАСА</div>
                     </div>
-                </div>
-
-                <div class="mines-info-row" style="background:transparent; border:none; padding:0; margin-top: 4px;">
-                    <span>Ставка:</span>
-                    <span style="display:flex; align-items:center; gap:6px;"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" style="width:16px;height:16px;"> <span id="minesBetAmount">0</span></span>
-                </div>
-                <button class="mines-start-btn" id="minesStartBtn" onclick="startMinesGame()">ИГРАТЬ</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="tab-panel" id="panelInventory">
-        <div class="inventory-page">
-            <div class="inventory-hero">
-                <div>
-                    <div class="inventory-hero-title">Мой инвентарь</div>
-                    <div class="inventory-hero-sub">Все твои брейнроты в одном месте</div>
-                </div>
-                <div class="inventory-hero-stats">
-                    <div class="inv-hero-pill" id="invHeroCount">0 предметов</div>
-                    <div class="inv-hero-pill gold" id="invHeroValue"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin"><span>0</span></div>
-                </div>
-            </div>
-
-            <div id="inventoryTabGrid" class="inventory-tab-grid"></div>
-        </div>
-    </div>
-
-    <div class="tab-panel" id="panelPromo">
-        <div class="promo-panel" id="promoAdminContent" style="padding:24px 20px;text-align:center;">
-            <h2 style="font-size:24px;font-weight:900;color:#fff;margin-bottom:6px;text-transform:uppercase;letter-spacing:2px;">Активация промокода</h2>
-            <p style="color:var(--text-muted);font-size:15px;font-weight:600;margin-bottom:16px;">Введи код и получи награду</p>
-            <div class="promo-input-wrap" style="display:flex;gap:8px;max-width:480px;margin:0 auto;">
-                <input type="text" class="form-input" id="promoInput" placeholder="ВВЕДИ ПРОМОКОД" maxlength="20" style="flex:1;text-transform:uppercase">
-                <button class="action-btn" id="promoActivateBtn" onclick="activatePromo()" style="width:auto;padding:12px 16px;margin-top:0;">Активировать</button>
-            </div>
-            <div style="margin-top:12px;font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;">1 человек — 1 активация промокода</div>
-            <div class="msg" id="promoMsg"></div>
-        </div>
-    </div>
-
-    <div class="tab-panel" id="panelProfile">
-        <div class="profile-page">
-            <div class="profile-hero">
-                <div class="profile-avatar-wrap">
-                    <div class="profile-avatar-frame">
-                        <div class="profile-avatar-inner">
-                            <img id="profileAvatarImg" src="https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg">
+                    <div class="banner-center">
+                        <div class="banner-timer-block">
+                            <div class="bt-label">ОСТАЛОСЬ</div>
+                            <div class="bt-value" id="autoPromoTimer">01:45:46</div>
+                        </div>
+                        <div class="banner-bonus-block">
+                            <div class="bb-label">БОНУС</div>
+                            <div class="bb-value" id="autoPromoBonus">+15%</div>
                         </div>
                     </div>
-                    <div class="profile-avatar-status"></div>
-                </div>
-                <div class="profile-nick-big" id="profileNick">Игрок</div>
-                <a class="profile-tg-big" id="profileTg" href="#" target="_blank"><span id="profileTgText">@username</span></a>
-            </div>
-            <div class="profile-stats-grid">
-                <div class="profile-stat-card">
-                    <div class="profile-stat-label">Баланс</div>
-                    <div class="profile-stat-value"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png"><span id="profileBalance">0</span></div>
-                </div>
-                <div class="profile-stat-card">
-                    <div class="profile-stat-label">Предметов</div>
-                    <div class="profile-stat-value"><span id="profileItemsCount">0</span><span style="font-size:12px;color:var(--text-muted);">шт.</span></div>
-                </div>
-                <div class="profile-stat-card">
-                    <div class="profile-stat-label">Лучший предмет</div>
-                    <div class="profile-stat-value" id="profileBestItem" style="font-size:14px;">—</div>
-                </div>
-            </div>
-            <div class="profile-inventory-section">
-                <button class="profile-inventory-toggle" id="inventoryToggle" onclick="toggleInventoryDrawer()">
-                    <div class="pt-text">
-                        <div class="pt-title">Мой инвентарь</div>
-                        <div class="pt-value"><span id="inventoryCountLabel">0 предметов</span></div>
-                    </div>
-                </button>
-                <div class="profile-inventory-drawer" id="inventoryDrawer">
-                    <div class="profile-inventory-grid" id="profileInventoryGrid"></div>
-                </div>
-            </div>
-            <div class="deposits-block" id="depositsBlock" style="display:none;">
-                <div class="deposits-block-title">Заявки на пополнение <span class="deposits-count" id="depositsCount">0</span></div>
-                <div id="depositsList"></div>
-            </div>
-            <div class="profile-action-row" style="max-width:640px;margin:10px auto 0;padding:0 20px;">
-                <button class="action-btn" id="adminPanelBtn" style="display:none; background: var(--bg-surface-hover); border-color: var(--color-purple); color:var(--color-cyan);" onclick="openAdminPanel()">Открыть админ-панель</button>
-            </div>
-            <div class="customize-in-profile">
-                <div class="profile-section-heading">Настройки профиля</div>
-                <div class="customize-section">
-                    <div class="customize-section-title">Аватарка</div>
-                    <div class="avatar-upload-row">
-                        <img class="avatar-preview" id="avatarPreview" src="https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg" alt="preview">
-                        <div class="avatar-upload-buttons">
-                            <label class="upload-btn" for="avatarFileInput">Загрузить</label>
-                            <button class="reset-avatar-btn" onclick="resetAvatar()">Сбросить</button>
+                    <div class="banner-right">
+                        <div class="promo-code-display">
+                            <span class="pcd-code" id="autoPromoCode">JACKPOT</span>
+                            <button class="pcd-copy" onclick="copyAutoPromoCode()" title="Копировать">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
                         </div>
-                        <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
+                        <button class="activate-btn" onclick="activateAutoPromo()">АКТИВИРОВАТЬ</button>
                     </div>
                 </div>
-                <div class="customize-section">
-                    <div class="customize-section-title">Никнейм</div>
-                    <input type="text" class="form-input" id="customizeNickInput" placeholder="Введи свой ник" maxlength="20">
-                    <button class="action-btn" onclick="saveCustomNick()">Сохранить ник</button>
+                <div class="cases-title-main">Кейсы</div>
+                <div class="cases-grid" id="menuCasesGrid"></div>
+            </div>
+
+            <div class="tab-panel" id="panelUpgrade">
+                <div class="upg-container">
+                    <div class="progress-section">
+                        <div class="progress-wrapper" id="wheelWrapper">
+                            <svg class="progress-svg" viewBox="0 0 340 340">
+                                <defs>
+                                    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#6fe9ff"/>
+                                        <stop offset="50%" stop-color="#3ec8ff"/>
+                                        <stop offset="100%" stop-color="#0ea5e9"/>
+                                    </linearGradient>
+                                </defs>
+                                <circle class="progress-outer-ring" cx="170" cy="170" r="149"></circle>
+                                <circle class="progress-track" cx="170" cy="170" r="130"></circle>
+                                <circle class="progress-track-inner" cx="170" cy="170" r="130"></circle>
+                                <circle class="progress-bar no-chance" id="progressBar" cx="170" cy="170" r="130"></circle>
+                            </svg>
+                            <div class="progress-ticks" id="progressTicks"></div>
+                            <div class="arrow-container" id="arrowContainer"><div class="arrow-pointer"></div></div>
+                            <div class="progress-center">
+                                <div class="chance-big" id="chanceBig">?%</div>
+                                <div class="chance-label">ШАНС</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="items-row">
+                        <div class="upg-card" id="upgCardLeft" onclick="document.getElementById('invAnchor').scrollIntoView({behavior: 'smooth'})">
+                            <div class="txt">ВЫБЕРИТЕ В ИНВЕНТАРЕ</div>
+                        </div>
+                        <div class="swap-arrow">»</div>
+                        <div class="upg-card" id="upgCardRight" onclick="openTargetList()">
+                            <div class="txt">ВЫБРАТЬ ЦЕЛЬ</div>
+                            <div class="txt sub">Нажми на меня</div>
+                        </div>
+                    </div>
+                    <div class="stage-controls">
+                        <button class="upgrade-main-btn" id="upgradeBtn" onclick="upgrade()" disabled><span>АПГРЕЙД</span></button>
+                        <button class="fast-btn" id="fastUpgradeBtn" onclick="toggleFastMode()" title="Быстрый режим">
+                            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                        </button>
+                    </div>
+                    <div class="segmented-control" style="margin-top: 12px;">
+                        <div class="segment active" id="segmentMyItems" onclick="switchUpgradeTab('my')">МОИ ПРЕДМЕТЫ</div>
+                        <div class="segment" id="segmentShop" onclick="switchUpgradeTab('shop')">МАГАЗИН</div>
+                    </div>
+                    <div id="inventorySection" style="display: block; margin-top: 14px;">
+                        <div class="section-title" id="invAnchor">Инвентарь</div>
+                        <div class="inventory-row" id="inventoryRow"></div>
+                    </div>
+                    <div id="shopSection" style="display: none; margin-top: 14px;">
+                        <div class="section-title">Магазин</div>
+                        <div class="shop-scroll"><div class="shop-grid" id="shopRow"></div></div>
+                    </div>
                 </div>
-                <div class="msg" id="customizeMsg"></div>
+            </div>
+
+            <div class="tab-panel" id="panelCatch">
+                <div class="mines-layout">
+                    <div class="mines-board-wrap">
+                        <div class="mines-board" id="minesBoard">
+                            <!-- 25 cells generated by JS -->
+                        </div>
+                    </div>
+                    <div class="mines-controls">
+                        <div class="mines-control-title">Мин на поле</div>
+                        <div class="mines-bet-input">
+                            <button onclick="changeMines(-1)">-</button>
+                            <input type="number" id="minesCountInput" value="2" min="1" max="24" readonly>
+                            <button onclick="changeMines(1)">+</button>
+                        </div>
+                        <div class="mines-multipliers" id="minesMultipliers">
+                            <div class="mines-mult-btn" onclick="setMinesMultiplier(2)">2</div>
+                            <div class="mines-mult-btn" onclick="setMinesMultiplier(3)">3</div>
+                            <div class="mines-mult-btn" onclick="setMinesMultiplier(5)">5</div>
+                            <div class="mines-mult-btn" onclick="setMinesMultiplier(10)">10</div>
+                            <div class="mines-mult-btn" onclick="setMinesMultiplier(24)">24</div>
+                        </div>
+                        <div class="mines-info-row">
+                            <span>Коэффициент</span>
+                            <span id="minesCurrentMult">x1.04</span>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label" style="margin-bottom: 4px;">Выбери предметы для ставки</label>
+                            <div class="shop-scroll" style="max-height: 150px; border: 1px solid var(--glass-border); border-radius: 8px; padding: 4px;">
+                                <div class="inventory-row" id="minesBetGrid" style="gap: 8px; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));"></div>
+                            </div>
+                        </div>
+
+                        <div class="mines-info-row" style="background:transparent; border:none; padding:0; margin-top: 4px;">
+                            <span>Ставка:</span>
+                            <span style="display:flex; align-items:center; gap:6px;"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" style="width:16px;height:16px;"> <span id="minesBetAmount">0</span></span>
+                        </div>
+                        <button class="mines-start-btn" id="minesStartBtn" onclick="startMinesGame()">ИГРАТЬ</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="panelInventory">
+                <div class="inventory-page">
+                    <div class="inventory-hero">
+                        <div>
+                            <div class="inventory-hero-title">Мой инвентарь</div>
+                            <div class="inventory-hero-sub">Все твои брейнроты в одном месте</div>
+                        </div>
+                        <div class="inventory-hero-stats">
+                            <div class="inv-hero-pill" id="invHeroCount">0 предметов</div>
+                            <div class="inv-hero-pill gold" id="invHeroValue"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin"><span>0</span></div>
+                        </div>
+                    </div>
+
+                    <div id="inventoryTabGrid" class="inventory-tab-grid"></div>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="panelPromo">
+                <div class="promo-panel" id="promoAdminContent" style="padding:24px 20px;text-align:center;">
+                    <h2 style="font-size:24px;font-weight:900;color:#fff;margin-bottom:6px;text-transform:uppercase;letter-spacing:2px;">Активация промокода</h2>
+                    <p style="color:var(--text-muted);font-size:15px;font-weight:600;margin-bottom:16px;">Введи код и получи награду</p>
+                    <div class="promo-input-wrap" style="display:flex;gap:8px;max-width:480px;margin:0 auto;">
+                        <input type="text" class="form-input" id="promoInput" placeholder="ВВЕДИ ПРОМОКОД" maxlength="20" style="flex:1;text-transform:uppercase">
+                        <button class="action-btn" id="promoActivateBtn" onclick="activatePromo()" style="width:auto;padding:12px 16px;margin-top:0;">Активировать</button>
+                    </div>
+                    <div style="margin-top:12px;font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;">1 человек — 1 активация промокода</div>
+                    <div class="msg" id="promoMsg"></div>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="panelProfile">
+                <div class="profile-page">
+                    <div class="profile-hero">
+                        <div class="profile-avatar-wrap">
+                            <div class="profile-avatar-frame">
+                                <div class="profile-avatar-inner">
+                                    <img id="profileAvatarImg" src="https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg">
+                                </div>
+                            </div>
+                            <div class="profile-avatar-status"></div>
+                        </div>
+                        <div class="profile-nick-big" id="profileNick">Игрок</div>
+                        <a class="profile-tg-big" id="profileTg" href="#" target="_blank"><span id="profileTgText">@username</span></a>
+                    </div>
+                    <div class="profile-stats-grid">
+                        <div class="profile-stat-card">
+                            <div class="profile-stat-label">Баланс</div>
+                            <div class="profile-stat-value"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png"><span id="profileBalance">0</span></div>
+                        </div>
+                        <div class="profile-stat-card">
+                            <div class="profile-stat-label">Предметов</div>
+                            <div class="profile-stat-value"><span id="profileItemsCount">0</span><span style="font-size:12px;color:var(--text-muted);">шт.</span></div>
+                        </div>
+                        <div class="profile-stat-card">
+                            <div class="profile-stat-label">Лучший предмет</div>
+                            <div class="profile-stat-value" id="profileBestItem" style="font-size:14px;">—</div>
+                        </div>
+                    </div>
+                    <div class="profile-inventory-section">
+                        <button class="profile-inventory-toggle" id="inventoryToggle" onclick="toggleInventoryDrawer()">
+                            <div class="pt-text">
+                                <div class="pt-title">Мой инвентарь</div>
+                                <div class="pt-value"><span id="inventoryCountLabel">0 предметов</span></div>
+                            </div>
+                        </button>
+                        <div class="profile-inventory-drawer" id="inventoryDrawer">
+                            <div class="profile-inventory-grid" id="profileInventoryGrid"></div>
+                        </div>
+                    </div>
+                    <div class="deposits-block" id="depositsBlock" style="display:none;">
+                        <div class="deposits-block-title">Заявки на пополнение <span class="deposits-count" id="depositsCount">0</span></div>
+                        <div id="depositsList"></div>
+                    </div>
+                    <div class="profile-action-row" style="max-width:640px;margin:10px auto 0;padding:0 20px;">
+                        <button class="action-btn" id="adminPanelBtn" style="display:none; background: var(--bg-surface-hover); border-color: var(--color-purple); color:var(--color-cyan);" onclick="openAdminPanel()">Открыть админ-панель</button>
+                    </div>
+                    <div class="customize-in-profile">
+                        <div class="profile-section-heading">Настройки профиля</div>
+                        <div class="customize-section">
+                            <div class="customize-section-title">Аватарка</div>
+                            <div class="avatar-upload-row">
+                                <img class="avatar-preview" id="avatarPreview" src="https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg" alt="preview">
+                                <div class="avatar-upload-buttons">
+                                    <label class="upload-btn" for="avatarFileInput">Загрузить</label>
+                                    <button class="reset-avatar-btn" onclick="resetAvatar()">Сбросить</button>
+                                </div>
+                                <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
+                            </div>
+                        </div>
+                        <div class="customize-section">
+                            <div class="customize-section-title">Никнейм</div>
+                            <input type="text" class="form-input" id="customizeNickInput" placeholder="Введи свой ник" maxlength="20">
+                            <button class="action-btn" onclick="saveCustomNick()">Сохранить ник</button>
+                        </div>
+                        <div class="msg" id="customizeMsg"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -3036,9 +3042,7 @@ async function init() {
 
   if (dropInterval) clearInterval(dropInterval);
   dropInterval = setInterval(() => {
-    if (document.getElementById('panelDrop')?.classList.contains('active')) {
-      checkLiveDrops();
-    }
+    checkLiveDrops();
   }, 5000);
 }
 window.addEventListener('load', () => {
