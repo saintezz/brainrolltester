@@ -15,7 +15,6 @@ const MAINTENANCE_FILE = path.join(DATA_DIR, 'maintenance.json');
 const ANNOUNCEMENT_FILE = path.join(DATA_DIR, 'announcement.json');
 const STATS_FILE = path.join(DATA_DIR, 'stats.json');
 const BANS_FILE = path.join(DATA_DIR, 'bans.json');
-const DROPS_FILE = path.join(DATA_DIR, 'drops.json');
 
 const ADMIN_USERNAMES = ['saintezz7', 'vortyn1'];
 const START_BALANCE = 500;
@@ -109,7 +108,6 @@ let currentAnnouncement = null;
 let stats = { total_upgrades: 0, total_cases: 0 };
 let onlineUsers = new Map();
 let pendingBans = {};
-let liveDrops = [];
 
 function ensureDataDir() { try { if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (e) {} }
 function loadJSON(file, fallback) { try { if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (err) { console.error('[ERROR] Load', file, err.message); } return fallback; }
@@ -124,7 +122,6 @@ function loadAll() {
   currentAnnouncement = loadJSON(ANNOUNCEMENT_FILE, null);
   stats = loadJSON(STATS_FILE, { total_upgrades: 0, total_cases: 0 });
   pendingBans = loadJSON(BANS_FILE, {});
-  liveDrops = loadJSON(DROPS_FILE, []);
 }
 function savePromos() { saveJSON(PROMO_FILE, promocodes); }
 function saveUsers() { saveJSON(USERS_FILE, users); }
@@ -134,7 +131,6 @@ function saveMaintenance() { saveJSON(MAINTENANCE_FILE, maintenance); }
 function saveAnnouncement() { saveJSON(ANNOUNCEMENT_FILE, currentAnnouncement); }
 function saveStats() { saveJSON(STATS_FILE, stats); }
 function saveBans() { saveJSON(BANS_FILE, pendingBans); }
-function saveDrops() { saveJSON(DROPS_FILE, liveDrops); }
 
 function getItem(id) { return ITEMS[id] || CASE_ONLY_ITEMS[id] || null; }
 function calcUpgradeChance(sourcePrice, targetPrice) {
@@ -163,18 +159,6 @@ function getMoscowDateStart() {
   const mskNow = new Date(now.getTime() + mskOffset);
   const startMskUtc = Date.UTC(mskNow.getUTCFullYear(), mskNow.getUTCMonth(), mskNow.getUTCDate(), 0, 0, 0, 0);
   return startMskUtc - mskOffset;
-}
-
-function pushLiveDrop(user, itemId) {
-  const drop = { 
-    id: 'drop_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), 
-    user: user.username || user.id, 
-    item_id: itemId, 
-    timestamp: Date.now() 
-  };
-  liveDrops.push(drop);
-  liveDrops = liveDrops.filter(d => d.timestamp > getMoscowDateStart() - 7*24*60*60*1000).slice(-500);
-  saveDrops();
 }
 
 function setCORS(res) { res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS'); res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Telegram-Init-Data'); }
@@ -337,7 +321,6 @@ const server = http.createServer(async (req, res) => {
         (req.method === 'GET' && req.url === '/api/maintenance') ||
         (req.method === 'GET' && req.url === '/api/stats') ||
         (req.method === 'GET' && req.url === '/api/announcement') ||
-        (req.method === 'GET' && req.url === '/api/live-drops') ||
         (req.method === 'GET' && req.url.startsWith('/api/admin/bans')) ||
         (req.method === 'POST' && req.url === '/api/admin/maintenance');
 
@@ -376,46 +359,6 @@ const server = http.createServer(async (req, res) => {
       currentAnnouncement = { text, timestamp: Date.now(), by: admin, username: admin };
       saveAnnouncement();
       return sendJSON(res, 200, { ok: true, announcement: currentAnnouncement });
-    }
-
-    if (req.method === 'GET' && req.url === '/api/live-drops') {
-      const startDay = getMoscowDateStart();
-      const todayDrops = liveDrops.filter(d => d.timestamp >= startDay);
-      todayDrops.sort((a, b) => b.timestamp - a.timestamp);
-      let topDrop = null;
-      let maxPrice = -1;
-      for (const d of todayDrops) {
-        const item = getItem(d.item_id);
-        if (item && item.price > maxPrice) {
-          maxPrice = item.price;
-          topDrop = d;
-        }
-      }
-      const result = todayDrops.slice(0, 50).map(d => {
-        const item = getItem(d.item_id);
-        return {
-          id: d.id,
-          user: d.user,
-          item_id: d.item_id,
-          item_name: item ? item.name : 'Unknown',
-          item_price: item ? item.price : 0,
-          timestamp: d.timestamp,
-          is_top: topDrop && d.id === topDrop.id
-        };
-      });
-
-      return sendJSON(res, 200, {
-        ok: true,
-        drops: result,
-        top: topDrop ? {
-          id: topDrop.id,
-          user: topDrop.user,
-          item_id: topDrop.item_id,
-          item_name: getItem(topDrop.item_id)?.name || 'Unknown',
-          item_price: getItem(topDrop.item_id)?.price || 0,
-          timestamp: topDrop.timestamp
-        } : null
-      });
     }
 
     if (req.method === 'POST' && req.url === '/api/admin/ban') {
@@ -501,7 +444,7 @@ const server = http.createServer(async (req, res) => {
       promo.uses -= 1;
       u.promos_used.push(upperCode);
       if (promo.type === 'balance') u.balance = (u.balance || 0) + promo.value;
-      else if (promo.type === 'item') { if (!Array.isArray(u.inventory)) u.inventory = []; u.inventory.push(promo.value); pushLiveDrop(user, promo.value); }
+      else if (promo.type === 'item') { if (!Array.isArray(u.inventory)) u.inventory = []; u.inventory.push(promo.value); }
       u.updated_at = new Date().toISOString();
       savePromos();
       saveUsers();
@@ -526,7 +469,6 @@ const server = http.createServer(async (req, res) => {
         const rng = Math.random() * 100; let acc = 0; let wonId = c.rewards[0].id;
         for (const r of c.rewards) { acc += r.chance; if (rng <= acc) { wonId = r.id; break; } }
         u.inventory.push(wonId); wonItems.push(wonId);
-        pushLiveDrop(user, wonId);
       }
       u.updated_at = new Date().toISOString(); saveUsers();
       stats.total_cases += quantity; saveStats();
@@ -551,7 +493,6 @@ const server = http.createServer(async (req, res) => {
       const success = Math.random() * 100 <= chance;
       if (success) { 
         u.inventory.push(target_item_id);
-        pushLiveDrop(user, target_item_id);
       }
       u.updated_at = new Date().toISOString(); saveUsers();
       stats.total_upgrades += 1; saveStats();
@@ -568,7 +509,6 @@ const server = http.createServer(async (req, res) => {
       if (denyIfBanned(res, u)) return;
       if (u.balance < item.price) return sendJSON(res, 400, { ok: false, error: 'Недостаточно монет' });
       u.balance -= item.price; u.inventory.push(item_id);
-      pushLiveDrop(user, item_id);
       u.updated_at = new Date().toISOString(); saveUsers();
       return sendJSON(res, 200, { ok: true, new_balance: u.balance, inventory: u.inventory });
     }
