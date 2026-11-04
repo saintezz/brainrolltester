@@ -625,7 +625,7 @@ const server = http.createServer(async (req, res) => {
       });
 
       // Генерируем бомбы для 1 этажа
-      const bombsCount = difficulty; // 1, 2, 3, 4
+      const bombsCount = difficulty;
       const bombs = [];
       while (bombs.length < bombsCount) {
         const r = Math.floor(Math.random() * 5);
@@ -664,36 +664,44 @@ const server = http.createServer(async (req, res) => {
         });
       } else {
         // Успех
-        game.current_floor++;
+        game.opened_count = (game.opened_count || 0) + 1;
         
-        if (game.current_floor > 5) {
-          // Дошли до конца, автоматический кэшаут
-          const mults = TOWER_MULTIPLIERS[game.difficulty];
-          const mult = mults[5];
-          const winAmount = Math.floor(game.total_bet_value * mult);
-          const u = users[user.id];
-          u.balance += winAmount;
-          saveUsers();
-          delete activeTowerGames[user.id];
-          return sendJSON(res, 200, { 
-            ok: true, 
-            is_bomb: false, 
-            win_amount: winAmount, 
-            inventory: u.inventory, 
-            new_balance: u.balance 
-          });
-        }
+        // Если открыто 5 ячеек, переходим на следующий этаж
+        if (game.opened_count >= 5) {
+          game.current_floor++;
+          game.opened_count = 0;
+          
+          if (game.current_floor > 5) {
+            // Дошли до конца, автоматический кэшаут
+            const mults = TOWER_MULTIPLIERS[game.difficulty];
+            const mult = mults[5];
+            const winAmount = Math.floor(game.total_bet_value * mult);
+            const u = users[user.id];
+            u.balance += winAmount;
+            saveUsers();
+            delete activeTowerGames[user.id];
+            return sendJSON(res, 200, { 
+              ok: true, 
+              is_bomb: false, 
+              win_amount: winAmount, 
+              inventory: u.inventory, 
+              new_balance: u.balance 
+            });
+          }
 
-        // Генерируем новые бомбы для следующего этажа
-        const bombsCount = game.difficulty;
-        const newBombs = [];
-        while (newBombs.length < bombsCount) {
-          const r = Math.floor(Math.random() * 5);
-          if (!newBombs.includes(r)) newBombs.push(r);
-        }
-        game.bombs = newBombs;
+          // Генерируем новые бомбы для следующего этажа
+          const bombsCount = game.difficulty;
+          const newBombs = [];
+          while (newBombs.length < bombsCount) {
+            const r = Math.floor(Math.random() * 5);
+            if (!newBombs.includes(r)) newBombs.push(r);
+          }
+          game.bombs = newBombs;
 
-        return sendJSON(res, 200, { ok: true, is_bomb: false, current_floor: game.current_floor, bombs: newBombs });
+          return sendJSON(res, 200, { ok: true, is_bomb: false, current_floor: game.current_floor, bombs: newBombs });
+        }
+        
+        return sendJSON(res, 200, { ok: true, is_bomb: false, current_floor: game.current_floor });
       }
     }
 
