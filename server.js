@@ -101,6 +101,8 @@ const CASES = {
 const MAX_CHANCE = 80;
 const MIN_CHANCE = 0.01;
 
+const activeMinesGames = {};
+
 let promocodes = {}, users = {}, deposits = [], withdraws = [];
 let maintenance = { enabled: false, since: null, by: '' };
 let currentAnnouncement = null;
@@ -155,17 +157,14 @@ function getOnlineCount() {
   return count;
 }
 
-// Функция получения начала текущих суток по МСК (UTC+3)
 function getMoscowDateStart() {
   const now = new Date();
   const mskOffset = 3 * 60 * 60 * 1000;
   const mskNow = new Date(now.getTime() + mskOffset);
-  // Начало суток в UTC, соответствующее 00:00 по МСК
   const startMskUtc = Date.UTC(mskNow.getUTCFullYear(), mskNow.getUTCMonth(), mskNow.getUTCDate(), 0, 0, 0, 0);
   return startMskUtc - mskOffset;
 }
 
-// Функция добавления дропа в лайв-ленту
 function pushLiveDrop(user, itemId) {
   liveDrops.push({ 
     id: 'drop_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), 
@@ -173,7 +172,6 @@ function pushLiveDrop(user, itemId) {
     item_id: itemId, 
     timestamp: Date.now() 
   });
-  // Сохраняем только последние 7 дней, чтобы не переполнять файл
   liveDrops = liveDrops.filter(d => d.timestamp > getMoscowDateStart() - 7*24*60*60*1000).slice(-500);
   saveDrops();
 }
@@ -381,14 +379,8 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'GET' && req.url === '/api/live-drops') {
       const startDay = getMoscowDateStart();
-      
-      // Берем все дропы за сегодня по МСК
       const todayDrops = liveDrops.filter(d => d.timestamp >= startDay);
-      
-      // Сортируем по времени (сначала новые)
       todayDrops.sort((a, b) => b.timestamp - a.timestamp);
-      
-      // Находим топ дроп по стоимости
       let topDrop = null;
       let maxPrice = -1;
       for (const d of todayDrops) {
@@ -398,8 +390,6 @@ const server = http.createServer(async (req, res) => {
           topDrop = d;
         }
       }
-      
-      // Ограничиваем список последних дропов 50 штуками
       const result = todayDrops.slice(0, 50).map(d => {
         const item = getItem(d.item_id);
         return {
@@ -595,6 +585,119 @@ const server = http.createServer(async (req, res) => {
       u.inventory.splice(idx, 1); u.balance += item.price;
       u.updated_at = new Date().toISOString(); saveUsers();
       return sendJSON(res, 200, { ok: true, new_balance: u.balance, inventory: u.inventory });
+    }
+
+    if (req.method === 'POST' && req.url === '/api/mines/start') {
+      const body = await readBody(req);
+      const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
+      const { item_ids, mines_count } = body;
+      if (!Array.isArray(item_ids) || item_ids.length === 0 || item_ids.length > 5) return sendJSON(res, 400, { ok: false, error: 'Выберите от 1 до 5 предметов' });
+      const u = ensureUser(user.id, user.username);
+      if (denyIfBanned(res, u)) return;
+      
+      const pendingW = computePendingWithdrawIds(user.id);
+      let totalBetValue = 0;
+      for (const id of item_ids) {
+        if (!u.inventory.includes(id)) return sendJSON(res, 400, { ok: false, error: 'Предмет не найден в инвентаре' });
+        if (pendingW.includes(id)) return sendJSON(res, 400, { ok: false, error: 'Предмет на выводе' });
+        totalBetValue += getItem(id).price;
+      }
+      if (totalBetValue <= 0) return sendJSON(res, 400, { ok: false, error: 'Ставка слишком мала' });
+
+      item_ids.forEach(id => {
+        const idx = u.inventory.indexOf(id);
+        if (idx !== -1) u.inventory.splice(idx, 1);
+      });
+
+      const minesPositions = new Set();
+      while (minesPositions.size < Math.min(24, Math.max(1, parseInt(mines_count) || 2))) {
+        minesPositions.add(Math.floor(Math.random() * 25));
+      }
+
+      activeMinesGames[user.id] = {
+        bet_items: item_ids,
+        total_bet_value: totalBetValue,
+        mines_count: minesPositions.size,
+        mines_positions: [...minesPositions],
+        opened: [],
+        started_at: Date.now()
+      };
+
+      u.updated_at = new Date().toISOString(); saveUsers();
+      return sendJSON(res, 200, { ok: true, inventory: u.inventory });
+    }
+
+    if (req.method === 'POST' && req.url === '/api/mines/open') {
+      const body = await readBody(req);
+      const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
+      const { cell_index } = body;
+      const game = activeMinesGames[user.id];
+      if (!game) return sendJSON(res, 400, { ok: false, error: 'Игра не найдена' });
+      if (game.opened.includes(cell_index)) return sendJSON(res, 400, { ok: false, error: 'Ячейка уже открыта' });
+
+      const isBomb = game.mines_positions.includes(cell_index);
+      game.opened.push(cell_index);
+
+      if (isBomb) {
+        delete activeMinesGames[user.id];
+        return sendJSON(res, 200, { 
+          ok: true, 
+          is_bomb: true, 
+          win_amount: 0, 
+          opened: game.opened, 
+          inventory: users[user.id].inventory 
+        });
+      } else {
+        const totalSafe = 25 - game.mines_count;
+        if (game.opened.length === totalSafe) {
+          let mult = 1.04;
+          if (game.mines_count === 2) mult = 1.04;
+          else if (game.mines_count === 3) mult = 1.13;
+          else if (game.mines_count === 5) mult = 1.24;
+          else if (game.mines_count === 10) mult = 1.37;
+          else if (game.mines_count === 24) mult = 24.00;
+          else mult = 1 + (game.mines_count * 0.05);
+          
+          const winAmount = Math.floor(game.total_bet_value * mult);
+          const u = users[user.id];
+          u.balance += winAmount;
+          
+          saveUsers();
+          delete activeMinesGames[user.id];
+          return sendJSON(res, 200, { 
+            ok: true, 
+            is_bomb: false, 
+            win_amount: winAmount, 
+            opened: game.opened, 
+            inventory: u.inventory, 
+            new_balance: u.balance 
+          });
+        }
+        return sendJSON(res, 200, { ok: true, is_bomb: false, opened: game.opened });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/api/mines/cashout') {
+      const body = await readBody(req);
+      const user = getTelegramUser(req, body); if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
+      const game = activeMinesGames[user.id];
+      if (!game) return sendJSON(res, 400, { ok: false, error: 'Игра не найдена' });
+
+      let mult = 1.04;
+      if (game.mines_count === 2) mult = 1.04;
+      else if (game.mines_count === 3) mult = 1.13;
+      else if (game.mines_count === 5) mult = 1.24;
+      else if (game.mines_count === 10) mult = 1.37;
+      else if (game.mines_count === 24) mult = 24.00;
+      else mult = 1 + (game.mines_count * 0.05);
+
+      const winAmount = Math.floor(game.total_bet_value * mult);
+      const u = users[user.id];
+      u.balance += winAmount;
+      
+      saveUsers();
+      delete activeMinesGames[user.id];
+      return sendJSON(res, 200, { ok: true, win_amount: winAmount, new_balance: u.balance, inventory: u.inventory });
     }
 
     if (req.method === 'POST' && req.url === '/api/deposit/create') {
