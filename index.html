@@ -476,13 +476,63 @@ body{
 .unban-reason-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin:22px 0 8px;}
 .unban-reason-value{font-size:16px;font-weight:700;line-height:1.45;overflow-wrap:anywhere;padding:14px;border-radius:12px;background:rgba(140,210,255,.05);border:1px solid var(--glass-border);}
 
-/* ================== MOBILE ================== */
-@media (max-width: 1100px) {
-  .app-wrapper { flex-direction: column; }
-  .sidebar { width: 100%; height: auto; max-height: 40vh; position: relative; border-right: none; border-bottom: 1px solid var(--glass-border); flex-direction: row; overflow-x: auto; overflow-y: hidden; gap: 12px; padding: 12px; }
-  .live-drop-list { flex-direction: row; overflow-x: auto; overflow-y: hidden; flex: 1; }
-  .live-drop-item { min-width: 180px; }
+/* ================== СОЗДАНИЕ ПРОМОКОДА ПОЛЬЗОВАТЕЛЕМ ================== */
+.create-promo-container {
+    padding: 20px;
+    background: radial-gradient(500px 200px at 50% 0%, rgba(62,200,255,.15), transparent 70%), var(--bg-surface);
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    margin-top: 20px;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
 }
+.create-promo-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 0 0 20px rgba(62,200,255,.5);
+}
+.create-promo-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: center;
+}
+.create-promo-input {
+    flex: 1;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    background: var(--bg-void);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    outline: none;
+    transition: all 0.2s;
+}
+.create-promo-input:focus {
+    border-color: var(--color-cyan);
+    box-shadow: 0 0 15px rgba(62,200,255,.3);
+}
+.create-promo-cost {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: rgba(62,200,255,.08);
+    border: 1px dashed var(--color-cyan);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-weight: 700;
+}
+.create-promo-cost .label { color: var(--text-muted); font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+.create-promo-cost .value { color: var(--color-cyan); font-size: 20px; display: flex; align-items: center; gap: 6px; }
+.create-promo-cost .value img { width: 20px; height: 20px; }
+
 @media (max-width: 768px) {
   .top-nav-panel { display: none; }
   .burger-btn { display: block; }
@@ -522,7 +572,6 @@ body{
   .ban-reason-block{margin-top:20px;padding:14px;}
   .ban-reason-value{font-size:15px;}
   
-  /* Tower Mobile */
   .tower-layout { flex-direction: column; padding: 0 10px; }
   .tower-sidebar { width: 100%; }
   .tower-image-wrap { max-width: 300px; }
@@ -595,6 +644,34 @@ body{
         <div class="unban-reason-label">ПРИЧИНА:</div>
         <div class="unban-reason-value"><span class="ban-gradient" id="unbanReasonText">—</span></div>
         <button class="action-btn" style="margin-top:22px;" onclick="ackUnban()">Понятно</button>
+    </div>
+</div>
+
+<!-- Модальное окно для создания промокода -->
+<div class="modal" id="createPromoModal">
+    <div class="modal-card" style="max-width: 440px;">
+        <button class="modal-close" onclick="closeModal('createPromoModal')">X</button>
+        <div class="modal-title">Создать промокод</div>
+        
+        <div class="create-promo-container" style="padding: 0; background: transparent; border: none; box-shadow: none; margin-top: 0;">
+            <div class="create-promo-row">
+                <input type="text" class="create-promo-input" id="createPromoCode" placeholder="Название промокода" maxlength="20" style="text-transform: uppercase;">
+            </div>
+            <div class="create-promo-row">
+                <input type="number" class="create-promo-input" id="createPromoAmount" placeholder="Сумма награды" min="1" value="100">
+            </div>
+            <div class="create-promo-row">
+                <input type="number" class="create-promo-input" id="createPromoUses" placeholder="Кол-во активаций" min="1" value="1">
+            </div>
+            
+            <div class="create-promo-cost">
+                <span class="label">Стоимость:</span>
+                <span class="value" id="createPromoTotalCost">100 <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin"></span>
+            </div>
+            
+            <button class="action-btn" onclick="submitCreatePromo()" style="background: linear-gradient(135deg, var(--color-cyan), var(--color-purple-deep)); border: none; color: #04121a; font-size: 16px; padding: 16px;">Создать промокод</button>
+            <div class="msg" id="createPromoMsg"></div>
+        </div>
     </div>
 </div>
 
@@ -1010,6 +1087,11 @@ body{
                         </div>
                         <div class="profile-nick-big" id="profileNick">Игрок</div>
                         <a class="profile-tg-big" id="profileTg" href="#" target="_blank"><span id="profileTgText">@username</span></a>
+                        
+                        <!-- Кнопка создания промокода -->
+                        <button class="action-btn" onclick="openCreatePromo()" style="max-width: 300px; margin-top: 16px; background: linear-gradient(135deg, var(--color-purple), var(--color-purple-deep)); border: none; color: #04121a; font-weight: 700; padding: 12px 24px; border-radius: 8px;">
+                            + СОЗДАТЬ ПРОМОКОД
+                        </button>
                     </div>
                     <div class="profile-stats-grid">
                         <div class="profile-stat-card">
@@ -1071,7 +1153,7 @@ body{
 
 <script>
 // ================== КОНСТАНТЫ ==================
-const API_URL = 'https://brainrolltester.onrender.com';
+const API_URL = 'https://brainrotwin.onrender.com';
 const ADMIN_USERNAMES = ['saintezz7', 'vortyn1'];
 const COIN_IMG = 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png';
 const DEFAULT_AVATAR = 'https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg';
@@ -1233,6 +1315,72 @@ function showToast(message, type = 'info') {
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
+
+// ================== СОЗДАНИЕ ПРОМОКОДА (ПОЛЬЗОВАТЕЛЬ) ==================
+window.openCreatePromo = function() {
+    document.getElementById('createPromoCode').value = '';
+    document.getElementById('createPromoAmount').value = '100';
+    document.getElementById('createPromoUses').value = '1';
+    document.getElementById('createPromoMsg').textContent = '';
+    document.getElementById('createPromoMsg').className = 'msg';
+    updateCreatePromoCost();
+    openModal('createPromoModal');
+    playClick();
+};
+
+function updateCreatePromoCost() {
+    const amount = parseInt(document.getElementById('createPromoAmount').value) || 0;
+    const uses = parseInt(document.getElementById('createPromoUses').value) || 0;
+    const total = amount * uses;
+    document.getElementById('createPromoTotalCost').innerHTML = `${total} <img src="${COIN_IMG}" alt="coin">`;
+}
+
+// Слушатели для обновления цены в реальном времени
+document.getElementById('createPromoAmount')?.addEventListener('input', updateCreatePromoCost);
+document.getElementById('createPromoUses')?.addEventListener('input', updateCreatePromoCost);
+
+window.submitCreatePromo = async function() {
+    const code = document.getElementById('createPromoCode').value.trim().toUpperCase();
+    const amount = parseInt(document.getElementById('createPromoAmount').value);
+    const uses = parseInt(document.getElementById('createPromoUses').value);
+    const msg = document.getElementById('createPromoMsg');
+
+    if (!code || code.length < 3) {
+        if (msg) { msg.className = 'msg err'; msg.textContent = 'Название минимум 3 символа'; }
+        return;
+    }
+    if (!amount || amount < 1) {
+        if (msg) { msg.className = 'msg err'; msg.textContent = 'Сумма минимум 1'; }
+        return;
+    }
+    if (!uses || uses < 1) {
+        if (msg) { msg.className = 'msg err'; msg.textContent = 'Активаций минимум 1'; }
+        return;
+    }
+
+    const totalCost = amount * uses;
+    if (balance < totalCost) {
+        if (msg) { msg.className = 'msg err'; msg.textContent = `Недостаточно монет. Нужно: ${totalCost}`; }
+        return;
+    }
+
+    if (msg) { msg.className = 'msg wait'; msg.textContent = 'Создаём...'; }
+
+    try {
+        const data = await api('/api/promo/create_by_user', { code, amount, uses });
+        if (data.ok) {
+            if (msg) { msg.className = 'msg ok'; msg.textContent = 'Промокод создан!'; }
+            playCoin(); vibrate(20);
+            applyServerUser({ balance: data.new_balance });
+            setTimeout(() => closeModal('createPromoModal'), 1500);
+        } else {
+            if (msg) { msg.className = 'msg err'; msg.textContent = data.error || 'Ошибка'; }
+            playLose();
+        }
+    } catch (e) {
+        if (msg) { msg.className = 'msg err'; msg.textContent = 'Сервер не отвечает'; }
+    }
+};
 
 (function initTelegramUser() {
   try {
@@ -1411,7 +1559,7 @@ function showBanOverlay(ban) {
   const wasOpen = ov.classList.contains('show');
   ov.classList.add('show');
   try { closeCaseOpen(); } catch (e) {}
-  ['topupModal', 'adminModal', 'targetModal', 'withdrawModal', 'withdrawInfoModal', 'unbanModal'].forEach(id => {
+  ['topupModal', 'adminModal', 'targetModal', 'withdrawModal', 'withdrawInfoModal', 'unbanModal', 'createPromoModal'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('open');
   });
@@ -2285,7 +2433,6 @@ function renderTowerBetList() {
     return;
   }
   
-  // Группируем предметы
   const groups = {};
   inventory.forEach((id, idx) => {
     if (!groups[id]) groups[id] = { id, item: getItemById(id), indexes: [] };
@@ -2294,7 +2441,6 @@ function renderTowerBetList() {
   
   container.innerHTML = Object.values(groups).map(g => {
     const it = g.item; if (!it) return '';
-    // Проверяем, сколько уже выбрано
     const selectedIndexes = g.indexes.filter(idx => towerGameState.betItems.some(b => b.index === idx));
     const selCount = selectedIndexes.length;
     const isSelected = selCount > 0;
@@ -2311,18 +2457,14 @@ function renderTowerBetList() {
 window.toggleTowerBetItem = function(id) {
   if (towerGameState.active) return;
   
-  // Находим все индексы этого предмета
   const indexes = [];
   inventory.forEach((iid, idx) => { if (iid === id) indexes.push(idx); });
   
-  // Проверяем, все ли уже выбраны
   const allSelected = indexes.every(idx => towerGameState.betItems.some(b => b.index === idx));
   
   if (allSelected) {
-    // Убираем все
     towerGameState.betItems = towerGameState.betItems.filter(b => !indexes.includes(b.index));
   } else {
-    // Добавляем все
     indexes.forEach(idx => {
       if (!towerGameState.betItems.some(b => b.index === idx)) {
         towerGameState.betItems.push({ id, index: idx });
@@ -2358,7 +2500,6 @@ function updateTowerUI() {
     
     title.textContent = `Этаж ${towerGameState.currentFloor} / 5 — Выбери ячейки`;
     
-    // Сбрасываем ячейки
     cells.forEach(c => {
       if (!c.classList.contains('opened')) {
         c.textContent = '?';
@@ -2399,12 +2540,10 @@ window.openTowerCell = async function(index) {
     }
     
     if (data.is_bomb) {
-      // Проигрыш
       towerGameState.active = false;
       cell.classList.add('opened', 'bomb');
-      cell.textContent = 'X'; // Крестик вместо эмодзи
+      cell.textContent = 'X';
       
-      // Открываем остальные бомбы
       for(let i=0; i<5; i++) {
         if (towerGameState.bombs.includes(i)) {
            const c = document.getElementById('towerCells').children[i];
@@ -2420,11 +2559,9 @@ window.openTowerCell = async function(index) {
       playLose(); vibratePattern([50,30,100]);
       showToast('Вы наткнулись на бомбу!', 'error');
       
-      // Очищаем ставку
       towerGameState.betItems = [];
       renderTowerBetList();
       
-      // Обновляем инвентарь (предметы сгорели)
       await loadUserFromServer();
       
       setTimeout(() => {
@@ -2432,20 +2569,16 @@ window.openTowerCell = async function(index) {
       }, 2000);
       
     } else {
-      // Успех
       cell.classList.add('opened', 'safe');
       cell.textContent = '✓';
       
       towerGameState.openedCells.push(index);
       playCoin(); vibrate(15);
       
-      // Проверяем, все ли 5 ячеек открыты
       if (towerGameState.openedCells.length === 5) {
-        // Переход на следующий этаж
         towerGameState.currentFloor++;
         
         if (towerGameState.currentFloor > 5) {
-          // Победа (дошел до конца)
           towerGameState.active = false;
           document.getElementById('towerActionBtn').textContent = 'ЗАБРАТЬ ВЫИГРЫШ';
           document.getElementById('towerActionBtn').classList.add('cashout');
@@ -2453,7 +2586,6 @@ window.openTowerCell = async function(index) {
           playWin(); vibratePattern([30,50,30,50,60]);
           showToast('Вы прошли все 5 этажей!', 'success');
         } else {
-          // Очищаем для нового этажа
           towerGameState.openedCells = [];
           const cells = document.querySelectorAll('#towerCells .tower-cell');
           cells.forEach(c => {
@@ -2475,7 +2607,6 @@ window.openTowerCell = async function(index) {
 
 window.startTowerGame = async function() {
   if (towerGameState.active) {
-    // Кэшаут
     playClick();
     try {
       const res = await fetch(API_URL + '/api/tower/cashout', {
@@ -2506,7 +2637,6 @@ window.startTowerGame = async function() {
     return;
   }
   
-  // Старт
   if (towerGameState.betItems.length === 0) {
     showToast('Выберите предметы для ставки!', 'error');
     return;
