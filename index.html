@@ -133,25 +133,10 @@ body{
 .chance-big{font-size:40px;font-weight:800;color:#fff;line-height:1;text-shadow: 0 0 26px rgba(111,233,255,1);letter-spacing:.5px;}
 .chance-label{margin-top:7px;font-size:9px;font-weight:600;color:var(--text-muted);letter-spacing:3.5px;text-transform:uppercase;}
 .arrow-container{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;transform-origin:center center;will-change:transform;}
-.arrow-pointer{
-  position:absolute;top:-30px;left:50%;transform:translateX(-50%);
-  width:60px;height:60px;
-  filter: drop-shadow(0 4px 14px rgba(62,200,255,1)) drop-shadow(0 0 8px rgba(200,240,255,.8));
-  background: url('https://github.com/saintezz/brainrolltester/blob/main/upgrad.png?raw=true') center/contain no-repeat;
-  border-radius:50%;
-}
+.arrow-pointer{position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:60px;height:60px;filter: drop-shadow(0 4px 14px rgba(62,200,255,1)) drop-shadow(0 0 8px rgba(200,240,255,.8));background: url('https://github.com/saintezz/brainrolltester/blob/main/upgrad.png?raw=true') center/contain no-repeat;border-radius:50%;}
 .arrow-pointer::before{display:none;}
 .items-row{display:flex;align-items:stretch;justify-content: space-between;gap:24px;width: 100%;padding: 0 10px;}
-.upg-card{
-  flex: 1;
-  background:linear-gradient(180deg, rgba(62,200,255,.08), transparent),#0a1826;
-  border: 1px dashed rgba(62,200,255,.5);
-  border-radius:18px;
-  padding:32px 24px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-height: 340px;
-  cursor:pointer;transition: all .18s ease;position:relative;overflow:hidden;
-}
+.upg-card{flex: 1;background:linear-gradient(180deg, rgba(62,200,255,.08), transparent),#0a1826;border: 1px dashed rgba(62,200,255,.5);border-radius:18px;padding:32px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height: 340px;cursor:pointer;transition: all .18s ease;position:relative;overflow:hidden;}
 .upg-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg, transparent, rgba(200,240,255,.35), transparent);}
 .upg-card:hover{background: var(--bg-surface-hover);border-color: var(--color-cyan);transform: translateY(-2px);box-shadow: 0 0 30px -10px rgba(62,200,255,.8);}
 .upg-card.filled{border-style: solid;border-color: rgba(62,200,255,.8);background:radial-gradient(120% 90% at 50% 0%, rgba(62,200,255,.25), transparent 60%),var(--bg-surface);}
@@ -208,12 +193,7 @@ body{
 .inv-hero-pill img { width: 16px; height: 16px; object-fit: contain; }
 .inv-hero-pill.gold { background: rgba(46,230,197,.14); border-color: rgba(46,230,197,.5); color: var(--color-emerald); }
 .inventory-tab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; padding: 4px 0 12px; }
-.inv-tab-card, .inv-card, .shop-card, .target-list-item, .case-possible-item, .profile-inventory-item {
-  border: none !important;
-  background: var(--bg-surface) !important;
-  box-shadow: none !important;
-  border-radius: 14px !important;
-}
+.inv-tab-card, .inv-card, .shop-card, .target-list-item, .case-possible-item, .profile-inventory-item { border: none !important; background: var(--bg-surface) !important; box-shadow: none !important; border-radius: 14px !important; }
 .inv-tab-card{padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;}
 .inv-tab-card img.inv-main{width:52px;height:52px;object-fit:contain;}
 .inv-tab-card .inv-name{font-size:12px;font-weight:700;color:#fff;text-align:center;height:32px;overflow:hidden;line-height:1.1;display:flex;align-items:center;justify-content:center;}
@@ -1055,7 +1035,8 @@ body{
 
 <script>
 // ================== КОНСТАНТЫ ==================
-const API_URL = 'https://https://brainrolltester.onrender.com/';
+// [FIX] Твой домен
+const API_URL = 'https://brainrolltester.onrender.com';
 const ADMIN_USERNAMES = ['saintezz7', 'vortyn1'];
 const COIN_IMG = 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png';
 const DEFAULT_AVATAR = 'https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg';
@@ -1068,7 +1049,6 @@ const MUTATION_ICONS = {
   lava: 'https://raw.githubusercontent.com/saintezz/SaintGLOSSARY/main/mutation/Lava_Mutation_Icon.webp'
 };
 
-// [FIX] gingergeart — исправлен ID
 const ITEMS = [
   { id: 'lagrande', name: 'La Grande Combination', price: 4, img: 'https://raw.githubusercontent.com/forerer-afk/brainroterX/main/lagrande.webp' },
   { id: 'nuclearo', name: 'Nuclearo Dinausauro', price: 12, img: 'https://raw.githubusercontent.com/forerer-afk/brainroterX/main/nuclearo.png' },
@@ -1133,7 +1113,6 @@ const CASE_ONLY_ITEMS = [
   { id: 'lavastrawberry', name: 'Lava Strawberry Elephant', price: 56000, img: 'https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/LavaStrawberry.webp', mutation: 'lava' }
 ];
 
-// [FIX] school case — сумма 100
 const CASES = [
   { id: 'witch', name: 'Witch Case', price: 10, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/fusecase.png', rewards: [{ id: 'lagrande', chance: 76 }, { id: 'nuclearo', chance: 22 }, { id: 'cupid', chance: 1.5 }, { id: 'garama', chance: 0.3 }, { id: 'burguro', chance: 0.2 }, { id: 'popcuru', chance: 0.1 }] },
   { id: 'fruits', name: 'Fruits Case', price: 19, img: 'https://github.com/saintezz/BrainrotWin/blob/main/FRUITSCASE.png?raw=true', rewards: [{ id: 'lagrande', chance: 30 }, { id: 'nuclearo', chance: 50 }, { id: 'cupid', chance: 15 }, { id: 'waverider', chance: 5 }] },
@@ -1188,11 +1167,8 @@ const CIRCUMFERENCE = 2 * Math.PI * 130;
 
 let invFilter = 'all';
 
-// [FIX #9] Экранирование HTML для защиты от XSS
 function escapeHtml(s) {
-  return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-  }[c]));
+  return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 (function initTelegramUser() {
@@ -1227,7 +1203,6 @@ function escapeHtml(s) {
   }
 })();
 
-// [FIX #1] telegram_id больше не fallback — только initData. Но для совместимости guest используем для GET.
 let guestId = null;
 function getTelegramId() {
   if (USER.id) return String(USER.id);
@@ -1236,20 +1211,78 @@ function getTelegramId() {
 }
 function getDisplayNick() { return customNick || USER.nick; }
 function isCurrentUserAdmin() { return ADMIN_USERNAMES.includes((USER.username || '').toLowerCase()); }
-function getItemById(id) {
-  return ITEMS.find(item => item.id === id) || CASE_ONLY_ITEMS.find(item => item.id === id);
+function getItemById(id) { return ITEMS.find(item => item.id === id) || CASE_ONLY_ITEMS.find(item => item.id === id); }
+
+// [FIX] api() — централизованно, с обработкой 401/403/503 и логированием
+async function api(path, body) {
+  if (maintenanceEnabled && !isCurrentUserAdmin()) return { ok: false, error: 'MAINTENANCE' };
+  const initDataRaw = window.Telegram?.WebApp?.initData || '';
+  const headers = { 'Content-Type': 'application/json' };
+  if (initDataRaw) headers['X-Telegram-Init-Data'] = initDataRaw;
+  const payload = Object.assign({}, body || {});
+  try {
+    const res = await fetch(API_URL + path, { method: 'POST', headers, body: JSON.stringify(payload) });
+    const data = await res.json().catch(() => ({ ok: false, error: 'BAD_JSON' }));
+    if (!res.ok && !data.error) data.error = 'HTTP_' + res.status;
+    if (data && data.error === 'BANNED') showBanOverlay(data.ban || null);
+    if (data && data.error === 'MAINTENANCE') applyMaintenanceState(true);
+    if (!data.ok && data.error) console.warn('[API]', path, '→', data.error);
+    return data;
+  } catch (e) {
+    console.error('[API] network', path, e.message);
+    return { ok: false, error: 'NETWORK' };
+  }
+}
+
+function applyServerUser(data) {
+  if (!data) return;
+  if (typeof data.balance === 'number' && isFinite(data.balance)) balance = data.balance;
+  if (Array.isArray(data.inventory)) inventory = data.inventory;
+  if (Array.isArray(data.pending_withdraw_ids)) pendingWithdrawItemIds = new Set(data.pending_withdraw_ids);
+  else pendingWithdrawItemIds = new Set();
+  if (data.pending_withdraw_details && typeof data.pending_withdraw_details === 'object') withdrawDetails = data.pending_withdraw_details;
+  else withdrawDetails = {};
+  if (typeof data.custom_nick === 'string' && data.custom_nick) customNick = data.custom_nick;
+  if (typeof data.avatar === 'string' && data.avatar) customAvatar = data.avatar;
+
+  if (Object.prototype.hasOwnProperty.call(data, 'banned')) {
+    if (data.banned) showBanOverlay(data.ban || null);
+    else hideBanOverlay();
+  }
+  if (data.unban_notice) showUnbanNotice(data.unban_notice);
+
+  updateBalanceUI();
+  renderInventory();
+  renderShop();
+  updateUpgradeScreen();
+  renderProfileInventory();
+  applyCustomAvatar();
+  applyUserToProfile();
+  if (document.getElementById('panelInventory')?.classList.contains('active')) renderInventoryTab();
+  if (document.getElementById('panelCatch')?.classList.contains('active')) renderMinesBetGrid();
+}
+
+async function loadUserFromServer() {
+  try {
+    const initDataRaw = window.Telegram?.WebApp?.initData || '';
+    const headers = {};
+    if (initDataRaw) headers['X-Telegram-Init-Data'] = initDataRaw;
+    const res = await fetch(API_URL + '/api/user/' + encodeURIComponent(getTelegramId()), { cache: 'no-store', headers });
+    const data = await res.json().catch(() => ({ ok: false, error: 'BAD_JSON' }));
+    if (data.ok && data.user) applyServerUser(data.user);
+    else if (data.error === 'BANNED') showBanOverlay(data.ban || null);
+    else if (data.error) console.warn('[SYNC]', data.error);
+  } catch (e) { console.warn('[SYNC] сервер недоступен:', e.message); }
 }
 
 // ================== АНОНСЫ ==================
 async function checkAnnouncement() {
   try {
-    const res = await fetch(API_URL + '/api/announcement');
+    const res = await fetch(API_URL + '/api/announcement', { cache: 'no-store' });
     const data = await res.json();
     if (data.ok) renderAnnouncement(data.announcement);
   } catch (e) {}
 }
-
-// [FIX #10] Экранирование анонса
 function renderAnnouncement(ann) {
   const container = document.getElementById('announcementContainer');
   if (!container) return;
@@ -1282,73 +1315,13 @@ function applyMaintenanceState(enabled) {
 }
 async function checkMaintenance() {
   try {
-    const res = await fetch(API_URL + '/api/maintenance');
+    const res = await fetch(API_URL + '/api/maintenance', { cache: 'no-store' });
     const data = await res.json();
     if (data.ok) {
       const newState = !!data.maintenance.enabled;
       if (newState !== maintenanceEnabled) applyMaintenanceState(newState);
     }
   } catch (e) {}
-}
-
-// ================== СЕРВЕР ==================
-async function api(path, body) {
-  if (maintenanceEnabled && !isCurrentUserAdmin()) return { ok: false, error: 'MAINTENANCE' };
-  const initDataRaw = window.Telegram?.WebApp?.initData || '';
-  const headers = { 'Content-Type': 'application/json' };
-  if (initDataRaw) headers['X-Telegram-Init-Data'] = initDataRaw;
-  // [FIX #1] telegram_id/username в body больше не отправляем как авторизацию — только initData
-  const payload = Object.assign({}, body || {});
-  try {
-    const res = await fetch(API_URL + path, { method: 'POST', headers, body: JSON.stringify(payload) });
-    const data = await res.json();
-    if (data && data.error === 'BANNED') showBanOverlay(data.ban || null);
-    return data;
-  } catch (e) {
-    return { ok: false, error: 'NETWORK' };
-  }
-}
-
-function applyServerUser(data) {
-  if (!data) return;
-  if (typeof data.balance === 'number' && isFinite(data.balance)) balance = data.balance;
-  if (Array.isArray(data.inventory)) inventory = data.inventory;
-  // [FIX #60] безопасная обработка pending_withdraw_ids
-  if (Array.isArray(data.pending_withdraw_ids)) pendingWithdrawItemIds = new Set(data.pending_withdraw_ids);
-  else pendingWithdrawItemIds = new Set();
-  if (data.pending_withdraw_details && typeof data.pending_withdraw_details === 'object') withdrawDetails = data.pending_withdraw_details;
-  else withdrawDetails = {};
-  if (typeof data.custom_nick === 'string' && data.custom_nick) customNick = data.custom_nick;
-  if (typeof data.avatar === 'string' && data.avatar) customAvatar = data.avatar;
-
-  if (Object.prototype.hasOwnProperty.call(data, 'banned')) {
-    if (data.banned) showBanOverlay(data.ban || null);
-    else hideBanOverlay();
-  }
-  if (data.unban_notice) showUnbanNotice(data.unban_notice);
-
-  updateBalanceUI();
-  renderInventory();
-  renderShop();
-  updateUpgradeScreen();
-  renderProfileInventory();
-  applyCustomAvatar();
-  applyUserToProfile();
-  if (document.getElementById('panelInventory')?.classList.contains('active')) renderInventoryTab();
-  if (document.getElementById('panelCatch')?.classList.contains('active')) renderMinesBetGrid();
-}
-
-async function loadUserFromServer() {
-  // [FIX #18] /api/user/:id требует initData — отправляем GET с заголовком
-  try {
-    const initDataRaw = window.Telegram?.WebApp?.initData || '';
-    const headers = {};
-    if (initDataRaw) headers['X-Telegram-Init-Data'] = initDataRaw;
-    const res = await fetch(API_URL + '/api/user/' + encodeURIComponent(getTelegramId()), { cache: 'no-store', headers });
-    const data = await res.json();
-    if (data.ok && data.user) applyServerUser(data.user);
-    else if (data.error === 'BANNED') showBanOverlay(data.ban || null);
-  } catch (e) { console.warn('[SYNC] сервер недоступен'); }
 }
 
 // ================== БАНЫ ==================
@@ -1359,7 +1332,6 @@ function refreshBodyScrollLock() {
     !!document.getElementById('caseOpenModal')?.classList.contains('show');
   document.body.style.overflow = anyOpen ? 'hidden' : '';
 }
-
 function showBanOverlay(ban) {
   currentBan = ban || null;
   const ov = document.getElementById('banOverlay');
@@ -1376,13 +1348,11 @@ function showBanOverlay(ban) {
   refreshBodyScrollLock();
   if (!wasOpen) { playLose(); vibratePattern([60, 40, 120]); }
 }
-
 function hideBanOverlay() {
   const ov = document.getElementById('banOverlay');
   if (ov) ov.classList.remove('show');
   refreshBodyScrollLock();
 }
-
 function showUnbanNotice(notice) {
   if (!notice || !notice.reason) return;
   const modal = document.getElementById('unbanModal');
@@ -1399,7 +1369,6 @@ function showUnbanNotice(notice) {
   }
   refreshBodyScrollLock();
 }
-
 async function ackUnban() {
   playClick(); vibrate(10);
   closeModal('unbanModal');
@@ -1417,7 +1386,6 @@ async function ackUnban() {
 document.getElementById('unbanModal')?.addEventListener('click', (e) => {
   if (e.target === document.getElementById('unbanModal')) ackUnban();
 });
-
 async function checkBanStatus() {
   try {
     const url = API_URL + '/api/ban/status?telegram_id=' + encodeURIComponent(getTelegramId()) +
@@ -1608,15 +1576,13 @@ window.createDeposit = async function() {
   if (!topupSelectedItem) { if(msg){msg.className='msg err';msg.textContent='Выбери предмет';} return; }
   if (!roblox) { if(msg){msg.className='msg err';msg.textContent='Введи Roblox ник';} return; }
   if (msg) { msg.className = 'msg wait'; msg.textContent = 'Отправляем...'; }
-  try {
-    const data = await api('/api/deposit/create', { item_id: topupSelectedItem, roblox_name: roblox });
-    if (data.ok) {
-      if (msg) { msg.className='msg ok'; msg.textContent='Заявка отправлена!'; }
-      playCoin(); vibrate(15); activePromo = null; updateTopupPromoDisplay();
-      setTimeout(() => closeModal('topupModal'), 2200);
-      if (data.inventory) applyServerUser({ inventory: data.inventory });
-    } else { if (msg) { msg.className='msg err'; msg.textContent = data.error || 'Ошибка'; } playLose(); }
-  } catch (e) { if(msg){msg.className='msg err';msg.textContent='Сервер не отвечает';} }
+  const data = await api('/api/deposit/create', { item_id: topupSelectedItem, roblox_name: roblox });
+  if (data.ok) {
+    if (msg) { msg.className='msg ok'; msg.textContent='Заявка отправлена!'; }
+    playCoin(); vibrate(15); activePromo = null; updateTopupPromoDisplay();
+    setTimeout(() => closeModal('topupModal'), 2200);
+    if (data.inventory) applyServerUser({ inventory: data.inventory });
+  } else { if (msg) { msg.className='msg err'; msg.textContent = data.error || 'Ошибка'; } playLose(); }
 };
 
 // ================== ДЕПОЗИТЫ ==================
@@ -1640,11 +1606,9 @@ function renderDeposits() {
 }
 window.processDeposit = async function(id, status) {
   playClick(); vibrate(10);
-  try {
-    const data = await api('/api/deposit/status', { id, status });
-    if (data.ok) { await loadDeposits(); playCoin(); if (document.getElementById('adminModal').classList.contains('open')) loadAdminDeposits(); }
-    else playLose();
-  } catch (e) {}
+  const data = await api('/api/deposit/status', { id, status });
+  if (data.ok) { await loadDeposits(); playCoin(); if (document.getElementById('adminModal').classList.contains('open')) loadAdminDeposits(); }
+  else playLose();
 };
 
 // ================== АДМИН ==================
@@ -1685,16 +1649,14 @@ window.createPromo = async function() {
     value = selectedAdminItem;
   }
   if (msg) { msg.className='msg wait'; msg.textContent='Создаём...'; }
-  try {
-    const data = await api('/api/create', { code, uses, type: promoType, value });
-    if (data.ok) {
-      if (msg) { msg.className='msg ok'; msg.textContent='Промокод создан: ' + code; }
-      playCoin();
-      document.getElementById('adminCode').value='';
-      document.getElementById('adminUses').value=1;
-      selectedAdminItem = null; updateAdminPreview(); renderAdminGrid(); renderPromoList();
-    } else { if(msg){msg.className='msg err';msg.textContent=data.error||'Ошибка';} }
-  } catch (err) { if(msg){msg.className='msg err';msg.textContent='Сервер не отвечает.';} }
+  const data = await api('/api/create', { code, uses, type: promoType, value });
+  if (data.ok) {
+    if (msg) { msg.className='msg ok'; msg.textContent='Промокод создан: ' + code; }
+    playCoin();
+    document.getElementById('adminCode').value='';
+    document.getElementById('adminUses').value=1;
+    selectedAdminItem = null; updateAdminPreview(); renderAdminGrid(); renderPromoList();
+  } else { if(msg){msg.className='msg err';msg.textContent=data.error||'Ошибка';} }
 };
 async function renderPromoList() {
   const list = document.getElementById('promoList'); if (!list) return;
@@ -1724,15 +1686,14 @@ window.activatePromo = async function() {
   isPromoActivating = true;
   if (btn) btn.disabled = true;
   if (msgTab) { msgTab.className='msg wait'; msgTab.textContent='Проверяем...'; }
-  try {
-    const data = await api('/api/activate', { code });
-    if (data.ok) {
-      if (data.type === 'balance') { if (msgTab) { msgTab.className='msg ok'; msgTab.textContent=`+${data.value} монет! Осталось: ${data.remaining}`; } playCoin(); vibrate(20); }
-      else { const item = getItemById(data.value); if (msgTab) { msgTab.className='msg ok'; msgTab.textContent=`Получен: ${item ? item.name : data.value}! Осталось: ${data.remaining}`; } playWin(); vibratePattern([20,40,20]); }
-      inputTab.value = ''; await loadUserFromServer();
-    } else { if (msgTab) { msgTab.className='msg err'; msgTab.textContent = data.error || 'Ошибка'; } playLose(); }
-  } catch (err) { if(msgTab){msgTab.className='msg err';msgTab.textContent='Сервер не отвечает.';} }
-  finally { isPromoActivating = false; if (btn) btn.disabled = false; }
+  const data = await api('/api/activate', { code });
+  if (data.ok) {
+    if (data.type === 'balance') { if (msgTab) { msgTab.className='msg ok'; msgTab.textContent=`+${data.value} монет! Осталось: ${data.remaining}`; } playCoin(); vibrate(20); }
+    else { const item = getItemById(data.value); if (msgTab) { msgTab.className='msg ok'; msgTab.textContent=`Получен: ${item ? item.name : data.value}! Осталось: ${data.remaining}`; } playWin(); vibratePattern([20,40,20]); }
+    inputTab.value = ''; await loadUserFromServer();
+  } else { if (msgTab) { msgTab.className='msg err'; msgTab.textContent = data.error || 'Ошибка'; } playLose(); }
+  isPromoActivating = false;
+  if (btn) btn.disabled = false;
 };
 window.switchAdminTab = function(tab) {
   playClick(); vibrate(8);
@@ -1749,7 +1710,6 @@ window.switchAdminTab = function(tab) {
   if (tab === 'bans') loadAdminBans();
   if (tab === 'abuse') { document.getElementById('adminAnnounceText').value = ''; document.getElementById('announceMsg').textContent = ''; }
 };
-
 window.sendAnnouncement = async function() {
   const textEl = document.getElementById('adminAnnounceText');
   const msg = document.getElementById('announceMsg');
@@ -1758,22 +1718,17 @@ window.sendAnnouncement = async function() {
   if (!text) { if (msg) { msg.className = 'msg err'; msg.textContent = 'Введите текст'; } return; }
   if (msg) { msg.className = 'msg wait'; msg.textContent = 'Отправка...'; }
   if (btn) btn.disabled = true;
-  try {
-    const data = await api('/api/admin/announce', { text });
-    if (data.ok) {
-      if (msg) { msg.className = 'msg ok'; msg.textContent = 'Анонс отправлен!'; }
-      playWin(); vibrate(20);
-      textEl.value = '';
-      checkAnnouncement();
-      setTimeout(() => { if (btn) btn.disabled = false; }, 10000);
-    } else {
-      if (msg) { msg.className = 'msg err'; msg.textContent = data.error || 'Ошибка'; }
-      if (btn) btn.disabled = false;
-      playLose();
-    }
-  } catch (e) {
-    if (msg) { msg.className = 'msg err'; msg.textContent = 'Сервер не отвечает'; }
+  const data = await api('/api/admin/announce', { text });
+  if (data.ok) {
+    if (msg) { msg.className = 'msg ok'; msg.textContent = 'Анонс отправлен!'; }
+    playWin(); vibrate(20);
+    textEl.value = '';
+    checkAnnouncement();
+    setTimeout(() => { if (btn) btn.disabled = false; }, 10000);
+  } else {
+    if (msg) { msg.className = 'msg err'; msg.textContent = data.error || 'Ошибка'; }
     if (btn) btn.disabled = false;
+    playLose();
   }
 };
 
@@ -1795,15 +1750,13 @@ window.adminBanUser = async function() {
   if (!reason) { setBanMsg('err', 'Укажи причину бана'); return; }
   playClick(); vibrate(10);
   setBanMsg('wait', 'Баним...');
-  try {
-    const data = await api('/api/admin/ban', { target, reason });
-    if (data.ok) {
-      const uname = data.user?.username || target;
-      setBanMsg('ok', data.pending ? 'Готово. Юзер ещё не заходил — бан сработает при входе.' : 'Забанен: @' + uname);
-      if (reasonEl) reasonEl.value = '';
-      loadAdminBans(); checkBanStatus();
-    } else { setBanMsg('err', data.error || 'Ошибка'); }
-  } catch (e) { setBanMsg('err', 'Сервер не отвечает'); }
+  const data = await api('/api/admin/ban', { target, reason });
+  if (data.ok) {
+    const uname = data.user?.username || target;
+    setBanMsg('ok', data.pending ? 'Готово. Юзер ещё не заходил — бан сработает при входе.' : 'Забанен: @' + uname);
+    if (reasonEl) reasonEl.value = '';
+    loadAdminBans(); checkBanStatus();
+  } else { setBanMsg('err', data.error || 'Ошибка'); }
 };
 window.adminUnbanUser = async function() {
   if (!isAdmin) return;
@@ -1814,15 +1767,13 @@ window.adminUnbanUser = async function() {
   if (!target) { setBanMsg('err', 'Введи юзера в тг'); return; }
   playClick(); vibrate(10);
   setBanMsg('wait', 'Разбаниваем...');
-  try {
-    const data = await api('/api/admin/unban', { target, reason });
-    if (data.ok) {
-      const uname = data.user?.username || target;
-      setBanMsg('ok', 'Разбанен: @' + uname + (data.reason ? ' · причина: ' + data.reason : ''));
-      if (reasonEl) reasonEl.value = '';
-      loadAdminBans(); checkBanStatus();
-    } else { setBanMsg('err', data.error || 'Ошибка'); }
-  } catch (e) { setBanMsg('err', 'Сервер не отвечает'); }
+  const data = await api('/api/admin/unban', { target, reason });
+  if (data.ok) {
+    const uname = data.user?.username || target;
+    setBanMsg('ok', 'Разбанен: @' + uname + (data.reason ? ' · причина: ' + data.reason : ''));
+    if (reasonEl) reasonEl.value = '';
+    loadAdminBans(); checkBanStatus();
+  } else { setBanMsg('err', data.error || 'Ошибка'); }
 };
 window.adminUnbanFromList = function(target) {
   const targetEl = document.getElementById('adminBanTarget');
@@ -1857,7 +1808,6 @@ async function loadAdminBans() {
     }).join('');
   } catch (e) { list.innerHTML = '<div class="admin-request-empty">Не удалось загрузить</div>'; }
 }
-
 async function loadAdminDeposits() {
   const list = document.getElementById('adminDepositsList'); const countEl = document.getElementById('adminDepCount'); if (!list) return;
   try {
@@ -1892,14 +1842,12 @@ async function loadAdminWithdraws() {
 }
 window.processWithdraw = async function(id, status) {
   playClick(); vibrate(10);
-  try {
-    const data = await api('/api/withdraw/status', { id, status });
-    if (data.ok) {
-      await loadAdminWithdraws();
-      if ((USER.username || '').toLowerCase() === (data.withdraw?.username || '').toLowerCase()) await loadUserFromServer();
-      playCoin();
-    } else playLose();
-  } catch (e) {}
+  const data = await api('/api/withdraw/status', { id, status });
+  if (data.ok) {
+    await loadAdminWithdraws();
+    if ((USER.username || '').toLowerCase() === (data.withdraw?.username || '').toLowerCase()) await loadUserFromServer();
+    playCoin();
+  } else playLose();
 };
 
 // ================== ТЕХПЕРЕРЫВ (АДМИН) ==================
@@ -1932,17 +1880,15 @@ async function loadMaintenanceStatus() {
 window.toggleMaintenance = async function() {
   const msg = document.getElementById('maintenanceMsg');
   if (msg) { msg.className = 'msg wait'; msg.textContent = 'Применяем...'; }
-  try {
-    const data = await api('/api/admin/maintenance', { enabled: !maintenanceEnabled });
-    if (data.ok) {
-      if (msg) { msg.className = 'msg ok'; msg.textContent = data.maintenance.enabled ? 'Техперерыв включён' : 'Техперерыв выключен'; }
-      playCoin(); vibrate(20);
-      await loadMaintenanceStatus(); await checkMaintenance();
-    } else {
-      if (msg) { msg.className = 'msg err'; msg.textContent = data.error || 'Ошибка'; }
-      playLose();
-    }
-  } catch (e) { if (msg) { msg.className = 'msg err'; msg.textContent = 'Сервер не отвечает'; } }
+  const data = await api('/api/admin/maintenance', { enabled: !maintenanceEnabled });
+  if (data.ok) {
+    if (msg) { msg.className = 'msg ok'; msg.textContent = data.maintenance.enabled ? 'Техперерыв включён' : 'Техперерыв выключен'; }
+    playCoin(); vibrate(20);
+    await loadMaintenanceStatus(); await checkMaintenance();
+  } else {
+    if (msg) { msg.className = 'msg err'; msg.textContent = data.error || 'Ошибка'; }
+    playLose();
+  }
 };
 
 // ================== МАГАЗИН / ИНВЕНТАРЬ ==================
@@ -1993,22 +1939,18 @@ function renderShop() {
 }
 window.buyItem = async function(id) {
   if (isSpinning || document.body.classList.contains('upgrade-locked')) return;
-  try {
-    const data = await api('/api/shop/buy', { item_id: id });
-    if (data.ok) { applyServerUser({ balance: data.new_balance, inventory: data.inventory }); playCoin(); vibrate(15); }
-    else { playLose(); vibrate(30); }
-  } catch (e) { playLose(); }
+  const data = await api('/api/shop/buy', { item_id: id });
+  if (data.ok) { applyServerUser({ balance: data.new_balance, inventory: data.inventory }); playCoin(); vibrate(15); }
+  else { playLose(); vibrate(30); }
 };
 window.sellItem = async function(index) {
   if (isSpinning || document.body.classList.contains('upgrade-locked')) return;
   if (index < 0 || index >= inventory.length) return;
   const id = inventory[index];
   if (pendingWithdrawItemIds.has(id)) { playLose(); return; }
-  try {
-    const data = await api('/api/shop/sell', { item_id: id });
-    if (data.ok) { applyServerUser({ balance: data.new_balance, inventory: data.inventory }); if (selectedSourceIndex === index) { selectedSourceIndex = null; selectedTargetId = null; } playCoin(); vibrate(15); }
-    else { playLose(); }
-  } catch (e) { playLose(); }
+  const data = await api('/api/shop/sell', { item_id: id });
+  if (data.ok) { applyServerUser({ balance: data.new_balance, inventory: data.inventory }); if (selectedSourceIndex === index) { selectedSourceIndex = null; selectedTargetId = null; } playCoin(); vibrate(15); }
+  else { playLose(); }
 };
 window.selectSourceByIndex = function(index) {
   if (isSpinning || document.body.classList.contains('upgrade-locked')) return;
@@ -2080,25 +2022,19 @@ function updateUpgradeScreen() {
   if (chanceBig) chanceBig.innerText = chance > 0 ? formatChance(chance) : '?%';
   if (upgradeBtn) upgradeBtn.disabled = !(src && tgt && chance > 0 && !isSpinning);
 }
-
 async function performUpgrade(durationMs) {
   if (isSpinning) return;
   if (selectedSourceIndex === null) return;
   const srcItem = getItemById(inventory[selectedSourceIndex]);
   const tgtItem = getItemById(selectedTargetId);
   if (!srcItem || !tgtItem || tgtItem.price <= srcItem.price) return;
-
   isSpinning = true;
   document.body.classList.add('upgrade-locked');
   const arrowContainer = document.getElementById('arrowContainer');
   const upgradeBtn = document.getElementById('upgradeBtn');
   if (upgradeBtn) { upgradeBtn.disabled = true; upgradeBtn.querySelector('span').innerText = 'КРУТИМ...'; }
   playUpgradeStart(); vibrate(20);
-
-  let data;
-  try { data = await api('/api/upgrade', { source_item_id: srcItem.id, target_item_id: tgtItem.id }); }
-  catch (e) { data = { ok: false }; }
-
+  const data = await api('/api/upgrade', { source_item_id: srcItem.id, target_item_id: tgtItem.id });
   if (!data.ok) {
     isSpinning = false;
     document.body.classList.remove('upgrade-locked');
@@ -2106,11 +2042,8 @@ async function performUpgrade(durationMs) {
     playLose(); vibrate(30);
     return;
   }
-
-  // [FIX #30] защита от undefined chance
   const chance = Math.max(MIN_CHANCE, Math.min(MAX_CHANCE, Number(data.chance) || 0));
   const chanceAngle = (chance / 100) * 360;
-
   let finalAngleDeg;
   if (data.success) {
     const margin = Math.min(2, chanceAngle * 0.15);
@@ -2120,14 +2053,11 @@ async function performUpgrade(durationMs) {
     const margin = Math.min(2, failZone * 0.15);
     finalAngleDeg = chanceAngle + margin + Math.random() * Math.max(0.01, failZone - margin * 2);
   }
-
   const baseRotation = 360 * 5;
   const targetRotation = baseRotation + finalAngleDeg;
-
   const tickCount = 30;
   const tickInterval = durationMs / tickCount;
   for (let i = 0; i < tickCount; i++) setTimeout(() => playTick(), i * tickInterval);
-
   if (arrowContainer) {
     arrowContainer.style.transition = 'none';
     arrowContainer.style.transform = 'rotate(0deg)';
@@ -2135,7 +2065,6 @@ async function performUpgrade(durationMs) {
     arrowContainer.style.transition = `transform ${durationMs}ms cubic-bezier(0.2, 0.8, 0.2, 1)`;
     arrowContainer.style.transform = `rotate(${targetRotation}deg)`;
   }
-
   setTimeout(() => {
     if (data.success) playWin(); else playLose();
     if (data.success) vibratePattern([30,50,30,50,60]); else vibratePattern([50,30,100]);
@@ -2223,10 +2152,8 @@ window.confirmOpenCase = async function() {
   document.querySelectorAll('.case-roulette-track').forEach(t => { t.style.transition = 'none'; t.style.transform = 'translateX(0px)'; });
   const btn = document.getElementById('caseOpenActionBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'ОТКРЫВАЕМ...'; }
-  let data;
-  try { data = await api('/api/case/open', { case_id: currentCaseId, qty: caseOpenQty }); } catch (e) { data = { ok: false }; }
+  const data = await api('/api/case/open', { case_id: currentCaseId, qty: caseOpenQty });
   if (!data.ok) { isCaseOpening = false; if (btn) { btn.disabled = false; btn.textContent = 'ОТКРЫТЬ КЕЙС'; } playLose(); vibrate(30); return; }
-  // [FIX #29] защита от не-массива won
   const wonList = Array.isArray(data.won) ? data.won : [];
   if (!wonList.length) { isCaseOpening = false; if (btn) { btn.disabled = false; btn.textContent = 'ОТКРЫТЬ КЕЙС'; } playLose(); return; }
   setTimeout(() => {
@@ -2262,14 +2189,12 @@ window.confirmOpenCase = async function() {
 // ================== ВЫВОД ==================
 let withdrawSelectedIndexes = [];
 let withdrawAgree = false;
-
 window.setInvFilter = function(f) {
   invFilter = f;
   document.querySelectorAll('.inv-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === f));
   playClick(); vibrate(8);
   renderInventoryTab();
 };
-
 function renderInventoryTab() {
   const grid = document.getElementById('inventoryTabGrid'); if (!grid) return;
   if (!inventory.length) {
@@ -2298,11 +2223,9 @@ window.sellItemFromTab = async function(index) {
   if (index < 0 || index >= inventory.length) return;
   const id = inventory[index];
   if (pendingWithdrawItemIds.has(id)) { playLose(); return; }
-  try {
-    const data = await api('/api/shop/sell', { item_id: id });
-    if (data.ok) { applyServerUser({ balance: data.new_balance, inventory: data.inventory }); playCoin(); vibrate(15); }
-    else playLose();
-  } catch (e) { playLose(); }
+  const data = await api('/api/shop/sell', { item_id: id });
+  if (data.ok) { applyServerUser({ balance: data.new_balance, inventory: data.inventory }); playCoin(); vibrate(15); }
+  else playLose();
 };
 window.openWithdrawFor = async function(index) {
   if (document.body.classList.contains('upgrade-locked')) return;
@@ -2355,11 +2278,9 @@ window.createWithdraw = async function() {
     const itemId = inventory[idx];
     if (pendingWithdrawItemIds.has(itemId)) { failCount++; continue; }
     const item = getItemById(itemId); if (!item) { failCount++; continue; }
-    try {
-      const data = await api('/api/withdraw/create', { item_id: itemId, roblox_name: roblox, time_slot: timeLabel });
-      if (data.ok) { pendingWithdrawItemIds.add(itemId); withdrawDetails[itemId] = { time: timeLabel, ts: Date.now() }; successCount++; }
-      else failCount++;
-    } catch (e) { failCount++; }
+    const data = await api('/api/withdraw/create', { item_id: itemId, roblox_name: roblox, time_slot: timeLabel });
+    if (data.ok) { pendingWithdrawItemIds.add(itemId); withdrawDetails[itemId] = { time: timeLabel, ts: Date.now() }; successCount++; }
+    else failCount++;
   }
   if (successCount > 0) {
     renderInventoryTab(); renderInventory(); renderProfileInventory();
@@ -2375,7 +2296,6 @@ window.showWithdrawInfo = function(itemId) {
   playClick();
   const item = getItemById(itemId); const info = withdrawDetails[itemId];
   const content = document.getElementById('withdrawInfoContent'); if (!content) return;
-  // [FIX #36] экранирование
   if (!info) content.innerHTML = `<div style="color:var(--color-red);">Информация о времени вывода не найдена.</div>`;
   else content.innerHTML = `<div style="margin-bottom: 8px;">Предмет: <span style="color:#fff; font-weight:700;">${escapeHtml(item ? item.name : 'Неизвестно')}</span></div><div style="margin-bottom: 8px;">Запланированное время: <span style="color:var(--color-cyan); font-weight:900; font-size:16px;">${escapeHtml(info.time)}</span></div><div style="font-size: 12px; color: var(--text-muted); margin-top: 12px;">Если вы не зайдете в игру в указанное время, предмет сгорит.</div>`;
   openModal('withdrawInfoModal');
@@ -2396,15 +2316,13 @@ window.copyAutoPromoCode = function() { const promo = getCurrentAutoPromo(); nav
 window.activateAutoPromo = function() { const promo = getCurrentAutoPromo(); activePromo = { code: promo.code, bonus: promo.bonus }; playWin(); vibrate(20); if (document.getElementById('topupModal').classList.contains('open')) updateTopupPromoDisplay(); };
 function updateTopupPromoDisplay() { const infoBlock = document.getElementById('activePromoInfo'); const bonusSpan = document.getElementById('activePromoBonus'); if (activePromo) { if (infoBlock) infoBlock.style.display = 'block'; if (bonusSpan) bonusSpan.textContent = '+' + activePromo.bonus + '%'; } else if (infoBlock) infoBlock.style.display = 'none'; updateTopupPrice(); }
 
-// ================== ИГРА «МИНЫ» ==================
-// [FIX #13] Клиент больше не генерирует поле — только рисует, сервер решает
+// ================== МИНЫ ==================
 let minesGameActive = false;
 let minesOpenedCells = new Set();
 let minesMinesCount = 2;
 let minesBetItems = [];
 let minesCurrentMultiplier = 1.04;
 let minesWinAmount = 0;
-
 function initMinesGame() {
   const board = document.getElementById('minesBoard');
   if (!board) return;
@@ -2422,7 +2340,6 @@ function initMinesGame() {
   updateMinesMultiplierButtons();
   renderMinesBetGrid();
 }
-
 function renderMinesBetGrid() {
   const grid = document.getElementById('minesBetGrid');
   if (!grid) return;
@@ -2446,7 +2363,6 @@ function renderMinesBetGrid() {
     </div>`;
   }).join('');
 }
-
 window.toggleMinesBetItem = function(itemId) {
   if (minesGameActive) return;
   const index = minesBetItems.indexOf(itemId);
@@ -2461,7 +2377,6 @@ window.toggleMinesBetItem = function(itemId) {
   document.getElementById('minesBetAmount').textContent = totalBetValue;
   playClick(); vibrate(8);
 };
-
 function changeMines(delta) {
   if (minesGameActive) return;
   const input = document.getElementById('minesCountInput');
@@ -2497,74 +2412,53 @@ function updateMinesChanceDisplay() {
   document.getElementById('minesCurrentMult').textContent = 'x' + mult.toFixed(2);
   minesCurrentMultiplier = mult;
 }
-
 async function openMineCell(index) {
   if (!minesGameActive) return;
   if (minesOpenedCells.has(index)) return;
   playClick();
-  try {
-    const data = await api('/api/mines/open', { cell_index: index });
-    if (!data.ok) { if (data.error) alert(data.error); return; }
-    if (data.is_bomb) {
-      minesGameActive = false;
-      document.getElementById('minesStartBtn').textContent = 'ИГРАТЬ';
-      document.getElementById('minesStartBtn').classList.remove('cashout');
-      const opened = Array.isArray(data.opened) ? data.opened : [];
-      opened.forEach(idx => {
-        const el = document.getElementById('mineCell_' + idx);
-        if (!el) return;
-        el.classList.add('opened', 'disabled');
-        el.innerHTML = '💥';
-      });
-      // открываем все ячейки, чтобы игрок увидел
-      for (let i = 0; i < 25; i++) {
-        const el = document.getElementById('mineCell_' + i);
-        if (el && !el.classList.contains('opened')) { el.classList.add('opened', 'disabled'); }
-      }
-      playLose();
-      vibratePattern([50,30,100]);
-      if (typeof data.new_balance === 'number') applyServerUser({ balance: data.new_balance, inventory: data.inventory });
-      return;
-    }
-    minesOpenedCells.add(index);
-    const el = document.getElementById('mineCell_' + index);
-    if (el) { el.classList.add('opened', 'disabled'); el.innerHTML = '✅'; }
-    playCoin(); vibrate(10);
-    if (data.win_amount !== undefined && data.win_amount > 0) {
-      minesGameActive = false;
-      document.getElementById('minesStartBtn').textContent = 'ИГРАТЬ';
-      document.getElementById('minesStartBtn').classList.remove('cashout');
-      if (typeof data.new_balance === 'number') applyServerUser({ balance: data.new_balance, inventory: data.inventory });
-      playWin(); vibratePattern([30,50,30,50,60]);
-      alert(`Вы выиграли ${data.win_amount} монет!`);
-    }
-  } catch (e) { console.error(e); playLose(); }
+  const data = await api('/api/mines/open', { cell_index: index });
+  if (!data.ok) { if (data.error) alert(data.error); return; }
+  if (data.is_bomb) {
+    minesGameActive = false;
+    document.getElementById('minesStartBtn').textContent = 'ИГРАТЬ';
+    document.getElementById('minesStartBtn').classList.remove('cashout');
+    const opened = Array.isArray(data.opened) ? data.opened : [];
+    opened.forEach(idx => { const el = document.getElementById('mineCell_' + idx); if (!el) return; el.classList.add('opened', 'disabled'); el.innerHTML = '💥'; });
+    for (let i = 0; i < 25; i++) { const el = document.getElementById('mineCell_' + i); if (el && !el.classList.contains('opened')) el.classList.add('opened', 'disabled'); }
+    playLose(); vibratePattern([50,30,100]);
+    if (typeof data.new_balance === 'number') applyServerUser({ balance: data.new_balance, inventory: data.inventory });
+    return;
+  }
+  minesOpenedCells.add(index);
+  const el = document.getElementById('mineCell_' + index);
+  if (el) { el.classList.add('opened', 'disabled'); el.innerHTML = '✅'; }
+  playCoin(); vibrate(10);
+  if (data.win_amount !== undefined && data.win_amount > 0) {
+    minesGameActive = false;
+    document.getElementById('minesStartBtn').textContent = 'ИГРАТЬ';
+    document.getElementById('minesStartBtn').classList.remove('cashout');
+    if (typeof data.new_balance === 'number') applyServerUser({ balance: data.new_balance, inventory: data.inventory });
+    playWin(); vibratePattern([30,50,30,50,60]);
+    alert(`Вы выиграли ${data.win_amount} монет!`);
+  }
 }
-
 async function startMinesGame() {
   if (minesGameActive) {
     playClick();
-    try {
-      const data = await api('/api/mines/cashout', {});
-      if (!data.ok) { if (data.error) alert(data.error); return; }
-      minesGameActive = false;
-      if (typeof data.new_balance === 'number') applyServerUser({ balance: data.new_balance, inventory: data.inventory });
-      const board = document.getElementById('minesBoard');
-      board.innerHTML = '';
-      for (let i = 0; i < 25; i++) {
-        const cell = document.createElement('div');
-        cell.className = 'mine-cell disabled';
-        cell.id = 'mineCell_' + i;
-        board.appendChild(cell);
-      }
-      document.getElementById('minesStartBtn').textContent = 'ИГРАТЬ';
-      document.getElementById('minesStartBtn').classList.remove('cashout');
-      document.getElementById('minesBetAmount').textContent = '0';
-      minesBetItems = [];
-      renderMinesBetGrid();
-      playWin(); vibratePattern([30,50,30,50,60]);
-      alert(`Вы выиграли ${data.win_amount} монет!`);
-    } catch (e) { console.error(e); playLose(); }
+    const data = await api('/api/mines/cashout', {});
+    if (!data.ok) { if (data.error) alert(data.error); return; }
+    minesGameActive = false;
+    if (typeof data.new_balance === 'number') applyServerUser({ balance: data.new_balance, inventory: data.inventory });
+    const board = document.getElementById('minesBoard');
+    board.innerHTML = '';
+    for (let i = 0; i < 25; i++) { const cell = document.createElement('div'); cell.className = 'mine-cell disabled'; cell.id = 'mineCell_' + i; board.appendChild(cell); }
+    document.getElementById('minesStartBtn').textContent = 'ИГРАТЬ';
+    document.getElementById('minesStartBtn').classList.remove('cashout');
+    document.getElementById('minesBetAmount').textContent = '0';
+    minesBetItems = [];
+    renderMinesBetGrid();
+    playWin(); vibratePattern([30,50,30,50,60]);
+    alert(`Вы выиграли ${data.win_amount} монет!`);
     return;
   }
   if (minesBetItems.length === 0) { alert('Выберите предметы для ставки!'); return; }
@@ -2572,27 +2466,19 @@ async function startMinesGame() {
   minesBetItems.forEach(id => { const it = getItemById(id); if (it) totalBetValue += it.price; });
   if (totalBetValue <= 0) { alert('Ставка слишком мала!'); return; }
   playClick();
-  try {
-    const data = await api('/api/mines/start', { item_ids: minesBetItems, mines_count: minesMinesCount });
-    if (!data.ok) { if (data.error) alert(data.error); return; }
-    inventory = Array.isArray(data.inventory) ? data.inventory : inventory;
-    updateBalanceUI(); renderInventory(); renderInventoryTab(); renderProfileInventory();
-    minesGameActive = true;
-    minesOpenedCells = new Set();
-    document.getElementById('minesStartBtn').innerHTML = `ЗАБРАТЬ <img src="${COIN_IMG}" style="width:20px; height:20px; display:inline-block; vertical-align:middle;">`;
-    document.getElementById('minesStartBtn').classList.add('cashout');
-    const board = document.getElementById('minesBoard');
-    board.innerHTML = '';
-    for (let i = 0; i < 25; i++) {
-      const cell = document.createElement('div');
-      cell.className = 'mine-cell';
-      cell.id = 'mineCell_' + i;
-      cell.onclick = () => openMineCell(i);
-      board.appendChild(cell);
-    }
-    document.getElementById('minesBetAmount').textContent = totalBetValue;
-    vibrate(15);
-  } catch (e) { console.error(e); playLose(); }
+  const data = await api('/api/mines/start', { item_ids: minesBetItems, mines_count: minesMinesCount });
+  if (!data.ok) { if (data.error) alert(data.error); return; }
+  inventory = Array.isArray(data.inventory) ? data.inventory : inventory;
+  updateBalanceUI(); renderInventory(); renderInventoryTab(); renderProfileInventory();
+  minesGameActive = true;
+  minesOpenedCells = new Set();
+  document.getElementById('minesStartBtn').innerHTML = `ЗАБРАТЬ <img src="${COIN_IMG}" style="width:20px; height:20px; display:inline-block; vertical-align:middle;">`;
+  document.getElementById('minesStartBtn').classList.add('cashout');
+  const board = document.getElementById('minesBoard');
+  board.innerHTML = '';
+  for (let i = 0; i < 25; i++) { const cell = document.createElement('div'); cell.className = 'mine-cell'; cell.id = 'mineCell_' + i; cell.onclick = () => openMineCell(i); board.appendChild(cell); }
+  document.getElementById('minesBetAmount').textContent = totalBetValue;
+  vibrate(15);
 }
 
 // ================== СТАРТ ==================
@@ -2614,6 +2500,7 @@ async function init() {
   announcementInterval = setInterval(checkAnnouncement, 1000);
   if (banPollInterval) clearInterval(banPollInterval);
   banPollInterval = setInterval(checkBanStatus, 8000);
+  console.log('[INIT] API_URL =', API_URL);
 }
 window.addEventListener('load', () => {
   setTimeout(async () => {
