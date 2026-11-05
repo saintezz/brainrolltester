@@ -104,112 +104,75 @@ const CASES = Object.freeze({
   school: {
     name: 'School Case', price: 12,
     rewards: [
-      { id: 'lagrande', chance: 40 },
-      { id: 'nuclearo', chance: 25 },
-      { id: 'tangtang', chance: 15 },
-      { id: 'tictacsahur', chance: 10 },
-      { id: 'worl', chance: 5 },
-      { id: 'lostangsitos', chance: 4 },
-      { id: 'garama', chance: 0.9 },
-      { id: 'burguro', chance: 0.1 }
+      { id: 'lagrande', chance: 40 }, { id: 'nuclearo', chance: 25 }, { id: 'tangtang', chance: 15 },
+      { id: 'tictacsahur', chance: 10 }, { id: 'worl', chance: 5 }, { id: 'lostangsitos', chance: 4 },
+      { id: 'garama', chance: 0.9 }, { id: 'burguro', chance: 0.1 }
     ]
   },
   sun: {
     name: 'Sun Case', price: 39,
     rewards: [
-      { id: 'tictacsahur', chance: 50 },
-      { id: 'worl', chance: 30 },
-      { id: 'garama', chance: 17 },
-      { id: 'burguro', chance: 2 },
-      { id: 'cerberus', chance: 1 }
+      { id: 'tictacsahur', chance: 50 }, { id: 'worl', chance: 30 }, { id: 'garama', chance: 17 },
+      { id: 'burguro', chance: 2 }, { id: 'cerberus', chance: 1 }
     ]
   },
   winter: {
     name: 'Winter Case', price: 61,
     rewards: [
-      { id: 'lostangsitos', chance: 40 },
-      { id: 'garama', chance: 30 },
-      { id: 'burguro', chance: 10 },
-      { id: 'popcuru', chance: 5 },
-      { id: 'fragrama', chance: 4 },
-      { id: 'cerberus', chance: 0.5 },
-      { id: 'dugdugdug', chance: 0.3 },
-      { id: 'roseyandteddy', chance: 0.1 },
-      { id: 'lacasaboo', chance: 0.1 }
+      { id: 'lostangsitos', chance: 40 }, { id: 'garama', chance: 30 }, { id: 'burguro', chance: 10 },
+      { id: 'popcuru', chance: 5 }, { id: 'fragrama', chance: 4 }, { id: 'cerberus', chance: 0.5 },
+      { id: 'dugdugdug', chance: 0.3 }, { id: 'roseyandteddy', chance: 0.1 }, { id: 'lacasaboo', chance: 0.1 }
     ]
   },
   autumn: {
     name: 'Autumn Case', price: 90,
     rewards: [
-      { id: 'garama', chance: 40 },
-      { id: 'burguro', chance: 30 },
-      { id: 'popcuru', chance: 20 },
-      { id: 'cloverat', chance: 5 },
-      { id: 'guest666', chance: 4 },
-      { id: 'lossecret', chance: 3 },
+      { id: 'garama', chance: 40 }, { id: 'burguro', chance: 30 }, { id: 'popcuru', chance: 20 },
+      { id: 'cloverat', chance: 5 }, { id: 'guest666', chance: 4 }, { id: 'lossecret', chance: 3 },
       { id: 'roseyandteddy', chance: 1 }
     ]
   },
   radioactive: {
     name: 'Radioctive Case', price: 150,
     rewards: [
-      { id: 'fragrama', chance: 60 },
-      { id: 'globba', chance: 30 },
-      { id: 'losamigos', chance: 9 },
-      { id: 'rubiko', chance: 0.9 },
-      { id: 'ketupas', chance: 0.1 }
+      { id: 'fragrama', chance: 60 }, { id: 'globba', chance: 30 }, { id: 'losamigos', chance: 9 },
+      { id: 'rubiko', chance: 0.9 }, { id: 'ketupas', chance: 0.1 }
     ]
   },
   money: {
     name: 'Money Case', price: 201,
     rewards: [
-      { id: 'cerberus', chance: 70 },
-      { id: 'dugdugdug', chance: 20 },
-      { id: 'cloverat', chance: 9 },
-      { id: 'guest666', chance: 0.3 },
-      { id: 'ricodinero', chance: 0.3 },
-      { id: 'lacasaboo', chance: 0.2 },
+      { id: 'cerberus', chance: 70 }, { id: 'dugdugdug', chance: 20 }, { id: 'cloverat', chance: 9 },
+      { id: 'guest666', chance: 0.3 }, { id: 'ricodinero', chance: 0.3 }, { id: 'lacasaboo', chance: 0.2 },
       { id: 'skelly', chance: 0.1 }
     ]
   },
   spring: {
     name: 'Spring Case', price: 451,
     rewards: [
-      { id: 'rubiko', chance: 50 },
-      { id: 'ricodinero', chance: 20 },
-      { id: 'lacasaboo', chance: 20 },
-      { id: 'ketupas', chance: 8 },
-      { id: 'skelly', chance: 2 }
+      { id: 'rubiko', chance: 50 }, { id: 'ricodinero', chance: 20 }, { id: 'lacasaboo', chance: 20 },
+      { id: 'ketupas', chance: 8 }, { id: 'skelly', chance: 2 }
     ]
   },
   summer: {
     name: 'Summer Case', price: 3241,
     rewards: [
-      { id: 'kraken', chance: 50 },
-      { id: 'lasupreme', chance: 20 },
-      { id: 'digi', chance: 15 },
-      { id: 'dragonaquanini', chance: 10 },
-      { id: 'antonio', chance: 4 },
-      { id: 'skibidi', chance: 1 }
+      { id: 'kraken', chance: 50 }, { id: 'lasupreme', chance: 20 }, { id: 'digi', chance: 15 },
+      { id: 'dragonaquanini', chance: 10 }, { id: 'antonio', chance: 4 }, { id: 'skibidi', chance: 1 }
     ]
   },
   easter: {
     name: 'Easter Case', price: 9000,
     rewards: [
-      { id: 'antonio', chance: 50 },
-      { id: 'griffin', chance: 30 },
-      { id: 'skibidi', chance: 10 },
-      { id: 'johnpork', chance: 5 },
-      { id: 'meowl', chance: 4 },
-      { id: 'strawberryelephant', chance: 0.9 },
+      { id: 'antonio', chance: 50 }, { id: 'griffin', chance: 30 }, { id: 'skibidi', chance: 10 },
+      { id: 'johnpork', chance: 5 }, { id: 'meowl', chance: 4 }, { id: 'strawberryelephant', chance: 0.9 },
       { id: 'headless', chance: 0.1 }
     ]
   },
   farm: {
     name: 'Farm Case', price: 54000,
     rewards: [
-      { id: 'strawberryelephant', chance: 99 },
-      { id: 'headless', chance: 1 }
+      { id: 'strawberryelephant', chance: 99 }, { id: 'headless', chance: 1 }
     ]
   }
 });
@@ -394,7 +357,7 @@ function applyPendingBan(userId, u) {
 function ensureUser(telegramId, username) {
   if (!telegramId) telegramId = 'guest_' + Date.now();
   if (!users[telegramId]) {
-    users[telegramId] = { balance: START_BALANCE, inventory: [], username: username || '', roblox_name: '', custom_nick: '', avatar: '', accent: '', promos_used: [], ban: null, unban_notice: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+    users[telegramId] = { balance: START_BALANCE, inventory: [], username: username || '', roblox_name: '', custom_nick: '', avatar: '', accent: '', promos_used: [], ban: null, unban_notice: null, best_drop: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
   } else if (username && users[telegramId].username !== username) {
     users[telegramId].username = username; users[telegramId].updated_at = new Date().toISOString();
   }
@@ -402,6 +365,7 @@ function ensureUser(telegramId, username) {
   if (!Array.isArray(u.promos_used)) u.promos_used = [];
   if (!Array.isArray(u.inventory)) u.inventory = [];
   if (typeof u.balance !== 'number' || !isFinite(u.balance)) u.balance = 0;
+  if (!u.best_drop) u.best_drop = null;
   applyPendingBan(telegramId, u);
   return u;
 }
@@ -426,6 +390,7 @@ function publicUser(u, telegramId) {
     pending_withdraw_ids: computePendingWithdrawIds(telegramId),
     pending_withdraw_details: computePendingWithdrawDetails(telegramId),
     banned, ban: banned ? banInfo(u) : null,
+    best_drop: u.best_drop || null,
     unban_notice: (u.unban_notice && !u.unban_notice.seen) ? { reason: u.unban_notice.reason || 'Решение администрации', at: u.unban_notice.at || null } : null
   };
 }
@@ -637,10 +602,18 @@ const server = http.createServer(async (req, res) => {
         const rng = secureRandom() * 100; let acc = 0; let wonId = c.rewards[0].id;
         for (const r of c.rewards) { acc += r.chance; if (rng <= acc) { wonId = r.id; break; } }
         u.inventory.push(wonId); wonItems.push(wonId);
+        
+        // Сохраняем лучший дроп
+        const wonItemObj = getItem(wonId);
+        if (wonItemObj) {
+          if (!u.best_drop || wonItemObj.price > u.best_drop.price) {
+            u.best_drop = { id: wonId, name: wonItemObj.name, price: wonItemObj.price, won_at: new Date().toISOString() };
+          }
+        }
       }
       u.updated_at = new Date().toISOString(); saveUsers();
       stats.total_cases += quantity; saveStats();
-      return sendJSON(res, 200, { ok: true, won: wonItems, new_balance: u.balance, inventory: u.inventory });
+      return sendJSON(res, 200, { ok: true, won: wonItems, new_balance: u.balance, inventory: u.inventory, best_drop: u.best_drop });
     }
 
     if (req.method === 'POST' && req.url === '/api/upgrade') {
@@ -659,10 +632,25 @@ const server = http.createServer(async (req, res) => {
       u.inventory.splice(idx, 1);
       const chance = calcUpgradeChance(src.price, tgt.price);
       const success = secureRandom() * 100 <= chance;
-      if (success) u.inventory.push(target_item_id);
+      if (success) {
+        u.inventory.push(target_item_id);
+        // Сохраняем лучший дроп
+        if (!u.best_drop || tgt.price > u.best_drop.price) {
+          u.best_drop = { id: target_item_id, name: tgt.name, price: tgt.price, won_at: new Date().toISOString() };
+        }
+      }
       u.updated_at = new Date().toISOString(); saveUsers();
       stats.total_upgrades += 1; saveStats();
-      return sendJSON(res, 200, { ok: true, success, chance, won_item: success ? target_item_id : null, new_balance: u.balance, inventory: u.inventory });
+      return sendJSON(res, 200, { ok: true, success, chance, won_item: success ? target_item_id : null, new_balance: u.balance, inventory: u.inventory, best_drop: u.best_drop });
+    }
+    
+    if (req.method === 'POST' && req.url === '/api/user/reset-best-drop') {
+      const user = getTelegramUser(req);
+      if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
+      const u = ensureUser(user.id, user.username);
+      u.best_drop = null;
+      u.updated_at = new Date().toISOString(); saveUsers();
+      return sendJSON(res, 200, { ok: true });
     }
 
     if (req.method === 'POST' && req.url === '/api/shop/buy') {
@@ -904,6 +892,7 @@ loadAll();
     if (!Object.prototype.hasOwnProperty.call(users, id)) continue;
     if (typeof users[id].balance !== 'number' || !isFinite(users[id].balance)) { users[id].balance = START_BALANCE; changed++; }
     if (!Array.isArray(users[id].inventory)) { users[id].inventory = []; changed++; }
+    if (!Object.prototype.hasOwnProperty.call(users[id], 'best_drop')) { users[id].best_drop = null; changed++; }
   }
   if (changed > 0) { saveUsers(); console.log('[MIGRATE] Исправлено ' + changed + ' пользователей'); }
 })();
