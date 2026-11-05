@@ -36,7 +36,6 @@ const ITEMS = Object.freeze({
   lostangsitos: { name: 'Los Tangsitos', price: 34 },
   worl: { name: 'W or L', price: 28 },
   tictacsahur: { name: 'TicTac Sahur', price: 19 },
-
   lagrande: { name: 'La Grande Combination', price: 4 },
   nuclearo: { name: 'Nuclearo Dinausauro', price: 12 },
   witchbroom: { name: 'Witch Broom', price: 29 },
@@ -603,7 +602,6 @@ const server = http.createServer(async (req, res) => {
         for (const r of c.rewards) { acc += r.chance; if (rng <= acc) { wonId = r.id; break; } }
         u.inventory.push(wonId); wonItems.push(wonId);
         
-        // Сохраняем лучший дроп
         const wonItemObj = getItem(wonId);
         if (wonItemObj) {
           if (!u.best_drop || wonItemObj.price > u.best_drop.price) {
@@ -634,7 +632,6 @@ const server = http.createServer(async (req, res) => {
       const success = secureRandom() * 100 <= chance;
       if (success) {
         u.inventory.push(target_item_id);
-        // Сохраняем лучший дроп
         if (!u.best_drop || tgt.price > u.best_drop.price) {
           u.best_drop = { id: target_item_id, name: tgt.name, price: tgt.price, won_at: new Date().toISOString() };
         }
