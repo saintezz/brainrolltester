@@ -32,13 +32,11 @@ const RATE_LIMIT_MAX = 30;
 const MINES_TTL_MS = 10 * 60 * 1000;
 
 const ITEMS = Object.freeze({
-  // Новые браинроты
   tangtang: { name: 'Tang Tang Keletang', price: 17 },
   lostangsitos: { name: 'Los Tangsitos', price: 34 },
   worl: { name: 'W or L', price: 28 },
   tictacsahur: { name: 'TicTac Sahur', price: 19 },
 
-  // Существующие
   lagrande: { name: 'La Grande Combination', price: 4 },
   nuclearo: { name: 'Nuclearo Dinausauro', price: 12 },
   witchbroom: { name: 'Witch Broom', price: 29 },
@@ -322,14 +320,11 @@ function readBody(req) {
 }
 
 function validateTelegramInitData(initData) {
-  if (!initData || typeof initData !== 'string') {
-    console.log('[AUTH] no initData');
-    return null;
-  }
+  if (!initData || typeof initData !== 'string') return null;
   try {
     const params = new URLSearchParams(initData);
     const hash = params.get('hash');
-    if (!hash) { console.log('[AUTH] no hash'); return null; }
+    if (!hash) return null;
     params.delete('hash');
     const dataCheckString = [...params.entries()]
       .sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)
@@ -339,29 +334,18 @@ function validateTelegramInitData(initData) {
     const computedHash = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
     const a = Buffer.from(computedHash, 'hex');
     const b = Buffer.from(hash, 'hex');
-    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
-      console.log('[AUTH] hash mismatch');
-      return null;
-    }
+    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
     const authDate = parseInt(params.get('auth_date') || '0', 10);
-    if (!authDate || (Date.now() / 1000 - authDate) > INIT_DATA_MAX_AGE_SEC) {
-      console.log('[AUTH] auth_date expired');
-      return null;
-    }
+    if (!authDate || (Date.now() / 1000 - authDate) > INIT_DATA_MAX_AGE_SEC) return null;
     const userJson = params.get('user');
-    if (!userJson) { console.log('[AUTH] no user'); return null; }
+    if (!userJson) return null;
     const u = JSON.parse(userJson);
-    if (!u || !u.id) { console.log('[AUTH] no user.id'); return null; }
+    if (!u || !u.id) return null;
     return { id: String(u.id), username: String(u.username || '') };
-  } catch (e) {
-    console.log('[AUTH] exception: ' + e.message);
-    return null;
-  }
+  } catch (e) { return null; }
 }
 
-function getTelegramUser(req) {
-  return validateTelegramInitData(req.headers['x-telegram-init-data']);
-}
+function getTelegramUser(req) { return validateTelegramInitData(req.headers['x-telegram-init-data']); }
 function requireAdmin(req) {
   const u = getTelegramUser(req);
   if (!u) return null;
@@ -484,14 +468,9 @@ const server = http.createServer(async (req, res) => {
     setCORS(res);
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify({
-      ok: true,
-      status: 'alive',
-      bot_token_valid: !!BOT_TOKEN,
-      bot_token_length: BOT_TOKEN.length,
-      maintenance: maintenance.enabled,
-      users_count: Object.keys(users).length,
-      uptime_sec: Math.floor(process.uptime()),
-      time: new Date().toISOString()
+      ok: true, status: 'alive', bot_token_valid: !!BOT_TOKEN, bot_token_length: BOT_TOKEN.length,
+      maintenance: maintenance.enabled, users_count: Object.keys(users).length,
+      uptime_sec: Math.floor(process.uptime()), time: new Date().toISOString()
     }));
     return;
   }
