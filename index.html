@@ -99,22 +99,138 @@ body{
 .promo-code-display .pcd-copy svg{ width: 20px; height: 20px; }
 .activate-btn{background: linear-gradient(135deg, var(--color-cyan), var(--color-purple-deep));color: #04121a;border: none;border-radius: 8px;padding: 14px 36px;font-size: 16px;font-weight: 900;cursor:pointer;transition: all .15s;text-transform: uppercase;letter-spacing: 1px;width: 100%;box-shadow: 0 10px 30px -8px rgba(62,200,255,.9);}
 .activate-btn:hover{filter: brightness(1.15); transform: translateY(-1px);}
-.tab-panel{display:none}
-.tab-panel.active{display:block}
-.cases-title-main{font-size:24px;font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;text-shadow: 0 0 20px rgba(62,200,255,.5);}
-.cases-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));gap:24px;}
-.case-card{background: linear-gradient(145deg, #0c1e30, #071522);border: 1px solid rgba(62,200,255,0.32);border-radius:20px;overflow:hidden;cursor:pointer;position:relative;transition: transform .3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow .3s ease, border-color .3s ease;box-shadow: 0 10px 26px -10px rgba(0,0,0,0.7);}
-.case-card:hover{border-color: var(--color-cyan);transform: translateY(-8px) scale(1.03);box-shadow: 0 22px 50px -14px rgba(62,200,255,0.75), 0 0 30px -8px rgba(62,200,255,.5);}
-.case-card-inner{padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:16px; position: relative;}
-.case-card-inner::before{content: '';position: absolute;top: 0; left: 0; right: 0; height: 100px;background: radial-gradient(ellipse at 50% 0%, rgba(62,200,255,0.28), transparent 70%);pointer-events: none;}
-.case-img-wrap{width:100%;aspect-ratio:1;background: radial-gradient(circle at 50% 50%, #0c1e30, #050d16);border-radius:16px;display:flex;align-items:center;justify-content:center;border: 1px solid rgba(140,210,255,.12);position:relative;overflow:hidden;box-shadow: inset 0 0 24px rgba(0,0,0,0.8), 0 0 20px -8px rgba(62,200,255,.4);}
-.case-img-wrap img{width:85%;height:85%;object-fit:contain;transition:transform .4s ease}
-.case-card:hover .case-img-wrap img{transform:scale(1.15) rotate(-3deg)}
-.case-info{width:100%;text-align:center; z-index: 1;}
-.case-name{font-size:18px;font-weight:900;color:#fff;margin-bottom:10px;line-height:1.2; text-transform: uppercase; letter-spacing: 0.5px;}
-.case-price{font-size:16px;font-weight:800;color:#04121a;background: linear-gradient(135deg, var(--color-cyan), var(--color-purple-deep));padding:10px 20px;border-radius:12px;display:inline-flex;align-items:center;gap:8px;box-shadow: 0 8px 22px -6px rgba(62,200,255,0.8);}
-.case-price img{width:18px;height:18px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));}
-.case-items-count{font-size:12px;color:var(--text-muted);margin-top:12px;font-weight:600; letter-spacing: 0.5px;}
+
+/* ===== CASES MENU (redesigned) ===== */
+.cases-hero{
+  position:relative;margin:16px 0 24px;padding:28px 32px;border-radius:24px;overflow:hidden;
+  background:
+    radial-gradient(900px 320px at 0% 0%, rgba(62,200,255,.32), transparent 62%),
+    radial-gradient(900px 320px at 100% 100%, rgba(46,230,197,.26), transparent 62%),
+    linear-gradient(145deg,#0c1e30,#071522);
+  border:1px solid rgba(62,200,255,.4);
+  box-shadow:0 24px 70px -30px rgba(62,200,255,.65), inset 0 1px 0 rgba(200,240,255,.08);
+  display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+}
+.cases-hero-left{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px;min-width:0;}
+.cases-hero-kicker{
+  font-size:11px;font-weight:900;letter-spacing:3px;text-transform:uppercase;color:var(--color-cyan);
+  display:inline-flex;align-items:center;gap:8px;
+}
+.cases-hero-kicker::before{content:'';width:22px;height:2px;background:linear-gradient(90deg,var(--color-cyan),transparent);border-radius:2px;}
+.cases-hero-title{
+  font-size:clamp(26px,4vw,40px);font-weight:900;line-height:1.05;letter-spacing:1px;text-transform:uppercase;
+  color:var(--color-snow);
+  text-shadow:0 0 34px rgba(62,200,255,.5);
+}
+.cases-hero-sub{font-size:13px;font-weight:700;color:var(--text-muted);letter-spacing:.5px;max-width:520px;line-height:1.5;}
+.cases-hero-stats{position:relative;z-index:1;display:flex;gap:10px;flex-wrap:wrap;}
+.cases-stat-pill{
+  display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:12px;
+  background:rgba(62,200,255,.12);border:1px solid rgba(62,200,255,.45);
+  font-size:13px;font-weight:800;color:#fff;letter-spacing:.4px;
+  box-shadow:0 0 22px -10px rgba(62,200,255,.7);
+}
+.cases-stat-pill img{width:16px;height:16px;object-fit:contain;}
+
+.cases-toolbar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;padding:10px 12px;
+  background:rgba(10,24,38,.7);border:1px solid var(--glass-border);border-radius:14px;backdrop-filter:blur(8px);
+}
+.cases-search{
+  flex:1;min-width:200px;display:flex;align-items:center;gap:8px;
+  background:var(--bg-void);border:1px solid var(--glass-border);border-radius:10px;padding:0 12px;height:42px;
+}
+.cases-search:focus-within{border-color:var(--color-cyan);box-shadow:0 0 22px -10px rgba(62,200,255,.8);}
+.cases-search svg{width:18px;height:18px;color:var(--text-muted);flex-shrink:0;}
+.cases-search input{
+  flex:1;background:transparent;border:none;outline:none;color:#fff;font-family:var(--font-main);
+  font-size:14px;font-weight:600;height:100%;
+}
+.cases-search input::placeholder{color:var(--text-muted);}
+.cases-sort{
+  display:flex;background:var(--bg-void);border:1px solid var(--glass-border);border-radius:10px;padding:4px;gap:2px;
+}
+.cases-sort button{
+  background:transparent;border:none;color:var(--text-muted);font-family:var(--font-main);
+  font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:8px 12px;border-radius:7px;cursor:pointer;
+  transition:all .15s;white-space:nowrap;
+}
+.cases-sort button:hover{color:#fff;}
+.cases-sort button.active{color:#04121a;background:linear-gradient(135deg,var(--color-cyan),var(--color-purple-deep));}
+
+.cases-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;
+  padding:2px 0 8px;
+}
+.case-card{
+  position:relative;border-radius:22px;overflow:hidden;cursor:pointer;
+  background:linear-gradient(160deg,#0c1e30 0%,#071522 100%);
+  border:1px solid rgba(62,200,255,.28);
+  transition:transform .3s cubic-bezier(.175,.885,.32,1.275),box-shadow .3s,border-color .3s;
+  box-shadow:0 14px 40px -20px rgba(0,0,0,.9);
+  isolation:isolate;
+}
+.case-card::after{
+  content:'';position:absolute;inset:0;border-radius:22px;pointer-events:none;z-index:2;
+  background:linear-gradient(180deg,transparent 55%,rgba(5,13,22,.55) 100%);
+  opacity:.85;
+}
+.case-card:hover{
+  transform:translateY(-8px) scale(1.02);
+  border-color:var(--color-cyan);
+  box-shadow:0 28px 60px -24px rgba(62,200,255,.8),0 0 40px -14px rgba(62,200,255,.7);
+}
+.case-card-inner{padding:18px 18px 16px;display:flex;flex-direction:column;gap:14px;position:relative;z-index:3;}
+.case-img-wrap{
+  width:100%;aspect-ratio:1.15;border-radius:16px;overflow:hidden;position:relative;
+  background:radial-gradient(circle at 50% 40%, #122638, #050d16 75%);
+  border:1px solid rgba(140,210,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 0 30px rgba(0,0,0,.85);
+}
+.case-img-wrap::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%, rgba(62,200,255,.28), transparent 62%);
+  pointer-events:none;
+}
+.case-img-wrap img{width:82%;height:82%;object-fit:contain;transition:transform .45s cubic-bezier(.175,.885,.32,1.275);filter:drop-shadow(0 8px 18px rgba(0,0,0,.6));}
+.case-card:hover .case-img-wrap img{transform:scale(1.12) rotate(-4deg);}
+.case-badge{
+  position:absolute;top:10px;left:10px;z-index:4;
+  font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;
+  padding:5px 10px;border-radius:8px;
+  background:rgba(62,200,255,.18);border:1px solid rgba(62,200,255,.55);color:var(--color-cyan);
+  backdrop-filter:blur(6px);
+}
+.case-badge.hot{background:rgba(255,224,102,.16);border-color:rgba(255,224,102,.6);color:var(--color-gold);}
+.case-badge.top{background:rgba(46,230,197,.16);border-color:rgba(46,230,197,.6);color:var(--color-emerald);}
+
+.case-info{display:flex;flex-direction:column;gap:8px;}
+.case-name{
+  font-size:17px;font-weight:900;color:#fff;line-height:1.15;text-transform:uppercase;letter-spacing:.5px;
+}
+.case-meta{font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.8px;text-transform:uppercase;}
+.case-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px;}
+.case-price{
+  font-size:14px;font-weight:900;color:#04121a;
+  background:linear-gradient(135deg,var(--color-cyan),var(--color-purple-deep));
+  padding:9px 14px;border-radius:11px;display:inline-flex;align-items:center;gap:7px;
+  box-shadow:0 10px 24px -10px rgba(62,200,255,.9);
+}
+.case-price img{width:16px;height:16px;}
+.case-open-hint{
+  font-size:11px;font-weight:800;color:var(--color-cyan);letter-spacing:1.2px;text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:6px;opacity:.9;
+}
+.case-open-hint svg{width:14px;height:14px;transition:transform .2s;}
+.case-card:hover .case-open-hint svg{transform:translateX(4px);}
+
+.cases-empty{
+  grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--text-muted);
+  font-size:14px;font-weight:700;letter-spacing:.5px;
+}
+
+/* остальной CSS */
 .upg-container{display: flex;flex-direction: column;gap: 20px;max-width: 960px;margin: 0 auto;padding: 8px 0 0;position: relative;}
 .progress-section{display:flex;justify-content:center;padding: 30px 0 10px 0;position:relative;}
 .progress-wrapper{position:relative;width:300px;height:300px;z-index:1;}
@@ -134,10 +250,8 @@ body{
 .chance-label{margin-top:7px;font-size:9px;font-weight:600;color:var(--text-muted);letter-spacing:3.5px;text-transform:uppercase;}
 .arrow-container{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;transform-origin:center center;will-change:transform;}
 .arrow-pointer{position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:60px;height:60px;filter: drop-shadow(0 4px 14px rgba(62,200,255,1)) drop-shadow(0 0 8px rgba(200,240,255,.8));background: url('https://github.com/saintezz/brainrolltester/blob/main/upgrad.png?raw=true') center/contain no-repeat;border-radius:50%;}
-.arrow-pointer::before{display:none;}
 .items-row{display:flex;align-items:stretch;justify-content: space-between;gap:24px;width: 100%;padding: 0 10px;}
 .upg-card{flex: 1;background:linear-gradient(180deg, rgba(62,200,255,.08), transparent),#0a1826;border: 1px dashed rgba(62,200,255,.5);border-radius:18px;padding:32px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height: 340px;cursor:pointer;transition: all .18s ease;position:relative;overflow:hidden;}
-.upg-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg, transparent, rgba(200,240,255,.35), transparent);}
 .upg-card:hover{background: var(--bg-surface-hover);border-color: var(--color-cyan);transform: translateY(-2px);box-shadow: 0 0 30px -10px rgba(62,200,255,.8);}
 .upg-card.filled{border-style: solid;border-color: rgba(62,200,255,.8);background:radial-gradient(120% 90% at 50% 0%, rgba(62,200,255,.25), transparent 60%),var(--bg-surface);}
 .upg-card .txt{font-size:14px;font-weight:700;color:var(--text-muted);text-transform:uppercase;text-align:center;letter-spacing:1px;line-height:1.5;}
@@ -149,11 +263,8 @@ body{
 .swap-arrow{font-size:28px;color:var(--color-cyan);line-height:1;font-weight:600;opacity:.8;flex-shrink: 0;display:flex;align-items:center;text-shadow: 0 0 16px rgba(111,233,255,.9);}
 .stage-controls{display:flex;justify-content:center;gap:10px;margin-top: 4px;}
 .upgrade-main-btn{flex:1;max-width: 100%;padding:16px;border-radius:13px;border: none;background:linear-gradient(135deg, var(--color-cyan), var(--color-purple-deep));color:#04121a;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:2px;cursor:pointer;transition:all .18s;box-shadow: 0 12px 30px -12px rgba(62,200,255,1);position:relative;overflow:hidden;}
-.upgrade-main-btn::after{content:'';position:absolute;top:0;left:-40%;width:40%;height:100%;background:linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);transform:skewX(-20deg);transition:left .55s ease;}
-.upgrade-main-btn:hover:not(:disabled)::after{left:120%;}
 .upgrade-main-btn:hover:not(:disabled){filter: brightness(1.12);transform: translateY(-1px);}
 .upgrade-main-btn:disabled{opacity:.4;cursor:not-allowed;background: var(--bg-surface-hover);color:var(--text-muted);box-shadow:none;}
-.upgrade-main-btn:disabled::after{display:none;}
 .fast-btn{width:52px;height:52px;border-radius:13px;border:1px solid var(--glass-border);background:var(--bg-surface);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;}
 .fast-btn.active{background:rgba(62,200,255,.2);border-color:var(--color-cyan);color:var(--color-cyan);box-shadow: 0 0 22px -6px rgba(62,200,255,.8);}
 .fast-btn svg{width:20px;height:20px}
@@ -358,18 +469,13 @@ body{
 .case-possible-item .cp-name{font-size:11px;font-weight:600;color:#fff;text-align:center;line-height:1.1;height:26px;overflow:hidden}
 .case-possible-item .cp-price{font-size:12px;font-weight:600;color:var(--color-cyan);display:flex;align-items:center;gap:3px;line-height:1.3}
 .case-possible-item .cp-price img{width:12px;height:12px;}
-.case-possible-item .cp-chance{font-size:11px;font-weight:700;color:var(--color-frost);line-height:1.2}
 .maintenance-overlay{position:fixed;inset:0;z-index:999998;background:var(--bg-void);display:flex;align-items:center;justify-content:center;padding:30px 20px;text-align:center;overflow:hidden;}
 .maintenance-bg-glow{position:absolute;top:50%;left:50%;width:80vw;height:80vw;transform:translate(-50%,-50%);background:radial-gradient(circle, rgba(62,200,255,.28) 0%, transparent 60%);animation: pulseGlow 3s ease-in-out infinite alternate;pointer-events:none;}
 @keyframes pulseGlow{0%{opacity:.6;transform:translate(-50%,-50%) scale(1);}100%{opacity:1;transform:translate(-50%,-50%) scale(1.1);}}
 .maintenance-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:24px;max-width:560px;}
 .maintenance-spinner{position:relative;width:140px;height:140px;color:var(--color-cyan);animation:spin 2.5s linear infinite;filter: drop-shadow(0 0 40px rgba(62,200,255,1));}
 .maintenance-spinner svg{width:100%;height:100%;}
-.maintenance-spinner::after{content:'';position:absolute;inset:-15px;border-radius:50%;border:2px dashed rgba(62,200,255,.5);animation:spinReverse 5s linear infinite;}
-@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-@keyframes spinReverse{0%{transform:rotate(360deg);}100%{transform:rotate(0deg);}}
-.maintenance-title{font-size:clamp(36px,8vw,72px);font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:6px;line-height:1;text-shadow: 0 0 34px rgba(62,200,255,.9), 0 0 70px rgba(62,200,255,.5);animation: titlePulse 2s ease-in-out infinite;}
-@keyframes titlePulse{0%,100%{transform:scale(1);}50%{transform:scale(1.02);}}
+.maintenance-title{font-size:clamp(36px,8vw,72px);font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:6px;line-height:1;text-shadow: 0 0 34px rgba(62,200,255,.9), 0 0 70px rgba(62,200,255,.5);}
 .maintenance-subtitle{font-size:clamp(14px,2.4vw,20px);font-weight:800;color:var(--color-cyan);letter-spacing:4px;text-transform:uppercase;}
 .maintenance-hint{font-size:14px;font-weight:600;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;}
 .deposits-block{max-width:640px;margin:10px auto 0;padding:14px;background:rgba(62,200,255,.08);border:1px solid var(--color-purple);border-radius:8px;}
@@ -455,13 +561,11 @@ body{
   .promo-code-display { width: 100%; justify-content: center; }
   .activate-btn { width: 100%; }
   .profile-stats-grid{grid-template-columns:1fr;}
-  .cases-grid{grid-template-columns:repeat(2,1fr);}
   .app{padding: 0 14px 20px;}
   .upg-container { max-width: 100%; padding: 0 10px; }
   .items-row { flex-direction: column; gap: 16px; }
   .upg-card { width: 100%; min-height: 280px; padding:24px 16px; }
   .upg-card img { width:140px; height:140px; }
-  .upg-card .txt { font-size:11px; }
   .swap-arrow { transform: rotate(90deg); font-size: 30px; margin: -10px 0; align-self:center; }
   .progress-wrapper { width: 260px; height: 260px; }
   .chance-big { font-size: 34px; }
@@ -471,20 +575,25 @@ body{
   .inventory-row, .shop-grid { grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); }
   .inventory-tab-grid { grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 10px; }
   .inventory-hero { align-items: flex-start; }
-  .admin-tabs{gap:6px;}
-  .admin-tab{padding:8px 10px;font-size:11px;}
-  .admin-request-card{grid-template-columns:36px 1fr;align-items:start;}
-  .admin-request-card .req-img{width:36px;height:36px;}
-  .admin-request-actions{grid-column:1/-1;flex-direction:row;min-width:0;}
-  .admin-request-actions .dep-accept,.admin-request-actions .dep-reject{flex:1;}
-  .ban-card{padding:32px 16px 26px;border-radius:18px;}
-  .ban-icon{width:64px;height:64px;font-size:30px;margin-bottom:16px;}
-  .ban-reason-block{margin-top:20px;padding:14px;}
-  .ban-reason-value{font-size:15px;}
   .mines-layout { flex-direction: column; align-items: stretch; }
   .mines-controls { width: 100%; }
   .mines-board { max-width: 100%; }
   .mine-cell { border-radius: 10px; }
+
+  /* mobile cases */
+  .cases-hero{padding:22px 20px;border-radius:20px;}
+  .cases-hero-title{font-size:26px;}
+  .cases-hero-sub{font-size:12px;}
+  .cases-grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+  .case-card-inner{padding:12px 12px 12px;gap:10px;}
+  .case-name{font-size:13px;}
+  .case-price{font-size:12px;padding:7px 10px;border-radius:9px;}
+  .case-price img{width:13px;height:13px;}
+  .case-open-hint{font-size:9px;letter-spacing:.8px;}
+  .case-meta{font-size:9px;}
+  .cases-toolbar{padding:8px;gap:8px;}
+  .cases-search{height:38px;min-width:0;}
+  .cases-sort button{padding:6px 9px;font-size:10px;}
 }
 </style>
 </head>
@@ -834,7 +943,31 @@ body{
                         <button class="activate-btn" onclick="activateAutoPromo()">АКТИВИРОВАТЬ</button>
                     </div>
                 </div>
-                <div class="cases-title-main">Кейсы</div>
+
+                <div class="cases-hero">
+                    <div class="cases-hero-left">
+                        <div class="cases-hero-kicker">Коллекция кейсов</div>
+                        <div class="cases-hero-title">Открой свой<br>лучший дроп</div>
+                        <div class="cases-hero-sub">10 кейсов — от дешёвых разогревов до legendary-дропов. Выбирай, открывай, апгрейди и собирай коллекцию.</div>
+                    </div>
+                    <div class="cases-hero-stats">
+                        <div class="cases-stat-pill"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin"><span id="casesHeroCount">10 кейсов</span></div>
+                        <div class="cases-stat-pill"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin"><span id="casesHeroBalance">0</span></div>
+                    </div>
+                </div>
+
+                <div class="cases-toolbar">
+                    <div class="cases-search">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></line></svg>
+                        <input type="text" id="casesSearchInput" placeholder="Поиск кейса..." autocomplete="off" oninput="renderMenuCases()">
+                    </div>
+                    <div class="cases-sort">
+                        <button class="active" data-sort="default" onclick="setCasesSort('default')">По умолчанию</button>
+                        <button data-sort="price-asc" onclick="setCasesSort('price-asc')">Дешевле</button>
+                        <button data-sort="price-desc" onclick="setCasesSort('price-desc')">Дороже</button>
+                    </div>
+                </div>
+
                 <div class="cases-grid" id="menuCasesGrid"></div>
             </div>
 
@@ -1035,7 +1168,6 @@ body{
 
 <script>
 // ================== КОНСТАНТЫ ==================
-// [FIX] Твой домен
 const API_URL = 'https://brainrolltester.onrender.com';
 const ADMIN_USERNAMES = ['saintezz7', 'vortyn1'];
 const COIN_IMG = 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png';
@@ -1050,6 +1182,13 @@ const MUTATION_ICONS = {
 };
 
 const ITEMS = [
+  // Новые браинроты
+  { id: 'tangtang', name: 'Tang Tang Keletang', price: 17, img: 'https://github.com/forerer-afk/brainroterX/blob/main/tangtang.png?raw=true' },
+  { id: 'lostangsitos', name: 'Los Tangsitos', price: 34, img: 'https://github.com/forerer-afk/brainroterX/blob/main/lostangcitos.png?raw=true' },
+  { id: 'worl', name: 'W or L', price: 28, img: 'https://github.com/forerer-afk/brainroterX/blob/main/w_or_l_brainrot.png?raw=true' },
+  { id: 'tictacsahur', name: 'TicTac Sahur', price: 19, img: 'https://github.com/forerer-afk/brainroterX/blob/main/tictacsahur.png?raw=true' },
+
+  // Существующие
   { id: 'lagrande', name: 'La Grande Combination', price: 4, img: 'https://raw.githubusercontent.com/forerer-afk/brainroterX/main/lagrande.webp' },
   { id: 'nuclearo', name: 'Nuclearo Dinausauro', price: 12, img: 'https://raw.githubusercontent.com/forerer-afk/brainroterX/main/nuclearo.png' },
   { id: 'witchbroom', name: 'Witch Broom', price: 29, img: 'https://raw.githubusercontent.com/forerer-afk/brainroterX/main/witch-broom.png' },
@@ -1114,17 +1253,50 @@ const CASE_ONLY_ITEMS = [
 ];
 
 const CASES = [
-  { id: 'witch', name: 'Witch Case', price: 10, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/fusecase.png', rewards: [{ id: 'lagrande', chance: 76 }, { id: 'nuclearo', chance: 22 }, { id: 'cupid', chance: 1.5 }, { id: 'garama', chance: 0.3 }, { id: 'burguro', chance: 0.2 }, { id: 'popcuru', chance: 0.1 }] },
-  { id: 'fruits', name: 'Fruits Case', price: 19, img: 'https://github.com/saintezz/BrainrotWin/blob/main/FRUITSCASE.png?raw=true', rewards: [{ id: 'lagrande', chance: 30 }, { id: 'nuclearo', chance: 50 }, { id: 'cupid', chance: 15 }, { id: 'waverider', chance: 5 }] },
-  { id: 'garama', name: 'Garama Case', price: 29, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/garamacase.png', rewards: [{ id: 'nuclearo', chance: 40 }, { id: 'cupid', chance: 40 }, { id: 'garama', chance: 15 }, { id: 'burguro', chance: 5 }] },
-  { id: 'yeti', name: 'Yeti Case', price: 40, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/yeticase.png', rewards: [{ id: 'nuclearo', chance: 50 }, { id: 'cupid', chance: 40 }, { id: 'burguro', chance: 9.99 }, { id: 'polaroidini', chance: 0.01 }] },
-  { id: 'school', name: 'School Case', price: 59, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/SCHOOL.png', rewards: [{ id: 'witchbroom', chance: 70 }, { id: 'garama', chance: 20 }, { id: 'lafoodcombinasion', chance: 5 }, { id: 'cerberus', chance: 4 }, { id: 'losadmins', chance: 1 }] },
-  { id: 'arcadragon', name: 'Arcadragon Case', price: 200, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/ARCAcase.png', rewards: [{ id: 'cerberus', chance: 60 }, { id: 'globba', chance: 20 }, { id: 'dugdugdug', chance: 10 }, { id: 'guest666', chance: 5 }, { id: 'rubiko', chance: 4 }, { id: 'dragon', chance: 1 }] },
-  { id: 'vampire', name: 'Vampire Case', price: 299, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/VampireCase.png', rewards: [{ id: 'dugdugdug', chance: 50 }, { id: 'losamigos', chance: 30 }, { id: 'losadmins', chance: 12 }, { id: 'ricodinero', chance: 8 }] },
-  { id: 'tacos', name: 'Tacos Case', price: 340, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/tacoscase.png', rewards: [{ id: 'guest666', chance: 77 }, { id: 'losadmins', chance: 13 }, { id: 'rubiko', chance: 10 }] },
-  { id: 'dragon', name: 'Dragon Case', price: 3900, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/dragoncase.png', rewards: [{ id: 'kraken', chance: 70 }, { id: 'digi', chance: 15 }, { id: 'kalikabros', chance: 10 }, { id: 'dragonaquanini', chance: 4.9 }, { id: 'meowl', chance: 0.1 }] },
-  { id: 'strawberry', name: 'Strawberry Case', price: 8900, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/strawberryaLLin.png', rewards: [{ id: 'griffin', chance: 70 }, { id: 'elefantofrigo', chance: 20 }, { id: 'skibidi', chance: 5 }, { id: 'meowl', chance: 5 }] },
-  { id: 'griffin', name: 'Griffin Case', price: 17000, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/GriffinCase.png', rewards: [{ id: 'skibidi', chance: 50 }, { id: 'johnpork', chance: 30 }, { id: 'meowl', chance: 17 }, { id: 'strawberryelephant', chance: 3 }] }
+  { id: 'school', name: 'School Case', price: 12, img: 'https://github.com/saintezz/BrainrotWin/blob/main/SchoolCase.png?raw=true', rewards: [
+    { id: 'lagrande', chance: 40 }, { id: 'nuclearo', chance: 25 }, { id: 'tangtang', chance: 15 },
+    { id: 'tictacsahur', chance: 10 }, { id: 'worl', chance: 5 }, { id: 'lostangsitos', chance: 4 },
+    { id: 'garama', chance: 0.9 }, { id: 'burguro', chance: 0.1 }
+  ]},
+  { id: 'sun', name: 'Sun Case', price: 39, img: 'https://github.com/saintezz/BrainrotWin/blob/main/SunCase.png?raw=true', rewards: [
+    { id: 'tictacsahur', chance: 50 }, { id: 'worl', chance: 30 }, { id: 'garama', chance: 17 },
+    { id: 'burguro', chance: 2 }, { id: 'cerberus', chance: 1 }
+  ]},
+  { id: 'winter', name: 'Winter Case', price: 61, img: 'https://github.com/saintezz/BrainrotWin/blob/main/WINTERCASE.png?raw=true', rewards: [
+    { id: 'lostangsitos', chance: 40 }, { id: 'garama', chance: 30 }, { id: 'burguro', chance: 10 },
+    { id: 'popcuru', chance: 5 }, { id: 'fragrama', chance: 4 }, { id: 'cerberus', chance: 0.5 },
+    { id: 'dugdugdug', chance: 0.3 }, { id: 'roseyandteddy', chance: 0.1 }, { id: 'lacasaboo', chance: 0.1 }
+  ]},
+  { id: 'autumn', name: 'Autumn Case', price: 90, img: 'https://github.com/saintezz/BrainrotWin/blob/main/AutumnCase.png?raw=true', rewards: [
+    { id: 'garama', chance: 40 }, { id: 'burguro', chance: 30 }, { id: 'popcuru', chance: 20 },
+    { id: 'cloverat', chance: 5 }, { id: 'guest666', chance: 4 }, { id: 'lossecret', chance: 3 },
+    { id: 'roseyandteddy', chance: 1 }
+  ]},
+  { id: 'radioactive', name: 'Radioctive Case', price: 150, img: 'https://github.com/saintezz/BrainrotWin/blob/main/RadioctiveCase.png?raw=true', rewards: [
+    { id: 'fragrama', chance: 60 }, { id: 'globba', chance: 30 }, { id: 'losamigos', chance: 9 },
+    { id: 'rubiko', chance: 0.9 }, { id: 'ketupas', chance: 0.1 }
+  ]},
+  { id: 'money', name: 'Money Case', price: 201, img: 'https://github.com/saintezz/BrainrotWin/blob/main/MoneyCase.png?raw=true', rewards: [
+    { id: 'cerberus', chance: 70 }, { id: 'dugdugdug', chance: 20 }, { id: 'cloverat', chance: 9 },
+    { id: 'guest666', chance: 0.3 }, { id: 'ricodinero', chance: 0.3 }, { id: 'lacasaboo', chance: 0.2 },
+    { id: 'skelly', chance: 0.1 }
+  ]},
+  { id: 'spring', name: 'Spring Case', price: 451, img: 'https://github.com/saintezz/BrainrotWin/blob/main/VesnaCase.png?raw=true', rewards: [
+    { id: 'rubiko', chance: 50 }, { id: 'ricodinero', chance: 20 }, { id: 'lacasaboo', chance: 20 },
+    { id: 'ketupas', chance: 8 }, { id: 'skelly', chance: 2 }
+  ]},
+  { id: 'summer', name: 'Summer Case', price: 3241, img: 'https://github.com/saintezz/BrainrotWin/blob/main/SummerCase.png?raw=true', rewards: [
+    { id: 'kraken', chance: 50 }, { id: 'lasupreme', chance: 20 }, { id: 'digi', chance: 15 },
+    { id: 'dragonaquanini', chance: 10 }, { id: 'antonio', chance: 4 }, { id: 'skibidi', chance: 1 }
+  ]},
+  { id: 'easter', name: 'Easter Case', price: 9000, img: 'https://github.com/saintezz/BrainrotWin/blob/main/eastercase.png?raw=true', rewards: [
+    { id: 'antonio', chance: 50 }, { id: 'griffin', chance: 30 }, { id: 'skibidi', chance: 10 },
+    { id: 'johnpork', chance: 5 }, { id: 'meowl', chance: 4 }, { id: 'strawberryelephant', chance: 0.9 },
+    { id: 'headless', chance: 0.1 }
+  ]},
+  { id: 'farm', name: 'Farm Case', price: 54000, img: 'https://github.com/saintezz/BrainrotWin/blob/main/FarmCase.png?raw=true', rewards: [
+    { id: 'strawberryelephant', chance: 99 }, { id: 'headless', chance: 1 }
+  ]}
 ];
 
 const MAX_CHANCE = 80;
@@ -1166,6 +1338,7 @@ const SPIN_DURATION_FAST = 5000;
 const CIRCUMFERENCE = 2 * Math.PI * 130;
 
 let invFilter = 'all';
+let casesSortMode = 'default';
 
 function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -1213,7 +1386,6 @@ function getDisplayNick() { return customNick || USER.nick; }
 function isCurrentUserAdmin() { return ADMIN_USERNAMES.includes((USER.username || '').toLowerCase()); }
 function getItemById(id) { return ITEMS.find(item => item.id === id) || CASE_ONLY_ITEMS.find(item => item.id === id); }
 
-// [FIX] api() — централизованно, с обработкой 401/403/503 и логированием
 async function api(path, body) {
   if (maintenanceEnabled && !isCurrentUserAdmin()) return { ok: false, error: 'MAINTENANCE' };
   const initDataRaw = window.Telegram?.WebApp?.initData || '';
@@ -1260,6 +1432,7 @@ function applyServerUser(data) {
   applyUserToProfile();
   if (document.getElementById('panelInventory')?.classList.contains('active')) renderInventoryTab();
   if (document.getElementById('panelCatch')?.classList.contains('active')) renderMinesBetGrid();
+  if (document.getElementById('panelMenu')?.classList.contains('active')) renderMenuCases();
 }
 
 async function loadUserFromServer() {
@@ -1409,6 +1582,8 @@ function updateBalanceUI() {
   if (pic) pic.innerText = inventory.length;
   const label = document.getElementById('inventoryCountLabel');
   if (label) label.textContent = inventory.length + ' ' + getItemsWord(inventory.length);
+  const hb = document.getElementById('casesHeroBalance');
+  if (hb) hb.textContent = balance.toLocaleString('ru-RU');
   updateInventoryHero();
   updateProfileStats();
 }
@@ -2083,10 +2258,61 @@ window.upgrade = function() {
 };
 
 // ================== КЕЙСЫ ==================
-function renderMenuCases() {
-  const grid = document.getElementById('menuCasesGrid'); if (!grid) return;
-  grid.innerHTML = CASES.map(c => `<div class="case-card" onclick="openCaseDetail('${c.id}')"><div class="case-card-inner"><div class="case-img-wrap"><img src="${c.img}" alt="${escapeHtml(c.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'"></div><div class="case-info"><div class="case-name">${escapeHtml(c.name)}</div><div class="case-price">${c.price} <img src="${COIN_IMG}" alt="coin"></div><div class="case-items-count">${c.rewards.length} предметов</div></div></div></div>`).join('');
+window.setCasesSort = function(mode) {
+  casesSortMode = mode;
+  document.querySelectorAll('.cases-sort button').forEach(b => b.classList.toggle('active', b.dataset.sort === mode));
+  playClick(); vibrate(6);
+  renderMenuCases();
+};
+
+function getCaseBadge(c) {
+  if (c.price >= 9000) return { text: 'Legendary', cls: 'top' };
+  if (c.price >= 451) return { text: 'Hot', cls: 'hot' };
+  return null;
 }
+
+function renderMenuCases() {
+  const grid = document.getElementById('menuCasesGrid');
+  if (!grid) return;
+
+  const heroCount = document.getElementById('casesHeroCount');
+  if (heroCount) heroCount.textContent = CASES.length + ' кейсов';
+  const heroBal = document.getElementById('casesHeroBalance');
+  if (heroBal) heroBal.textContent = (typeof balance === 'number' ? balance : 0).toLocaleString('ru-RU');
+
+  const q = (document.getElementById('casesSearchInput')?.value || '').trim().toLowerCase();
+  let list = CASES.slice();
+  if (q) list = list.filter(c => c.name.toLowerCase().includes(q));
+  if (casesSortMode === 'price-asc') list.sort((a,b) => a.price - b.price);
+  if (casesSortMode === 'price-desc') list.sort((a,b) => b.price - a.price);
+
+  if (!list.length) {
+    grid.innerHTML = '<div class="cases-empty">Кейсы не найдены</div>';
+    return;
+  }
+
+  grid.innerHTML = list.map(c => {
+    const badge = getCaseBadge(c);
+    const badgeHtml = badge ? `<div class="case-badge ${badge.cls}">${badge.text}</div>` : '';
+    return `<div class="case-card" onclick="openCaseDetail('${c.id}')">
+      <div class="case-card-inner">
+        <div class="case-img-wrap">
+          ${badgeHtml}
+          <img src="${c.img}" alt="${escapeHtml(c.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'">
+        </div>
+        <div class="case-info">
+          <div class="case-name">${escapeHtml(c.name)}</div>
+          <div class="case-meta">${c.rewards.length} предметов внутри</div>
+          <div class="case-footer">
+            <div class="case-price">${c.price.toLocaleString('ru-RU')} <img src="${COIN_IMG}" alt="coin"></div>
+            <div class="case-open-hint">Открыть <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 window.openCaseDetail = function(caseId) {
   if (isCaseOpening || document.body.classList.contains('upgrade-locked')) return;
   if (maintenanceEnabled && !isCurrentUserAdmin()) return;
@@ -2123,14 +2349,12 @@ window.openCaseDetail = function(caseId) {
     rc.appendChild(row);
   }
   const pg = document.getElementById('casePossibleGrid');
-  const showChance = isCurrentUserAdmin();
   pg.innerHTML = c.rewards.map(r => {
     const item = getItemById(r.id); if (!item) return '';
     return `<div class="case-possible-item">
       <img src="${item.img}" alt="${escapeHtml(item.name)}" loading="lazy" decoding="async" ${FALLBACK_ATTR}>
       <div class="cp-name">${escapeHtml(item.name)}</div>
       <div class="cp-price"><img src="${COIN_IMG}">${item.price}</div>
-      ${showChance ? `<div class="cp-chance" style="font-size:11px;font-weight:700;color:var(--color-frost);line-height:1.2">${r.chance}%</div>` : ''}
     </div>`;
   }).join('');
   modal.classList.add('show');
