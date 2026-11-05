@@ -100,7 +100,7 @@ body{
 .activate-btn{background: linear-gradient(135deg, var(--color-cyan), var(--color-purple-deep));color: #04121a;border: none;border-radius: 8px;padding: 14px 36px;font-size: 16px;font-weight: 900;cursor:pointer;transition: all .15s;text-transform: uppercase;letter-spacing: 1px;width: 100%;box-shadow: 0 10px 30px -8px rgba(62,200,255,.9);}
 .activate-btn:hover{filter: brightness(1.15); transform: translateY(-1px);}
 
-/* ===== CASES HERO / TOOLBAR / TABS ===== */
+/* ===== CASES ===== */
 .cases-hero{
   position:relative;margin:16px 0 20px;padding:28px 32px;border-radius:24px;overflow:hidden;
   background:
@@ -130,28 +130,6 @@ body{
 .cases-search input{flex:1;background:transparent;border:none;outline:none;color:#fff;font-family:var(--font-main);font-size:14px;font-weight:600;height:100%;}
 .cases-search input::placeholder{color:var(--text-muted);}
 
-.cases-tabs{
-  display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px;padding:6px;
-  background:rgba(10,24,38,.7);border:1px solid var(--glass-border);border-radius:14px;
-  backdrop-filter:blur(8px);
-}
-.cases-tab{
-  flex:1;min-width:90px;padding:11px 14px;border-radius:9px;border:1px solid transparent;
-  background:transparent;color:var(--text-muted);font-family:var(--font-main);
-  font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;
-  transition:all .18s;
-}
-.cases-tab:hover{color:#fff;background:rgba(140,210,255,.08);}
-.cases-tab.active{color:#04121a;background:linear-gradient(135deg,var(--color-cyan),var(--color-purple-deep));box-shadow:0 8px 24px -10px rgba(62,200,255,.9);}
-
-.cases-tier-info{
-  margin:0 0 14px;padding:10px 14px;border-radius:10px;
-  background:rgba(62,200,255,.08);border:1px solid rgba(62,200,255,.3);
-  font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:.6px;
-  text-transform:uppercase;line-height:1.5;
-}
-.cases-tier-info strong{color:var(--color-cyan);}
-
 .cases-grid{
   display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;
   padding:2px 0 8px;
@@ -177,15 +155,6 @@ body{
 .case-img-wrap::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%, rgba(62,200,255,.28), transparent 62%);pointer-events:none;}
 .case-img-wrap img{width:82%;height:82%;object-fit:contain;transition:transform .45s cubic-bezier(.175,.885,.32,1.275);filter:drop-shadow(0 8px 18px rgba(0,0,0,.6));}
 .case-card:hover .case-img-wrap img{transform:scale(1.12) rotate(-4deg);}
-.case-badge{
-  position:absolute;top:10px;left:10px;z-index:4;
-  font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;
-  padding:5px 10px;border-radius:8px;
-  background:rgba(62,200,255,.18);border:1px solid rgba(62,200,255,.55);color:var(--color-cyan);
-  backdrop-filter:blur(6px);
-}
-.case-badge.hot{background:rgba(255,224,102,.16);border-color:rgba(255,224,102,.6);color:var(--color-gold);}
-.case-badge.top{background:rgba(46,230,197,.16);border-color:rgba(46,230,197,.6);color:var(--color-emerald);}
 
 .case-info{display:flex;flex-direction:column;gap:8px;}
 .case-name{font-size:17px;font-weight:900;color:#fff;line-height:1.15;text-transform:uppercase;letter-spacing:.5px;}
@@ -201,37 +170,27 @@ body{
 .case-open-hint{font-size:11px;font-weight:800;color:var(--color-cyan);letter-spacing:1.2px;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px;opacity:.9;}
 .case-open-hint svg{width:14px;height:14px;transition:transform .2s;}
 .case-card:hover .case-open-hint svg{transform:translateX(4px);}
-
 .cases-empty{grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--text-muted);font-size:14px;font-weight:700;letter-spacing:.5px;}
 
 /* ===== CASE OPEN MODAL ===== */
 .case-open-modal{
   position:fixed;inset:0;z-index:4000;display:none;flex-direction:column;align-items:center;
-  background:
-    radial-gradient(1200px 600px at 50% 0%, rgba(62,200,255,.18), transparent 60%),
-    radial-gradient(900px 500px at 50% 100%, rgba(46,230,197,.14), transparent 60%),
-    var(--bg-void);
-  overflow-y:auto;padding:20px 0 40px;
-  -webkit-overflow-scrolling:touch;
-  overscroll-behavior:contain;
+  background:radial-gradient(1200px 600px at 50% 0%, rgba(62,200,255,.18), transparent 60%),radial-gradient(900px 500px at 50% 100%, rgba(46,230,197,.14), transparent 60%),var(--bg-void);
+  overflow-y:auto;padding:20px 0 40px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
 }
 .case-open-modal.show{display:flex;animation:caseModalIn .25s ease-out;}
 @keyframes caseModalIn{from{opacity:0;}to{opacity:1;}}
-
 .case-open-header{width:100%;max-width:1100px;padding:0 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-shrink:0;}
 .case-back-btn{padding:10px 16px;border-radius:10px;border:1px solid var(--glass-border);background:var(--bg-surface);color:#fff;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:all .15s;}
 .case-back-btn:hover{border-color:var(--color-cyan);color:var(--color-cyan);box-shadow:0 0 18px -6px rgba(62,200,255,.8);}
 .case-open-balance{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:900;color:var(--color-cyan);padding:10px 16px;background:rgba(62,200,255,.14);border-radius:10px;border:1px solid rgba(62,200,255,.5);box-shadow:0 0 20px -8px rgba(62,200,255,.7);}
 .case-open-balance img{width:16px;height:16px;}
-
 .case-open-stage{position:relative;width:200px;height:200px;display:flex;align-items:center;justify-content:center;margin:10px auto 4px;flex-shrink:0;}
 .case-open-stage-bg{position:absolute;inset:-40px;border-radius:50%;background:radial-gradient(circle at 50% 50%, rgba(62,200,255,.35), transparent 65%);filter:blur(14px);animation:caseStagePulse 2.6s ease-in-out infinite alternate;pointer-events:none;}
 @keyframes caseStagePulse{0%{opacity:.55;transform:scale(.92);}100%{opacity:1;transform:scale(1.08);}}
 .case-open-main-img{width:180px;height:180px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 14px 30px rgba(0,0,0,.65)) drop-shadow(0 0 24px rgba(62,200,255,.5));animation:caseFloat 3.4s ease-in-out infinite;}
 @keyframes caseFloat{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-8px) rotate(1deg);}}
-
 .case-open-name{font-size:20px;font-weight:900;color:#fff;letter-spacing:2.5px;text-transform:uppercase;text-align:center;margin:0 0 20px;text-shadow:0 0 24px rgba(62,200,255,.6);flex-shrink:0;}
-
 .case-roulette-wrapper{width:100%;max-width:1100px;padding:0 16px;margin-bottom:16px;display:flex;flex-direction:column;gap:12px;flex-shrink:0;}
 .case-roulette-row{width:100%;position:relative;overflow:hidden;border-radius:14px;background:linear-gradient(90deg, var(--bg-void), var(--bg-surface), var(--bg-void));border:1px solid rgba(62,200,255,0.4);height:132px;box-shadow:inset 0 0 24px rgba(0,0,0,0.85), 0 6px 24px -12px rgba(62,200,255,.5);}
 .case-roulette-row::before,.case-roulette-row::after{content:'';position:absolute;top:0;bottom:0;width:70px;z-index:8;pointer-events:none;}
@@ -244,20 +203,16 @@ body{
 .case-roulette-item .roulette-name{font-size:10px;font-weight:700;color:#fff;text-align:center;line-height:1.15;height:24px;overflow:hidden;width:100%;padding:0 2px;}
 .case-roulette-item .roulette-price{font-size:11px;font-weight:800;color:var(--color-cyan);display:flex;align-items:center;gap:3px;line-height:1.3;}
 .case-roulette-item .roulette-price img{width:11px;height:11px;}
-
 .case-roulette-pointer{position:absolute;top:0;left:50%;transform:translateX(-50%);width:3px;height:100%;background:var(--color-cyan);z-index:10;pointer-events:none;box-shadow:0 0 14px rgba(111,233,255,1);}
 .case-roulette-pointer::before{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:12px solid var(--color-cyan);}
 .case-roulette-pointer::after{content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:12px solid var(--color-cyan);}
-
 .case-qty-row{display:flex;gap:8px;margin-bottom:14px;width:100%;max-width:600px;padding:0 20px;flex-shrink:0;}
 .case-qty-btn-big{flex:1;padding:13px 8px;border-radius:10px;border:1px solid var(--glass-border);background:var(--bg-surface);color:var(--text-muted);font-size:14px;font-weight:800;cursor:pointer;transition:all .15s;letter-spacing:1px;}
 .case-qty-btn-big:hover{border-color:var(--color-purple);color:#fff;}
 .case-qty-btn-big.active{background:rgba(62,200,255,.2);border-color:var(--color-purple);color:#fff;box-shadow:0 0 20px -8px rgba(62,200,255,.8);}
-
 .case-open-action-btn{width:100%;max-width:600px;padding:16px;border-radius:12px;border:none;background:linear-gradient(135deg, var(--color-cyan), var(--color-purple-deep));color:#04121a;font-size:16px;font-weight:900;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .15s;margin-bottom:24px;box-shadow:0 14px 34px -12px rgba(62,200,255,.9);flex-shrink:0;}
 .case-open-action-btn:hover:not(:disabled){filter:brightness(1.15);transform:translateY(-2px);}
 .case-open-action-btn:disabled{opacity:.5;cursor:not-allowed;background:var(--bg-surface);color:var(--text-muted);box-shadow:none;}
-
 .case-possible-title{width:100%;max-width:1100px;padding:0 20px;font-size:13px;font-weight:800;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
 .case-possible-grid{width:100%;max-width:1100px;display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;padding:0 20px;}
 .case-possible-item{padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--glass-border);border-radius:12px;transition:transform .15s,border-color .15s;}
@@ -266,6 +221,62 @@ body{
 .case-possible-item .cp-name{font-size:11px;font-weight:700;color:#fff;text-align:center;line-height:1.15;height:26px;overflow:hidden;}
 .case-possible-item .cp-price{font-size:12px;font-weight:700;color:var(--color-cyan);display:flex;align-items:center;gap:3px;}
 .case-possible-item .cp-price img{width:12px;height:12px;}
+
+/* ===== PROFILE ===== */
+.profile-page{padding: 0 0 40px;background: var(--bg-surface);border-radius: 16px;border: 1px solid var(--glass-border);overflow: hidden;margin-top: 20px;box-shadow: 0 16px 40px -20px rgba(0,0,0,0.8);}
+.profile-hero{position:relative;padding: 40px 20px 30px;background:radial-gradient(600px 200px at 50% 0%, rgba(62,200,255,.28), transparent 70%),var(--bg-surface-hover);border-bottom: 1px solid var(--glass-border);display: flex;flex-direction: column;align-items: center;}
+.profile-hero::before{content:'';position:absolute;inset:0;background:url('https://www.transparenttextures.com/patterns/stardust.png');opacity:0.1;pointer-events:none;}
+.profile-avatar-wrap{position:relative;width:120px;height:120px;margin-bottom:20px;z-index:1;}
+.profile-avatar-frame{position:absolute;inset:-8px;border-radius:50%;background: conic-gradient(from 0deg, var(--color-cyan), var(--color-emerald), var(--color-cyan));padding:4px;animation:spin 4s linear infinite;box-shadow: 0 0 40px -10px rgba(62,200,255,.8);}
+@keyframes spin {100% {transform:rotate(360deg);}}
+.profile-avatar-inner{position:relative;width:100%;height:100%;background:var(--bg-void);border-radius:50%;overflow:hidden;border: 4px solid var(--bg-surface);}
+.profile-avatar-inner img{width:100%;height:100%;object-fit:cover;}
+.profile-avatar-status{position:absolute;bottom:4px;right:4px;width:26px;height:26px;background:#2ee6c5;border:3px solid var(--bg-surface);border-radius:50%;z-index:3;box-shadow: 0 0 12px rgba(46,230,197,.8);}
+.profile-nick-big{font-size:32px;font-weight:900;color:#fff;margin-bottom:8px;text-align:center;text-shadow: 0 4px 20px rgba(0,0,0,0.5);z-index:1;}
+.profile-tg-big{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:var(--text-muted);text-decoration:none;padding:8px 16px;background:rgba(140,210,255,0.08);border:1px solid var(--glass-border);border-radius:10px;z-index:1;transition:all .2s;}
+.profile-tg-big:hover{color:#fff;border-color:var(--color-cyan);}
+
+.profile-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding: 24px;}
+.profile-stat-card{background: linear-gradient(145deg, var(--bg-void), var(--bg-surface));border: 1px solid var(--glass-border);padding:20px;border-radius:16px;position:relative;box-shadow: 0 10px 24px -14px rgba(0,0,0,0.9);overflow:hidden;}
+.profile-stat-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg, transparent, rgba(62,200,255,.5), transparent);opacity:0.3;}
+.profile-stat-label{font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;}
+.profile-stat-value{font-size:22px;font-weight:900;color:#fff;display:flex;align-items:center;gap:8px;line-height:1;}
+.profile-stat-value img{width:22px;height:22px;filter:drop-shadow(0 0 8px rgba(255,255,255,0.4));}
+
+/* Best Drop Block */
+.best-drop-section{padding: 0 24px 24px;}
+.best-drop-card{position:relative;background:radial-gradient(120% 120% at 50% 0%, rgba(255,224,102,.15), transparent 80%),linear-gradient(145deg, #122638, #0a1826);border: 1px solid rgba(255,224,102,.4);border-radius:18px;padding:24px;display:flex;align-items:center;justify-content:space-between;gap:20px;overflow:hidden;box-shadow:0 16px 40px -20px rgba(255,224,102,.3), inset 0 1px 0 rgba(255,224,102,.2);flex-wrap:wrap;}
+.best-drop-card::before{content:'';position:absolute;inset:0;background:url('https://www.transparenttextures.com/patterns/stardust.png');opacity:.15;pointer-events:none;}
+.best-drop-info{position:relative;z-index:1;display:flex;flex-direction:column;gap:6px;flex:1;min-width:200px;}
+.best-drop-title{font-size:12px;font-weight:800;color:var(--color-gold);text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;gap:6px;}
+.best-drop-title svg{width:16px;height:16px;fill:currentColor;}
+.best-drop-name{font-size:22px;font-weight:900;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.5);line-height:1.1;}
+.best-drop-price{font-size:14px;font-weight:800;color:var(--color-cyan);display:flex;align-items:center;gap:4px;margin-top:4px;}
+.best-drop-price img{width:14px;height:14px;}
+.best-drop-date{font-size:11px;color:var(--text-muted);font-weight:600;margin-top:4px;}
+.best-drop-img{position:relative;z-index:1;width:100px;height:100px;object-fit:contain;filter:drop-shadow(0 10px 20px rgba(0,0,0,.6)) drop-shadow(0 0 20px rgba(255,224,102,.4));animation:floatGold 3s ease-in-out infinite;}
+@keyframes floatGold{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.best-drop-actions{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px;align-items:flex-end;justify-content:center;}
+.best-drop-btn{padding:10px 16px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#fff;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.best-drop-btn:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3);}
+.best-drop-empty{display:flex;align-items:center;justify-content:center;padding:30px;color:var(--text-muted);font-size:14px;font-weight:600;text-align:center;width:100%;border: 1px dashed rgba(255,255,255,0.1);border-radius: 12px;background: rgba(0,0,0,0.2);}
+
+.profile-inventory-section{padding: 0 24px 24px;}
+.profile-inventory-toggle{width:100%;padding:18px 20px;border-radius:14px;background: var(--bg-surface-hover);border:1px solid var(--glass-border);display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;text-align:left;box-shadow: 0 8px 20px -12px rgba(0,0,0,0.8);}
+.profile-inventory-toggle:hover{border-color: var(--color-purple);background:var(--bg-surface);}
+.profile-inventory-toggle .pt-title{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;}
+.profile-inventory-toggle .pt-value{font-size:18px;font-weight:900;color:#fff;margin-top:2px;}
+.profile-inventory-drawer{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s ease;background:var(--bg-void);border-radius:0 0 14px 14px;border:2px solid transparent;}
+.profile-inventory-drawer.expanded{max-height:600px;padding:16px;border-color:var(--glass-border);overflow-y:auto;}
+
+/* Reuse existing grid */
+.profile-inventory-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:12px;}
+.profile-inventory-item{padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--bg-surface);border-radius:12px;border:1px solid var(--glass-border);}
+.profile-inventory-item img{width:48px;height:48px;object-fit:contain;}
+.profile-inventory-item .inv-name{font-size:11px;color:#ccc;text-align:center;height:26px;overflow:hidden;}
+.profile-inventory-item .inv-price{font-size:12px;color:var(--color-cyan);font-weight:800;}
+.profile-inventory-empty{text-align:center;color:var(--text-muted);font-size:13px;font-weight:600;padding:24px;line-height:1.3;grid-column:1/-1;}
+.customize-in-profile{padding: 0 24px 30px;}
 
 /* остальной CSS */
 .upg-container{display: flex;flex-direction: column;gap: 20px;max-width: 960px;margin: 0 auto;padding: 8px 0 0;position: relative;}
@@ -385,35 +396,6 @@ body{
 .target-list-item .tl-name{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;line-height:1.1}
 .target-list-item .tl-price{font-size:12px;font-weight:800;color:var(--color-cyan);display:flex;align-items:center;gap:4px;line-height:1.3}
 .target-list-item .tl-price img{width:12px;height:12px;}
-.profile-page{padding: 0 0 20px;background: var(--bg-surface);border-radius: 16px;border: 1px solid var(--glass-border);overflow: hidden;margin-top: 20px;}
-.profile-hero{padding: 30px 20px;background:radial-gradient(500px 200px at 50% 0%, rgba(62,200,255,.28), transparent 70%),var(--bg-surface-hover);border-bottom: 1px solid var(--glass-border);display: flex;flex-direction: column;align-items: center;}
-.profile-avatar-wrap{position:relative;width:110px;height:110px;margin-bottom:16px;}
-.profile-avatar-frame{position:absolute;inset:-6px;border-radius:50%;background: linear-gradient(135deg, var(--color-cyan), var(--color-emerald));padding:3px;box-shadow: 0 0 30px -6px rgba(62,200,255,.8);}
-.profile-avatar-inner{position:relative;width:100%;height:100%;background:var(--bg-void);border-radius:50%;overflow:hidden;}
-.profile-avatar-inner img{width:100%;height:100%;object-fit:cover;}
-.profile-avatar-status{position:absolute;bottom:0;right:0;width:24px;height:24px;background:#555;border:3px solid var(--bg-surface);border-radius:50%;z-index:3;}
-.profile-nick-big{font-size:28px;font-weight:900;color:#ccc;margin-bottom:6px;text-align:center;}
-.profile-tg-big{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--text-muted);text-decoration:none;padding:6px 14px;background:rgba(140,210,255,0.06);border:1px solid var(--glass-border);border-radius:8px;}
-.profile-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding: 20px;}
-.profile-stat-card{background: var(--bg-surface-hover);border: 1px solid var(--glass-border);padding:16px;border-radius:12px;position:relative;}
-.profile-stat-label{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
-.profile-stat-value{font-size:20px;font-weight:900;color:#fff;display:flex;align-items:center;gap:8px;}
-.profile-stat-value img{width:20px;height:20px;}
-.profile-inventory-section{padding: 0 20px 20px;}
-.profile-inventory-toggle{width:100%;padding:16px;border-radius:12px;background: var(--bg-surface-hover);border:1px solid var(--glass-border);display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;text-align:left;}
-.profile-inventory-toggle:hover{border-color: var(--color-purple);}
-.profile-inventory-toggle .pt-title{font-size:12px;color:var(--text-muted);text-transform:uppercase;}
-.profile-inventory-toggle .pt-value{font-size:16px;font-weight:800;color:#fff;}
-.profile-inventory-drawer{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s ease;background:var(--bg-void);border-radius:0 0 12px 12px;border:2px solid transparent;}
-.profile-inventory-drawer.expanded{max-height:600px;padding:16px;border-color:var(--glass-border);overflow-y:auto;}
-.profile-inventory-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:12px;}
-.profile-inventory-item{padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;}
-.profile-inventory-item img{width:48px;height:48px;object-fit:contain;}
-.profile-inventory-item .inv-name{font-size:11px;color:#ccc;text-align:center;height:26px;overflow:hidden;}
-.profile-inventory-item .inv-price{font-size:12px;color:var(--color-cyan);font-weight:800;}
-.profile-inventory-empty{text-align:center;color:var(--text-muted);font-size:13px;font-weight:600;padding:24px;line-height:1.3;grid-column:1/-1;}
-.customize-in-profile{padding: 0 20px 20px;}
-.profile-section-heading{font-size:14px;font-weight:800;color:#fff;margin-bottom:12px;text-transform:uppercase;}
 .customize-section{background: var(--bg-surface-hover);border: 1px solid var(--glass-border);border-radius:12px;padding:16px;margin-bottom:12px;}
 .customize-section-title{font-size:12px;font-weight:800;color:var(--text-muted);margin-bottom:12px;text-transform:uppercase;}
 .form-input{width:100%;padding:12px;border-radius:8px;border:1px solid var(--glass-border);background:var(--bg-void);color:#fff;font-size:16px;outline:none;}
@@ -590,7 +572,6 @@ body{
   .case-meta{font-size:9px;}
   .cases-toolbar{padding:8px;gap:8px;}
   .cases-search{height:38px;min-width:0;}
-  .cases-tab{font-size:11px;padding:10px 8px;min-width:70px;}
   .case-open-stage{width:160px;height:160px;}
   .case-open-main-img{width:140px;height:140px;}
   .case-open-name{font-size:16px;letter-spacing:1.5px;}
@@ -599,6 +580,13 @@ body{
   .case-roulette-item img{width:44px;height:44px;}
   .case-roulette-item .roulette-name{font-size:9px;}
   .case-roulette-item .roulette-price{font-size:10px;}
+  .profile-hero {padding: 30px 20px 20px;}
+  .profile-avatar-wrap {width: 100px;height: 100px;}
+  .profile-nick-big {font-size: 26px;}
+  .profile-stat-card {padding: 16px;}
+  .best-drop-card {flex-direction: column;align-items: flex-start;padding: 20px;gap: 16px;}
+  .best-drop-img {width: 80px;height: 80px;position: absolute;right: 16px;bottom: 16px;}
+  .best-drop-actions {flex-direction: row;width: 100%;justify-content: flex-start;}
 }
 </style>
 </head>
@@ -961,7 +949,7 @@ body{
                     <div class="cases-hero-left">
                         <div class="cases-hero-kicker">Коллекция кейсов</div>
                         <div class="cases-hero-title">Открой свой<br>лучший дроп</div>
-                        <div class="cases-hero-sub">10 кейсов — от дешёвых разогревов до legendary-дропов. Выбирай вкладку, открывай, апгрейди и собирай коллекцию.</div>
+                        <div class="cases-hero-sub">10 кейсов — от дешёвых разогревов до legendary-дропов. Выбирай, открывай, апгрейди и собирай коллекцию.</div>
                     </div>
                     <div class="cases-hero-stats">
                         <div class="cases-stat-pill"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin"><span id="casesHeroCount">10 кейсов</span></div>
@@ -975,15 +963,6 @@ body{
                         <input type="text" id="casesSearchInput" placeholder="Поиск кейса..." autocomplete="off" oninput="renderMenuCases()">
                     </div>
                 </div>
-
-                <div class="cases-tabs" id="casesTabs">
-                    <button class="cases-tab active" data-tier="starter" onclick="setCasesTier('starter')">Starter</button>
-                    <button class="cases-tab" data-tier="mid" onclick="setCasesTier('mid')">Mid</button>
-                    <button class="cases-tab" data-tier="high" onclick="setCasesTier('high')">High</button>
-                    <button class="cases-tab" data-tier="legendary" onclick="setCasesTier('legendary')">Legendary</button>
-                </div>
-
-                <div class="cases-tier-info" id="casesTierInfo"></div>
 
                 <div class="cases-grid" id="menuCasesGrid"></div>
             </div>
@@ -1125,6 +1104,7 @@ body{
                         <div class="profile-nick-big" id="profileNick">Игрок</div>
                         <a class="profile-tg-big" id="profileTg" href="#" target="_blank"><span id="profileTgText">@username</span></a>
                     </div>
+                    
                     <div class="profile-stats-grid">
                         <div class="profile-stat-card">
                             <div class="profile-stat-label">Баланс</div>
@@ -1132,13 +1112,19 @@ body{
                         </div>
                         <div class="profile-stat-card">
                             <div class="profile-stat-label">Предметов</div>
-                            <div class="profile-stat-value"><span id="profileItemsCount">0</span><span style="font-size:12px;color:var(--text-muted);">шт.</span></div>
+                            <div class="profile-stat-value"><span id="profileItemsCount">0</span><span style="font-size:12px;color:var(--text-muted);margin-left:4px;">шт.</span></div>
                         </div>
                         <div class="profile-stat-card">
-                            <div class="profile-stat-label">Лучший предмет</div>
-                            <div class="profile-stat-value" id="profileBestItem" style="font-size:14px;">—</div>
+                            <div class="profile-stat-label">Стоимость инвентаря</div>
+                            <div class="profile-stat-value" style="color:var(--color-cyan);"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png"><span id="profileInvValue">0</span></div>
                         </div>
                     </div>
+
+                    <div class="best-drop-section">
+                        <div class="profile-section-heading" style="margin-bottom:12px;">Лучший дроп за всё время</div>
+                        <div id="bestDropContainer"></div>
+                    </div>
+
                     <div class="profile-inventory-section">
                         <button class="profile-inventory-toggle" id="inventoryToggle" onclick="toggleInventoryDrawer()">
                             <div class="pt-text">
@@ -1154,11 +1140,11 @@ body{
                         <div class="deposits-block-title">Заявки на пополнение <span class="deposits-count" id="depositsCount">0</span></div>
                         <div id="depositsList"></div>
                     </div>
-                    <div class="profile-action-row" style="max-width:640px;margin:10px auto 0;padding:0 20px;">
+                    <div class="profile-action-row" style="max-width:640px;margin:10px auto 0;padding:0 24px;">
                         <button class="action-btn" id="adminPanelBtn" style="display:none; background: var(--bg-surface-hover); border-color: var(--color-purple); color:var(--color-cyan);" onclick="openAdminPanel()">Открыть админ-панель</button>
                     </div>
                     <div class="customize-in-profile">
-                        <div class="profile-section-heading">Настройки профиля</div>
+                        <div class="profile-section-heading" style="margin-top:24px;">Настройки профиля</div>
                         <div class="customize-section">
                             <div class="customize-section-title">Аватарка</div>
                             <div class="avatar-upload-row">
@@ -1267,48 +1253,48 @@ const CASE_ONLY_ITEMS = [
 ];
 
 const CASES = [
-  { id: 'school', name: 'School Case', price: 12, img: 'https://github.com/saintezz/BrainrotWin/blob/main/SchoolCase.png?raw=true', rewards: [
+  { id: 'school', name: 'School Case', price: 12, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/schoolcase1.png', rewards: [
     { id: 'lagrande', chance: 40 }, { id: 'nuclearo', chance: 25 }, { id: 'tangtang', chance: 15 },
     { id: 'tictacsahur', chance: 10 }, { id: 'worl', chance: 5 }, { id: 'lostangsitos', chance: 4 },
     { id: 'garama', chance: 0.9 }, { id: 'burguro', chance: 0.1 }
   ]},
-  { id: 'sun', name: 'Sun Case', price: 39, img: 'https://github.com/saintezz/BrainrotWin/blob/main/SunCase.png?raw=true', rewards: [
+  { id: 'sun', name: 'Sun Case', price: 39, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/suncase1.png', rewards: [
     { id: 'tictacsahur', chance: 50 }, { id: 'worl', chance: 30 }, { id: 'garama', chance: 17 },
     { id: 'burguro', chance: 2 }, { id: 'cerberus', chance: 1 }
   ]},
-  { id: 'winter', name: 'Winter Case', price: 61, img: 'https://github.com/saintezz/BrainrotWin/blob/main/WINTERCASE.png?raw=true', rewards: [
+  { id: 'winter', name: 'Winter Case', price: 61, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/wintercase1.png', rewards: [
     { id: 'lostangsitos', chance: 40 }, { id: 'garama', chance: 30 }, { id: 'burguro', chance: 10 },
     { id: 'popcuru', chance: 5 }, { id: 'fragrama', chance: 4 }, { id: 'cerberus', chance: 0.5 },
     { id: 'dugdugdug', chance: 0.3 }, { id: 'roseyandteddy', chance: 0.1 }, { id: 'lacasaboo', chance: 0.1 }
   ]},
-  { id: 'autumn', name: 'Autumn Case', price: 90, img: 'https://github.com/saintezz/BrainrotWin/blob/main/AutumnCase.png?raw=true', rewards: [
+  { id: 'autumn', name: 'Autumn Case', price: 90, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/autumncase1.png', rewards: [
     { id: 'garama', chance: 40 }, { id: 'burguro', chance: 30 }, { id: 'popcuru', chance: 20 },
     { id: 'cloverat', chance: 5 }, { id: 'guest666', chance: 4 }, { id: 'lossecret', chance: 3 },
     { id: 'roseyandteddy', chance: 1 }
   ]},
-  { id: 'radioactive', name: 'Radioctive Case', price: 150, img: 'https://github.com/saintezz/BrainrotWin/blob/main/RadioctiveCase.png?raw=true', rewards: [
+  { id: 'radioactive', name: 'Radioctive Case', price: 150, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/radioctivecase1.png', rewards: [
     { id: 'fragrama', chance: 60 }, { id: 'globba', chance: 30 }, { id: 'losamigos', chance: 9 },
     { id: 'rubiko', chance: 0.9 }, { id: 'ketupas', chance: 0.1 }
   ]},
-  { id: 'money', name: 'Money Case', price: 201, img: 'https://github.com/saintezz/BrainrotWin/blob/main/MoneyCase.png?raw=true', rewards: [
+  { id: 'money', name: 'Money Case', price: 201, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/moneycase1.png', rewards: [
     { id: 'cerberus', chance: 70 }, { id: 'dugdugdug', chance: 20 }, { id: 'cloverat', chance: 9 },
     { id: 'guest666', chance: 0.3 }, { id: 'ricodinero', chance: 0.3 }, { id: 'lacasaboo', chance: 0.2 },
     { id: 'skelly', chance: 0.1 }
   ]},
-  { id: 'spring', name: 'Spring Case', price: 451, img: 'https://github.com/saintezz/BrainrotWin/blob/main/VesnaCase.png?raw=true', rewards: [
+  { id: 'spring', name: 'Spring Case', price: 451, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/vesnacase1.png', rewards: [
     { id: 'rubiko', chance: 50 }, { id: 'ricodinero', chance: 20 }, { id: 'lacasaboo', chance: 20 },
     { id: 'ketupas', chance: 8 }, { id: 'skelly', chance: 2 }
   ]},
-  { id: 'summer', name: 'Summer Case', price: 3241, img: 'https://github.com/saintezz/BrainrotWin/blob/main/SummerCase.png?raw=true', rewards: [
+  { id: 'summer', name: 'Summer Case', price: 3241, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/summercase1.png', rewards: [
     { id: 'kraken', chance: 50 }, { id: 'lasupreme', chance: 20 }, { id: 'digi', chance: 15 },
     { id: 'dragonaquanini', chance: 10 }, { id: 'antonio', chance: 4 }, { id: 'skibidi', chance: 1 }
   ]},
-  { id: 'easter', name: 'Easter Case', price: 9000, img: 'https://github.com/saintezz/BrainrotWin/blob/main/eastercase.png?raw=true', rewards: [
+  { id: 'easter', name: 'Easter Case', price: 9000, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/eastercase1.png', rewards: [
     { id: 'antonio', chance: 50 }, { id: 'griffin', chance: 30 }, { id: 'skibidi', chance: 10 },
     { id: 'johnpork', chance: 5 }, { id: 'meowl', chance: 4 }, { id: 'strawberryelephant', chance: 0.9 },
     { id: 'headless', chance: 0.1 }
   ]},
-  { id: 'farm', name: 'Farm Case', price: 54000, img: 'https://github.com/saintezz/BrainrotWin/blob/main/FarmCase.png?raw=true', rewards: [
+  { id: 'farm', name: 'Farm Case', price: 54000, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/farmcase1.png', rewards: [
     { id: 'strawberryelephant', chance: 99 }, { id: 'headless', chance: 1 }
   ]}
 ];
@@ -1322,6 +1308,7 @@ let customAvatar = null;
 
 let balance = 0;
 let inventory = [];
+let bestDrop = null;
 
 let deposits = [];
 let topupSelectedItem = null;
@@ -1352,7 +1339,6 @@ const SPIN_DURATION_FAST = 5000;
 const CIRCUMFERENCE = 2 * Math.PI * 130;
 
 let invFilter = 'all';
-let casesTier = 'starter';
 
 function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -1430,6 +1416,7 @@ function applyServerUser(data) {
   else withdrawDetails = {};
   if (typeof data.custom_nick === 'string' && data.custom_nick) customNick = data.custom_nick;
   if (typeof data.avatar === 'string' && data.avatar) customAvatar = data.avatar;
+  if (Object.prototype.hasOwnProperty.call(data, 'best_drop')) bestDrop = data.best_drop;
 
   if (Object.prototype.hasOwnProperty.call(data, 'banned')) {
     if (data.banned) showBanOverlay(data.ban || null);
@@ -1598,21 +1585,23 @@ function updateBalanceUI() {
   if (label) label.textContent = inventory.length + ' ' + getItemsWord(inventory.length);
   const hb = document.getElementById('casesHeroBalance');
   if (hb) hb.textContent = balance.toLocaleString('ru-RU');
+  
+  // Update inv value
+  const piv = document.getElementById('profileInvValue');
+  if (piv) {
+    let total = 0;
+    inventory.forEach(id => { const it = getItemById(id); if (it) total += it.price; });
+    piv.innerText = total.toLocaleString('ru-RU');
+  }
+  
   updateInventoryHero();
-  updateProfileStats();
+  updateProfileBestDrop();
 }
 function getItemsWord(n) {
   const m10 = n % 10, m100 = n % 100;
   if (m10 === 1 && m100 !== 11) return 'предмет';
   if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return 'предмета';
   return 'предметов';
-}
-function updateProfileStats() {
-  const bestEl = document.getElementById('profileBestItem'); if (!bestEl) return;
-  let best = null, bestPrice = -1;
-  inventory.forEach(id => { const it = getItemById(id); if (it && it.price > bestPrice) { bestPrice = it.price; best = it; } });
-  bestEl.textContent = best ? best.name : '—';
-  bestEl.title = best ? best.name : '';
 }
 function updateInventoryHero() {
   const cnt = document.getElementById('invHeroCount');
@@ -1624,6 +1613,51 @@ function updateInventoryHero() {
     val.querySelector('span').textContent = total.toLocaleString('ru-RU');
   }
 }
+
+function updateProfileBestDrop() {
+  const container = document.getElementById('bestDropContainer');
+  if (!container) return;
+  
+  if (!bestDrop) {
+    container.innerHTML = `<div class="best-drop-empty">У тебя пока нет лучшего дропа. Открывай кейсы или делай апгрейды!</div>`;
+    return;
+  }
+  
+  const item = getItemById(bestDrop.id) || { img: FALLBACK_IMG, name: bestDrop.name };
+  const dateStr = bestDrop.won_at ? new Date(bestDrop.won_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  
+  container.innerHTML = `
+    <div class="best-drop-card">
+      <div class="best-drop-info">
+        <div class="best-drop-title">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Лучший дроп
+        </div>
+        <div class="best-drop-name">${escapeHtml(bestDrop.name)}</div>
+        <div class="best-drop-price"><img src="${COIN_IMG}">${bestDrop.price.toLocaleString('ru-RU')}</div>
+        ${dateStr ? `<div class="best-drop-date">Выбито: ${dateStr}</div>` : ''}
+      </div>
+      <img class="best-drop-img" src="${item.img}" alt="${escapeHtml(bestDrop.name)}" ${FALLBACK_ATTR}>
+      <div class="best-drop-actions">
+        <button class="best-drop-btn" onclick="resetBestDrop()">Сбросить</button>
+      </div>
+    </div>
+  `;
+}
+
+window.resetBestDrop = async function() {
+  if (!confirm('Ты уверен, что хочешь сбросить лучший дроп?')) return;
+  playClick(); vibrate(10);
+  const data = await api('/api/user/reset-best-drop', {});
+  if (data.ok) {
+    bestDrop = null;
+    updateProfileBestDrop();
+    playWin();
+  } else {
+    alert(data.error || 'Ошибка');
+    playLose();
+  }
+};
 
 // ================== ЗВУКИ ==================
 let audioCtx = null;
@@ -1695,7 +1729,7 @@ function updateProfile() {
   isAdmin = isCurrentUserAdmin();
   const adminBtn = document.getElementById('adminPanelBtn');
   if (adminBtn) adminBtn.style.display = isAdmin ? 'block' : 'none';
-  renderProfileInventory(); updateProfileStats();
+  renderProfileInventory(); updateProfileBestDrop();
   const depositsBlock = document.getElementById('depositsBlock');
   if (depositsBlock) { if (isAdmin) { depositsBlock.style.display = 'block'; loadDeposits(); } else depositsBlock.style.display = 'none'; }
 }
@@ -2262,7 +2296,7 @@ async function performUpgrade(durationMs) {
     isSpinning = false;
     document.body.classList.remove('upgrade-locked');
     if (arrowContainer) { arrowContainer.style.transition = 'none'; arrowContainer.style.transform = 'rotate(0deg)'; }
-    applyServerUser({ balance: data.new_balance, inventory: data.inventory });
+    applyServerUser({ balance: data.new_balance, inventory: data.inventory, best_drop: data.best_drop });
     updateUpgradeScreen();
   }, durationMs + 100);
 }
@@ -2272,38 +2306,11 @@ window.upgrade = function() {
 };
 
 // ================== КЕЙСЫ ==================
-const CASE_TIERS = {
-  starter:   { name: 'Starter',   min: 0,     max: 99,     desc: 'Стартовые кейсы — дешёвый разогрев' },
-  mid:       { name: 'Mid',       min: 100,   max: 999,    desc: 'Средние кейсы — стабильный дроп' },
-  high:      { name: 'High',      min: 1000,  max: 9999,   desc: 'Дорогие кейсы — шанс на топ-предметы' },
-  legendary: { name: 'Legendary', min: 10000, max: 999999, desc: 'Legendary-кейсы — редчайшие дропы' }
-};
-
 const CASE_ROW_ITEMS = 60;
 const CASE_ITEM_WIDTH = 120;
 const CASE_WIN_INDEX = 50;
 const CASE_SPIN_MS = 6800;
 let caseSpinTimeout = null;
-
-window.setCasesTier = function(tier) {
-  casesTier = tier;
-  document.querySelectorAll('.cases-tab').forEach(b => b.classList.toggle('active', b.dataset.tier === tier));
-  playClick(); vibrate(6);
-  renderMenuCases();
-};
-
-function getCaseTier(c) {
-  if (c.price >= 10000) return 'legendary';
-  if (c.price >= 1000) return 'high';
-  if (c.price >= 100) return 'mid';
-  return 'starter';
-}
-
-function getCaseBadge(c) {
-  if (c.price >= 10000) return { text: 'Legendary', cls: 'top' };
-  if (c.price >= 1000) return { text: 'High', cls: 'hot' };
-  return null;
-}
 
 function renderMenuCases() {
   const grid = document.getElementById('menuCasesGrid');
@@ -2314,31 +2321,19 @@ function renderMenuCases() {
   const heroBal = document.getElementById('casesHeroBalance');
   if (heroBal) heroBal.textContent = (typeof balance === 'number' ? balance : 0).toLocaleString('ru-RU');
 
-  document.querySelectorAll('.cases-tab').forEach(b => b.classList.toggle('active', b.dataset.tier === casesTier));
-
-  const tierInfo = document.getElementById('casesTierInfo');
-  const tierMeta = CASE_TIERS[casesTier];
-  if (tierInfo && tierMeta) {
-    tierInfo.innerHTML = `<strong>${tierMeta.name}</strong> · ${tierMeta.desc} · ${tierMeta.min.toLocaleString('ru-RU')}–${tierMeta.max >= 999999 ? '∞' : tierMeta.max.toLocaleString('ru-RU')} монет`;
-  }
-
   const q = (document.getElementById('casesSearchInput')?.value || '').trim().toLowerCase();
-
-  let list = CASES.filter(c => getCaseTier(c) === casesTier);
+  let list = CASES.slice();
   if (q) list = list.filter(c => c.name.toLowerCase().includes(q));
 
   if (!list.length) {
-    grid.innerHTML = '<div class="cases-empty">В этой категории кейсов пока нет</div>';
+    grid.innerHTML = '<div class="cases-empty">Кейсы не найдены</div>';
     return;
   }
 
   grid.innerHTML = list.map(c => {
-    const badge = getCaseBadge(c);
-    const badgeHtml = badge ? `<div class="case-badge ${badge.cls}">${badge.text}</div>` : '';
     return `<div class="case-card" onclick="openCaseDetail('${c.id}')">
       <div class="case-card-inner">
         <div class="case-img-wrap">
-          ${badgeHtml}
           <img src="${c.img}" alt="${escapeHtml(c.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'">
         </div>
         <div class="case-info">
@@ -2514,7 +2509,7 @@ window.confirmOpenCase = async function() {
           if (items[CASE_WIN_INDEX]) items[CASE_WIN_INDEX].classList.add('winning');
         });
 
-        applyServerUser({ balance: data.new_balance, inventory: data.inventory });
+        applyServerUser({ balance: data.new_balance, inventory: data.inventory, best_drop: data.best_drop });
         playWin(); vibratePattern([30,50,30,50,60]);
         isCaseOpening = false;
         if (btn) { btn.disabled = false; btn.textContent = 'ОТКРЫТЬ КЕЙС'; }
@@ -2831,7 +2826,7 @@ async function init() {
   selectedSourceIndex = null; selectedTargetId = null;
   applyCustomAvatar(); renderMenuCases(); updateAutoPromoDisplay();
   updateBalanceUI();
-  renderInventory(); renderShop(); updateUpgradeScreen(); renderProfileInventory();
+  renderInventory(); renderShop(); updateUpgradeScreen(); renderProfileInventory(); updateProfileBestDrop();
   switchTab('menu');
   await checkMaintenance();
   applyMaintenanceState(maintenanceEnabled);
