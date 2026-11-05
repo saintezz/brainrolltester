@@ -6,10 +6,9 @@ const crypto = require('crypto');
 const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
 
-// [FIX] BOT_TOKEN обязателен, но с trim и понятной ошибкой
 const BOT_TOKEN = (process.env.BOT_TOKEN || '').trim();
 if (!BOT_TOKEN) {
-  console.error('[FATAL] Переменная окружения BOT_TOKEN не задана. Render → Environment → BOT_TOKEN');
+  console.error('[FATAL] Переменная окружения BOT_TOKEN не задана.');
   process.exit(1);
 }
 console.log('[INIT] BOT_TOKEN задан, длина=' + BOT_TOKEN.length + ', префикс=' + BOT_TOKEN.slice(0, 10) + '...');
@@ -29,10 +28,17 @@ const START_BALANCE = 500;
 const MAX_BODY_SIZE = 1024 * 1024;
 const INIT_DATA_MAX_AGE_SEC = 86400;
 const RATE_LIMIT_WINDOW_MS = 1000;
-const RATE_LIMIT_MAX = 30; // чуть мягче для free-tier
+const RATE_LIMIT_MAX = 30;
 const MINES_TTL_MS = 10 * 60 * 1000;
 
 const ITEMS = Object.freeze({
+  // Новые браинроты
+  tangtang: { name: 'Tang Tang Keletang', price: 17 },
+  lostangsitos: { name: 'Los Tangsitos', price: 34 },
+  worl: { name: 'W or L', price: 28 },
+  tictacsahur: { name: 'TicTac Sahur', price: 19 },
+
+  // Существующие
   lagrande: { name: 'La Grande Combination', price: 4 },
   nuclearo: { name: 'Nuclearo Dinausauro', price: 12 },
   witchbroom: { name: 'Witch Broom', price: 29 },
@@ -97,17 +103,117 @@ const CASE_ONLY_ITEMS = Object.freeze({
 });
 
 const CASES = Object.freeze({
-  witch: { name: 'Witch Case', price: 10, rewards: [{ id: 'lagrande', chance: 76 }, { id: 'nuclearo', chance: 22 }, { id: 'cupid', chance: 1.5 }, { id: 'garama', chance: 0.3 }, { id: 'burguro', chance: 0.2 }, { id: 'popcuru', chance: 0.1 }] },
-  fruits: { name: 'Fruits Case', price: 19, rewards: [{ id: 'lagrande', chance: 30 }, { id: 'nuclearo', chance: 50 }, { id: 'cupid', chance: 15 }, { id: 'waverider', chance: 5 }] },
-  garama: { name: 'Garama Case', price: 29, rewards: [{ id: 'nuclearo', chance: 40 }, { id: 'cupid', chance: 40 }, { id: 'garama', chance: 15 }, { id: 'burguro', chance: 5 }] },
-  yeti: { name: 'Yeti Case', price: 40, rewards: [{ id: 'nuclearo', chance: 50 }, { id: 'cupid', chance: 40 }, { id: 'burguro', chance: 9.99 }, { id: 'polaroidini', chance: 0.01 }] },
-  school: { name: 'School Case', price: 59, rewards: [{ id: 'witchbroom', chance: 70 }, { id: 'garama', chance: 20 }, { id: 'lafoodcombinasion', chance: 5 }, { id: 'cerberus', chance: 4 }, { id: 'losadmins', chance: 1 }] },
-  arcadragon: { name: 'Arcadragon Case', price: 200, rewards: [{ id: 'cerberus', chance: 60 }, { id: 'globba', chance: 20 }, { id: 'dugdugdug', chance: 10 }, { id: 'guest666', chance: 5 }, { id: 'rubiko', chance: 4 }, { id: 'dragon', chance: 1 }] },
-  vampire: { name: 'Vampire Case', price: 299, rewards: [{ id: 'dugdugdug', chance: 50 }, { id: 'losamigos', chance: 30 }, { id: 'losadmins', chance: 12 }, { id: 'ricodinero', chance: 8 }] },
-  tacos: { name: 'Tacos Case', price: 340, rewards: [{ id: 'guest666', chance: 77 }, { id: 'losadmins', chance: 13 }, { id: 'rubiko', chance: 10 }] },
-  dragon: { name: 'Dragon Case', price: 3900, rewards: [{ id: 'kraken', chance: 70 }, { id: 'digi', chance: 15 }, { id: 'kalikabros', chance: 10 }, { id: 'dragonaquanini', chance: 4.9 }, { id: 'meowl', chance: 0.1 }] },
-  strawberry: { name: 'Strawberry Case', price: 8900, rewards: [{ id: 'griffin', chance: 70 }, { id: 'elefantofrigo', chance: 20 }, { id: 'skibidi', chance: 5 }, { id: 'meowl', chance: 5 }] },
-  griffin: { name: 'Griffin Case', price: 17000, rewards: [{ id: 'skibidi', chance: 50 }, { id: 'johnpork', chance: 30 }, { id: 'meowl', chance: 17 }, { id: 'strawberryelephant', chance: 3 }] }
+  school: {
+    name: 'School Case', price: 12,
+    rewards: [
+      { id: 'lagrande', chance: 40 },
+      { id: 'nuclearo', chance: 25 },
+      { id: 'tangtang', chance: 15 },
+      { id: 'tictacsahur', chance: 10 },
+      { id: 'worl', chance: 5 },
+      { id: 'lostangsitos', chance: 4 },
+      { id: 'garama', chance: 0.9 },
+      { id: 'burguro', chance: 0.1 }
+    ]
+  },
+  sun: {
+    name: 'Sun Case', price: 39,
+    rewards: [
+      { id: 'tictacsahur', chance: 50 },
+      { id: 'worl', chance: 30 },
+      { id: 'garama', chance: 17 },
+      { id: 'burguro', chance: 2 },
+      { id: 'cerberus', chance: 1 }
+    ]
+  },
+  winter: {
+    name: 'Winter Case', price: 61,
+    rewards: [
+      { id: 'lostangsitos', chance: 40 },
+      { id: 'garama', chance: 30 },
+      { id: 'burguro', chance: 10 },
+      { id: 'popcuru', chance: 5 },
+      { id: 'fragrama', chance: 4 },
+      { id: 'cerberus', chance: 0.5 },
+      { id: 'dugdugdug', chance: 0.3 },
+      { id: 'roseyandteddy', chance: 0.1 },
+      { id: 'lacasaboo', chance: 0.1 }
+    ]
+  },
+  autumn: {
+    name: 'Autumn Case', price: 90,
+    rewards: [
+      { id: 'garama', chance: 40 },
+      { id: 'burguro', chance: 30 },
+      { id: 'popcuru', chance: 20 },
+      { id: 'cloverat', chance: 5 },
+      { id: 'guest666', chance: 4 },
+      { id: 'lossecret', chance: 3 },
+      { id: 'roseyandteddy', chance: 1 }
+    ]
+  },
+  radioactive: {
+    name: 'Radioctive Case', price: 150,
+    rewards: [
+      { id: 'fragrama', chance: 60 },
+      { id: 'globba', chance: 30 },
+      { id: 'losamigos', chance: 9 },
+      { id: 'rubiko', chance: 0.9 },
+      { id: 'ketupas', chance: 0.1 }
+    ]
+  },
+  money: {
+    name: 'Money Case', price: 201,
+    rewards: [
+      { id: 'cerberus', chance: 70 },
+      { id: 'dugdugdug', chance: 20 },
+      { id: 'cloverat', chance: 9 },
+      { id: 'guest666', chance: 0.3 },
+      { id: 'ricodinero', chance: 0.3 },
+      { id: 'lacasaboo', chance: 0.2 },
+      { id: 'skelly', chance: 0.1 }
+    ]
+  },
+  spring: {
+    name: 'Spring Case', price: 451,
+    rewards: [
+      { id: 'rubiko', chance: 50 },
+      { id: 'ricodinero', chance: 20 },
+      { id: 'lacasaboo', chance: 20 },
+      { id: 'ketupas', chance: 8 },
+      { id: 'skelly', chance: 2 }
+    ]
+  },
+  summer: {
+    name: 'Summer Case', price: 3241,
+    rewards: [
+      { id: 'kraken', chance: 50 },
+      { id: 'lasupreme', chance: 20 },
+      { id: 'digi', chance: 15 },
+      { id: 'dragonaquanini', chance: 10 },
+      { id: 'antonio', chance: 4 },
+      { id: 'skibidi', chance: 1 }
+    ]
+  },
+  easter: {
+    name: 'Easter Case', price: 9000,
+    rewards: [
+      { id: 'antonio', chance: 50 },
+      { id: 'griffin', chance: 30 },
+      { id: 'skibidi', chance: 10 },
+      { id: 'johnpork', chance: 5 },
+      { id: 'meowl', chance: 4 },
+      { id: 'strawberryelephant', chance: 0.9 },
+      { id: 'headless', chance: 0.1 }
+    ]
+  },
+  farm: {
+    name: 'Farm Case', price: 54000,
+    rewards: [
+      { id: 'strawberryelephant', chance: 99 },
+      { id: 'headless', chance: 1 }
+    ]
+  }
 });
 
 const MAX_CHANCE = 80;
@@ -215,8 +321,6 @@ function readBody(req) {
   });
 }
 
-// [FIX] localeCompare → побайтовое сравнение, как требует Telegram
-// [FIX] логирование причин отказа
 function validateTelegramInitData(initData) {
   if (!initData || typeof initData !== 'string') {
     console.log('[AUTH] no initData');
@@ -236,19 +340,18 @@ function validateTelegramInitData(initData) {
     const a = Buffer.from(computedHash, 'hex');
     const b = Buffer.from(hash, 'hex');
     if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
-      console.log('[AUTH] hash mismatch: computed=' + computedHash.slice(0, 12) + ' got=' + hash.slice(0, 12));
+      console.log('[AUTH] hash mismatch');
       return null;
     }
     const authDate = parseInt(params.get('auth_date') || '0', 10);
     if (!authDate || (Date.now() / 1000 - authDate) > INIT_DATA_MAX_AGE_SEC) {
-      console.log('[AUTH] auth_date expired: age=' + (Date.now() / 1000 - authDate) + 's');
+      console.log('[AUTH] auth_date expired');
       return null;
     }
     const userJson = params.get('user');
     if (!userJson) { console.log('[AUTH] no user'); return null; }
     const u = JSON.parse(userJson);
     if (!u || !u.id) { console.log('[AUTH] no user.id'); return null; }
-    console.log('[AUTH] OK user=' + u.id + ' @' + (u.username || ''));
     return { id: String(u.id), username: String(u.username || '') };
   } catch (e) {
     console.log('[AUTH] exception: ' + e.message);
@@ -377,7 +480,6 @@ setInterval(() => {
 const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { setCORS(res); res.writeHead(204); res.end(); return; }
 
-  // Health-check с диагностикой
   if (req.method === 'GET' && (req.url === '/' || req.url === '/health')) {
     setCORS(res);
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
@@ -830,5 +932,4 @@ loadAll();
 server.listen(PORT, () => {
   console.log('🚀 Brainrot Game server started on port ' + PORT);
   console.log('✅ BOT_TOKEN: OK (length=' + BOT_TOKEN.length + ')');
-  console.log('🌐 Health: https://brainrolltester.onrender.com/');
 });
