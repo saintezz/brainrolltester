@@ -100,6 +100,10 @@ body{
 .activate-btn{background: linear-gradient(135deg, var(--color-cyan), var(--color-purple-deep));color: #04121a;border: none;border-radius: 8px;padding: 14px 36px;font-size: 16px;font-weight: 900;cursor:pointer;transition: all .15s;text-transform: uppercase;letter-spacing: 1px;width: 100%;box-shadow: 0 10px 30px -8px rgba(62,200,255,.9);}
 .activate-btn:hover{filter: brightness(1.15); transform: translateY(-1px);}
 
+/* ===== TABS ===== */
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
 /* ===== CASES ===== */
 .cases-hero{
   position:relative;margin:16px 0 20px;padding:28px 32px;border-radius:24px;overflow:hidden;
@@ -227,8 +231,8 @@ body{
 .profile-hero{position:relative;padding: 40px 20px 30px;background:radial-gradient(600px 200px at 50% 0%, rgba(62,200,255,.28), transparent 70%),var(--bg-surface-hover);border-bottom: 1px solid var(--glass-border);display: flex;flex-direction: column;align-items: center;}
 .profile-hero::before{content:'';position:absolute;inset:0;background:url('https://www.transparenttextures.com/patterns/stardust.png');opacity:0.1;pointer-events:none;}
 .profile-avatar-wrap{position:relative;width:120px;height:120px;margin-bottom:20px;z-index:1;}
-.profile-avatar-frame{position:absolute;inset:-8px;border-radius:50%;background: conic-gradient(from 0deg, var(--color-cyan), var(--color-emerald), var(--color-cyan));padding:4px;animation:spin 4s linear infinite;box-shadow: 0 0 40px -10px rgba(62,200,255,.8);}
-@keyframes spin {100% {transform:rotate(360deg);}}
+/* ИСПРАВЛЕНИЕ: Убрана анимация вращения */
+.profile-avatar-frame{position:absolute;inset:-8px;border-radius:50%;background: conic-gradient(from 0deg, var(--color-cyan), var(--color-emerald), var(--color-cyan));padding:4px;box-shadow: 0 0 40px -10px rgba(62,200,255,.8);}
 .profile-avatar-inner{position:relative;width:100%;height:100%;background:var(--bg-void);border-radius:50%;overflow:hidden;border: 4px solid var(--bg-surface);}
 .profile-avatar-inner img{width:100%;height:100%;object-fit:cover;}
 .profile-avatar-status{position:absolute;bottom:4px;right:4px;width:26px;height:26px;background:#2ee6c5;border:3px solid var(--bg-surface);border-radius:50%;z-index:3;box-shadow: 0 0 12px rgba(46,230,197,.8);}
@@ -269,7 +273,6 @@ body{
 .profile-inventory-drawer{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s ease;background:var(--bg-void);border-radius:0 0 14px 14px;border:2px solid transparent;}
 .profile-inventory-drawer.expanded{max-height:600px;padding:16px;border-color:var(--glass-border);overflow-y:auto;}
 
-/* Reuse existing grid */
 .profile-inventory-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:12px;}
 .profile-inventory-item{padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--bg-surface);border-radius:12px;border:1px solid var(--glass-border);}
 .profile-inventory-item img{width:48px;height:48px;object-fit:contain;}
@@ -1586,7 +1589,6 @@ function updateBalanceUI() {
   const hb = document.getElementById('casesHeroBalance');
   if (hb) hb.textContent = balance.toLocaleString('ru-RU');
   
-  // Update inv value
   const piv = document.getElementById('profileInvValue');
   if (piv) {
     let total = 0;
