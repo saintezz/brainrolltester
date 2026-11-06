@@ -34,7 +34,10 @@ const MINES_TTL_MS = 10 * 60 * 1000;
 
 // ================== USERNAME CASE + STAKING =================
 const USERNAME_CASE_COOLDOWN_MS = 12 * 60 * 60 * 1000;
-const USERNAME_REQUIRED = 'brainrotggame';
+// Ник должен содержать эту приписку (без @, регистр не важен)
+const USERNAME_TAG = 'BrainrotGGame';
+const USERNAME_TAG_LOWER = USERNAME_TAG.toLowerCase();
+
 const STAKING_TIERS = Object.freeze({
   week:    { id: 'week',    label: 'Неделя',   bonus: 10, duration_ms:  7 * 24 * 60 * 60 * 1000 },
   twoWeek: { id: 'twoWeek', label: '2 недели', bonus: 25, duration_ms: 14 * 24 * 60 * 60 * 1000 },
@@ -134,6 +137,13 @@ function getOnlineCount() {
   return count;
 }
 
+// Ник содержит @BrainrotGGame (без @ в самом теге, регистронезависимо)
+function nickHasRequiredTag(nick) {
+  if (!nick || typeof nick !== 'string') return false;
+  const cleaned = nick.replace(/@/g, ' ').toLowerCase();
+  return cleaned.includes(USERNAME_TAG_LOWER);
+}
+
 function setCORS(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -188,7 +198,18 @@ function validateTelegramInitData(initData) {
     if (!userJson) return null;
     const u = JSON.parse(userJson);
     if (!u || !u.id) return null;
-    return { id: String(u.id), username: String(u.username || '') };
+
+    const firstName = String(u.first_name || '').trim();
+    const lastName  = String(u.last_name  || '').trim();
+    const nickname  = [firstName, lastName].filter(Boolean).join(' ').trim();
+
+    return {
+      id: String(u.id),
+      username: String(u.username || ''),
+      first_name: firstName,
+      last_name: lastName,
+      nick: nickname
+    };
   } catch (e) { return null; }
 }
 function getTelegramUser(req) { return validateTelegramInitData(req.headers['x-telegram-init-data']); }
@@ -276,9 +297,11 @@ async function listActiveBans() {
   }));
 }
 
-async function getUsernameCaseStatus(telegramId, username) {
-  const tgUser = String(username || '').toLowerCase().replace(/^@+/, '');
-  const hasRequired = tgUser === USERNAME_REQUIRED;
+// Проверка ника пользователя на наличие тега @BrainrotGGame
+// Принимает nick (first_name + last_name), который пришёл из initData.
+// Если nick не передан — берём custom_nick или сохранённый username (fallback).
+async function getUsernameCaseStatus(telegramId, nick) {
+  const hasRequired = nickHasRequiredTag(nick || '');
   const res = await pool.query(
     "SELECT last_opened_at FROM username_case WHERE telegram_id = $1",
     [String(telegramId)]
@@ -290,7 +313,7 @@ async function getUsernameCaseStatus(telegramId, username) {
   const now = Date.now();
   return {
     has_required_username: hasRequired,
-    required_username: '@' + USERNAME_REQUIRED,
+    required_tag: '@' + USERNAME_TAG,
     next_available_at: nextAvailableAt,
     can_open: hasRequired && now >= nextAvailableAt,
     cooldown_ms: USERNAME_CASE_COOLDOWN_MS
@@ -475,8 +498,13 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && req.url === '/api/username-case/status') {
       const user = getTelegramUser(req);
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
-      const st = await getUsernameCaseStatus(user.id, user.username);
-      return sendJSON(res, 200, { ok: true, ...st });
+
+      // Клиент может передать nick в query (?nick=...), но основной источник — initData.user
+      const nickFromQuery = String(reqUrl.searchParams.get('nick') || '');
+      const nick = nickFromQuery || user.nick || '';
+
+      const st = await getUsernameCaseStatus(user.id, nick);
+      return sendJSON(res, 200, { ok: true, ...st, nick });
     }
 
     if (req.method === 'POST' && req.url === '/api/username-case/open') {
@@ -484,12 +512,15 @@ const server = http.createServer(async (req, res) => {
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
       updateOnline(user.id);
 
+      const nickFromBody = String(body.nick || '');
+      const nick = nickFromBody || user.nick || '';
+
       const u = await getUser(user.id, user.username);
       if (u.ban && u.ban.active) return sendJSON(res, 403, { ok: false, error: 'BANNED' });
 
-      const st = await getUsernameCaseStatus(user.id, user.username);
+      const st = await getUsernameCaseStatus(user.id, nick);
       if (!st.has_required_username) {
-        return sendJSON(res, 400, { ok: false, error: 'USERNAME_REQUIRED', required_username: st.required_username });
+        return sendJSON(res, 400, { ok: false, error: 'USERNAME_REQUIRED', required_tag: st.required_tag });
       }
       if (Date.now() < st.next_available_at) {
         return sendJSON(res, 429, { ok: false, error: 'COOLDOWN', next_available_at: st.next_available_at });
