@@ -32,7 +32,7 @@ const RATE_LIMIT_WINDOW_MS = 1000;
 const RATE_LIMIT_MAX = 30;
 const MINES_TTL_MS = 10 * 60 * 1000;
 
-// ================== КОНСТАНТЫ ИГРЫ ==================
+// ================== КОНСТАНТЫ ИГРЫ =================
 const ITEMS = Object.freeze({
   tangtang: { name: 'Tang Tang Keletang', price: 17 }, lostangsitos: { name: 'Los Tangsitos', price: 34 },
   worl: { name: 'W or L', price: 28 }, tictacsahur: { name: 'TicTac Sahur', price: 19 },
