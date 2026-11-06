@@ -1,11 +1,9 @@
+require('dotenv').config();
 const http = require('http');
-const fs = require('fs');
-const path = require('path');
 const crypto = require('crypto');
+const { Pool } = require('pg');
 
 const PORT = process.env.PORT || 3000;
-const DATA_DIR = path.join(__dirname, 'data');
-
 const BOT_TOKEN = (process.env.BOT_TOKEN || '').trim();
 if (!BOT_TOKEN) {
   console.error('[FATAL] Переменная окружения BOT_TOKEN не задана.');
@@ -13,14 +11,17 @@ if (!BOT_TOKEN) {
 }
 console.log('[INIT] BOT_TOKEN задан, длина=' + BOT_TOKEN.length + ', префикс=' + BOT_TOKEN.slice(0, 10) + '...');
 
-const PROMO_FILE = path.join(DATA_DIR, 'promocodes.json');
-const USERS_FILE = path.join(DATA_DIR, 'users.json');
-const DEPOSITS_FILE = path.join(DATA_DIR, 'deposits.json');
-const WITHDRAWS_FILE = path.join(DATA_DIR, 'withdraws.json');
-const MAINTENANCE_FILE = path.join(DATA_DIR, 'maintenance.json');
-const ANNOUNCEMENT_FILE = path.join(DATA_DIR, 'announcement.json');
-const STATS_FILE = path.join(DATA_DIR, 'stats.json');
-const BANS_FILE = path.join(DATA_DIR, 'bans.json');
+// ================== ПОДКЛЮЧЕНИЕ К БД ==================
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { require: true }
+});
+
+pool.connect((err, client, release) => {
+  if (err) return console.error('Ошибка подключения к базе:', err.stack);
+  console.log('✅ Успешное подключение к PostgreSQL (Neon)');
+  release();
+});
 
 const ADMIN_USERNAMES = ['saintezz7', 'vortyn1'];
 const START_BALANCE = 500;
@@ -31,186 +32,68 @@ const RATE_LIMIT_WINDOW_MS = 1000;
 const RATE_LIMIT_MAX = 30;
 const MINES_TTL_MS = 10 * 60 * 1000;
 
+// ================== КОНСТАНТЫ ИГРЫ ==================
 const ITEMS = Object.freeze({
-  tangtang: { name: 'Tang Tang Keletang', price: 17 },
-  lostangsitos: { name: 'Los Tangsitos', price: 34 },
-  worl: { name: 'W or L', price: 28 },
-  tictacsahur: { name: 'TicTac Sahur', price: 19 },
-  lagrande: { name: 'La Grande Combination', price: 4 },
-  nuclearo: { name: 'Nuclearo Dinausauro', price: 12 },
-  witchbroom: { name: 'Witch Broom', price: 29 },
-  cupid: { name: 'Cupid Wings', price: 34 },
-  cashorcard: { name: 'Cash or Card', price: 34 },
-  garama: { name: 'Garama and Madundung', price: 41 },
-  waverider: { name: 'Waverider', price: 41 },
-  burguro: { name: 'Burguro and Fryuro', price: 70 },
-  sammyni: { name: 'Sammyni Fattini', price: 70 },
-  popcuru: { name: 'Popcuru and Fizzuru', price: 87 },
-  celestial: { name: 'Celestial Pegasus', price: 93 },
-  lafoodcombinasion: { name: 'La Food Combinasion', price: 103 },
-  fragrama: { name: 'Fragrama and Chocrama', price: 129 },
-  cooki: { name: 'Cooki and Milki', price: 130 },
-  jolly: { name: 'Jolly Jolly Sahur', price: 132 },
-  cerberus: { name: 'Cerberus', price: 155 },
-  globba: { name: 'Globba Steppa', price: 164 },
-  reinito: { name: 'Reinito Sleighto', price: 170 },
-  dugdugdug: { name: 'Dug Dug Dug', price: 201 },
-  losamigos: { name: 'Los Amigos', price: 220 },
-  cloverat: { name: 'Cloverat Clapat', price: 245 },
-  guest666: { name: 'Guest 666', price: 324 },
-  losadmins: { name: 'Los Admins', price: 370 },
-  rubiko: { name: 'Rubiko and Kubiko', price: 395 },
-  lossecret: { name: 'Los Secret Combinasionas', price: 419 },
-  ricodinero: { name: 'Rico Dinero', price: 430 },
-  foxinilanternini: { name: 'Foxini Lanternini', price: 480 },
-  roseyandteddy: { name: 'Rosey and Teddy', price: 501 },
-  lacasaboo: { name: 'La Casa Boo', price: 551 },
-  ketupas: { name: 'Ketupas Bros', price: 641 },
-  skelly: { name: 'Skelly and Coffy', price: 866 },
-  dragon: { name: 'Dragon Cannelloni', price: 890 },
-  grabitron: { name: 'Grabatron', price: 1125 },
-  hydra: { name: 'Hydra Dragon Cannelloni', price: 1220 },
-  tirilikalika: { name: 'Tirilikalika Tirilikalaka', price: 1255 },
-  moby: { name: 'Moby Bros', price: 1600 },
-  gingergeart: { name: 'Ginger Gerat', price: 1920 },
-  kraken: { name: 'Kraken', price: 2030 },
-  lasupreme: { name: 'La Supreme Combination', price: 2203 },
-  digi: { name: 'Digi Narwhal', price: 3492 },
-  kalikabros: { name: 'Kalika Bros', price: 3490 },
-  dragonaquanini: { name: 'Dragon Aquanini', price: 3701 },
-  lovelovebear: { name: 'Love Love Bear', price: 5540 },
-  antonio: { name: 'Antonio', price: 5549 },
-  griffin: { name: 'Griffin', price: 6307 },
-  elefantofrigo: { name: 'Elefanto Frigo', price: 11232 },
-  skibidi: { name: 'Skibidi Toilet', price: 13154 },
-  johnpork: { name: 'John Pork', price: 16054 },
-  meowl: { name: 'Meowl', price: 16839 },
-  orchidox: { name: 'Orchidox', price: 16704 },
-  signorecarapace: { name: 'Signore Carapace', price: 35000 },
-  polaroidini: { name: 'Polaroidini', price: 40000 },
-  strawberryelephant: { name: 'Strawberry Elephant', price: 41400 },
-  headless: { name: 'Headless Horseman', price: 235000 }
+  tangtang: { name: 'Tang Tang Keletang', price: 17 }, lostangsitos: { name: 'Los Tangsitos', price: 34 },
+  worl: { name: 'W or L', price: 28 }, tictacsahur: { name: 'TicTac Sahur', price: 19 },
+  lagrande: { name: 'La Grande Combination', price: 4 }, nuclearo: { name: 'Nuclearo Dinausauro', price: 12 },
+  witchbroom: { name: 'Witch Broom', price: 29 }, cupid: { name: 'Cupid Wings', price: 34 },
+  cashorcard: { name: 'Cash or Card', price: 34 }, garama: { name: 'Garama and Madundung', price: 41 },
+  waverider: { name: 'Waverider', price: 41 }, burguro: { name: 'Burguro and Fryuro', price: 70 },
+  sammyni: { name: 'Sammyni Fattini', price: 70 }, popcuru: { name: 'Popcuru and Fizzuru', price: 87 },
+  celestial: { name: 'Celestial Pegasus', price: 93 }, lafoodcombinasion: { name: 'La Food Combinasion', price: 103 },
+  fragrama: { name: 'Fragrama and Chocrama', price: 129 }, cooki: { name: 'Cooki and Milki', price: 130 },
+  jolly: { name: 'Jolly Jolly Sahur', price: 132 }, cerberus: { name: 'Cerberus', price: 155 },
+  globba: { name: 'Globba Steppa', price: 164 }, reinito: { name: 'Reinito Sleighto', price: 170 },
+  dugdugdug: { name: 'Dug Dug Dug', price: 201 }, losamigos: { name: 'Los Amigos', price: 220 },
+  cloverat: { name: 'Cloverat Clapat', price: 245 }, guest666: { name: 'Guest 666', price: 324 },
+  losadmins: { name: 'Los Admins', price: 370 }, rubiko: { name: 'Rubiko and Kubiko', price: 395 },
+  lossecret: { name: 'Los Secret Combinasionas', price: 419 }, ricodinero: { name: 'Rico Dinero', price: 430 },
+  foxinilanternini: { name: 'Foxini Lanternini', price: 480 }, roseyandteddy: { name: 'Rosey and Teddy', price: 501 },
+  lacasaboo: { name: 'La Casa Boo', price: 551 }, ketupas: { name: 'Ketupas Bros', price: 641 },
+  skelly: { name: 'Skelly and Coffy', price: 866 }, dragon: { name: 'Dragon Cannelloni', price: 890 },
+  grabitron: { name: 'Grabatron', price: 1125 }, hydra: { name: 'Hydra Dragon Cannelloni', price: 1220 },
+  tirilikalika: { name: 'Tirilikalika Tirilikalaka', price: 1255 }, moby: { name: 'Moby Bros', price: 1600 },
+  gingergeart: { name: 'Ginger Gerat', price: 1920 }, kraken: { name: 'Kraken', price: 2030 },
+  lasupreme: { name: 'La Supreme Combination', price: 2203 }, digi: { name: 'Digi Narwhal', price: 3492 },
+  kalikabros: { name: 'Kalika Bros', price: 3490 }, dragonaquanini: { name: 'Dragon Aquanini', price: 3701 },
+  lovelovebear: { name: 'Love Love Bear', price: 5540 }, antonio: { name: 'Antonio', price: 5549 },
+  griffin: { name: 'Griffin', price: 6307 }, elefantofrigo: { name: 'Elefanto Frigo', price: 11232 },
+  skibidi: { name: 'Skibidi Toilet', price: 13154 }, johnpork: { name: 'John Pork', price: 16054 },
+  meowl: { name: 'Meowl', price: 16839 }, orchidox: { name: 'Orchidox', price: 16704 },
+  signorecarapace: { name: 'Signore Carapace', price: 35000 }, polaroidini: { name: 'Polaroidini', price: 40000 },
+  strawberryelephant: { name: 'Strawberry Elephant', price: 41400 }, headless: { name: 'Headless Horseman', price: 235000 }
 });
 
 const CASE_ONLY_ITEMS = Object.freeze({
-  cyberskibidi: { name: 'Cyber Skibidi Toilet', price: 31000 },
-  yinyangmeowl: { name: 'YinYang Meowl', price: 35000 },
-  goldstrawberry: { name: 'Gold Strawberry Elephant', price: 45000 },
-  lavastrawberry: { name: 'Lava Strawberry Elephant', price: 56000 }
+  cyberskibidi: { name: 'Cyber Skibidi Toilet', price: 31000 }, yinyangmeowl: { name: 'YinYang Meowl', price: 35000 },
+  goldstrawberry: { name: 'Gold Strawberry Elephant', price: 45000 }, lavastrawberry: { name: 'Lava Strawberry Elephant', price: 56000 }
 });
 
 const CASES = Object.freeze({
-  school: {
-    name: 'School Case', price: 12,
-    rewards: [
-      { id: 'lagrande', chance: 40 }, { id: 'nuclearo', chance: 25 }, { id: 'tangtang', chance: 15 },
-      { id: 'tictacsahur', chance: 10 }, { id: 'worl', chance: 5 }, { id: 'lostangsitos', chance: 4 },
-      { id: 'garama', chance: 0.9 }, { id: 'burguro', chance: 0.1 }
-    ]
-  },
-  sun: {
-    name: 'Sun Case', price: 39,
-    rewards: [
-      { id: 'tictacsahur', chance: 50 }, { id: 'worl', chance: 30 }, { id: 'garama', chance: 17 },
-      { id: 'burguro', chance: 2 }, { id: 'cerberus', chance: 1 }
-    ]
-  },
-  winter: {
-    name: 'Winter Case', price: 61,
-    rewards: [
-      { id: 'lostangsitos', chance: 40 }, { id: 'garama', chance: 30 }, { id: 'burguro', chance: 10 },
-      { id: 'popcuru', chance: 5 }, { id: 'fragrama', chance: 4 }, { id: 'cerberus', chance: 0.5 },
-      { id: 'dugdugdug', chance: 0.3 }, { id: 'roseyandteddy', chance: 0.1 }, { id: 'lacasaboo', chance: 0.1 }
-    ]
-  },
-  autumn: {
-    name: 'Autumn Case', price: 90,
-    rewards: [
-      { id: 'garama', chance: 40 }, { id: 'burguro', chance: 30 }, { id: 'popcuru', chance: 20 },
-      { id: 'cloverat', chance: 5 }, { id: 'guest666', chance: 4 }, { id: 'lossecret', chance: 3 },
-      { id: 'roseyandteddy', chance: 1 }
-    ]
-  },
-  radioactive: {
-    name: 'Radioctive Case', price: 150,
-    rewards: [
-      { id: 'fragrama', chance: 60 }, { id: 'globba', chance: 30 }, { id: 'losamigos', chance: 9 },
-      { id: 'rubiko', chance: 0.9 }, { id: 'ketupas', chance: 0.1 }
-    ]
-  },
-  money: {
-    name: 'Money Case', price: 201,
-    rewards: [
-      { id: 'cerberus', chance: 70 }, { id: 'dugdugdug', chance: 20 }, { id: 'cloverat', chance: 9 },
-      { id: 'guest666', chance: 0.3 }, { id: 'ricodinero', chance: 0.3 }, { id: 'lacasaboo', chance: 0.2 },
-      { id: 'skelly', chance: 0.1 }
-    ]
-  },
-  spring: {
-    name: 'Spring Case', price: 451,
-    rewards: [
-      { id: 'rubiko', chance: 50 }, { id: 'ricodinero', chance: 20 }, { id: 'lacasaboo', chance: 20 },
-      { id: 'ketupas', chance: 8 }, { id: 'skelly', chance: 2 }
-    ]
-  },
-  summer: {
-    name: 'Summer Case', price: 3241,
-    rewards: [
-      { id: 'kraken', chance: 50 }, { id: 'lasupreme', chance: 20 }, { id: 'digi', chance: 15 },
-      { id: 'dragonaquanini', chance: 10 }, { id: 'antonio', chance: 4 }, { id: 'skibidi', chance: 1 }
-    ]
-  },
-  easter: {
-    name: 'Easter Case', price: 9000,
-    rewards: [
-      { id: 'antonio', chance: 50 }, { id: 'griffin', chance: 30 }, { id: 'skibidi', chance: 10 },
-      { id: 'johnpork', chance: 5 }, { id: 'meowl', chance: 4 }, { id: 'strawberryelephant', chance: 0.9 },
-      { id: 'headless', chance: 0.1 }
-    ]
-  },
-  farm: {
-    name: 'Farm Case', price: 54000,
-    rewards: [
-      { id: 'strawberryelephant', chance: 99 }, { id: 'headless', chance: 1 }
-    ]
-  }
+  school: { name: 'School Case', price: 12, rewards: [{ id: 'lagrande', chance: 40 }, { id: 'nuclearo', chance: 25 }, { id: 'tangtang', chance: 15 }, { id: 'tictacsahur', chance: 10 }, { id: 'worl', chance: 5 }, { id: 'lostangsitos', chance: 4 }, { id: 'garama', chance: 0.9 }, { id: 'burguro', chance: 0.1 }] },
+  sun: { name: 'Sun Case', price: 39, rewards: [{ id: 'tictacsahur', chance: 50 }, { id: 'worl', chance: 30 }, { id: 'garama', chance: 17 }, { id: 'burguro', chance: 2 }, { id: 'cerberus', chance: 1 }] },
+  winter: { name: 'Winter Case', price: 61, rewards: [{ id: 'lostangsitos', chance: 40 }, { id: 'garama', chance: 30 }, { id: 'burguro', chance: 10 }, { id: 'popcuru', chance: 5 }, { id: 'fragrama', chance: 4 }, { id: 'cerberus', chance: 0.5 }, { id: 'dugdugdug', chance: 0.3 }, { id: 'roseyandteddy', chance: 0.1 }, { id: 'lacasaboo', chance: 0.1 }] },
+  autumn: { name: 'Autumn Case', price: 90, rewards: [{ id: 'garama', chance: 40 }, { id: 'burguro', chance: 30 }, { id: 'popcuru', chance: 20 }, { id: 'cloverat', chance: 5 }, { id: 'guest666', chance: 4 }, { id: 'lossecret', chance: 3 }, { id: 'roseyandteddy', chance: 1 }] },
+  radioactive: { name: 'Radioctive Case', price: 150, rewards: [{ id: 'fragrama', chance: 60 }, { id: 'globba', chance: 30 }, { id: 'losamigos', chance: 9 }, { id: 'rubiko', chance: 0.9 }, { id: 'ketupas', chance: 0.1 }] },
+  money: { name: 'Money Case', price: 201, rewards: [{ id: 'cerberus', chance: 70 }, { id: 'dugdugdug', chance: 20 }, { id: 'cloverat', chance: 9 }, { id: 'guest666', chance: 0.3 }, { id: 'ricodinero', chance: 0.3 }, { id: 'lacasaboo', chance: 0.2 }, { id: 'skelly', chance: 0.1 }] },
+  spring: { name: 'Spring Case', price: 451, rewards: [{ id: 'rubiko', chance: 50 }, { id: 'ricodinero', chance: 20 }, { id: 'lacasaboo', chance: 20 }, { id: 'ketupas', chance: 8 }, { id: 'skelly', chance: 2 }] },
+  summer: { name: 'Summer Case', price: 3241, rewards: [{ id: 'kraken', chance: 50 }, { id: 'lasupreme', chance: 20 }, { id: 'digi', chance: 15 }, { id: 'dragonaquanini', chance: 10 }, { id: 'antonio', chance: 4 }, { id: 'skibidi', chance: 1 }] },
+  easter: { name: 'Easter Case', price: 9000, rewards: [{ id: 'antonio', chance: 50 }, { id: 'griffin', chance: 30 }, { id: 'skibidi', chance: 10 }, { id: 'johnpork', chance: 5 }, { id: 'meowl', chance: 4 }, { id: 'strawberryelephant', chance: 0.9 }, { id: 'headless', chance: 0.1 }] },
+  farm: { name: 'Farm Case', price: 54000, rewards: [{ id: 'strawberryelephant', chance: 99 }, { id: 'headless', chance: 1 }] }
 });
 
 const MAX_CHANCE = 80;
 const MIN_CHANCE = 0.01;
 const activeMinesGames = {};
 
-let promocodes = {}, users = {}, deposits = [], withdraws = [];
 let maintenance = { enabled: false, since: null, by: '' };
 let currentAnnouncement = null;
 let stats = { total_upgrades: 0, total_cases: 0 };
 let onlineUsers = new Map();
-let pendingBans = {};
 const rateBuckets = new Map();
 
-function ensureDataDir() { try { if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (e) {} }
-function loadJSON(file, fallback) { try { if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (err) { console.error('[ERROR] Load', file, err.message); } return fallback; }
-function saveJSON(file, data) { try { ensureDataDir(); fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf8'); return true; } catch (err) { console.error('[ERROR] Save', file, err.message); return false; } }
-
-function loadAll() {
-  promocodes = loadJSON(PROMO_FILE, {});
-  users = loadJSON(USERS_FILE, {});
-  deposits = loadJSON(DEPOSITS_FILE, []);
-  withdraws = loadJSON(WITHDRAWS_FILE, []);
-  maintenance = loadJSON(MAINTENANCE_FILE, { enabled: false, since: null, by: '' });
-  currentAnnouncement = loadJSON(ANNOUNCEMENT_FILE, null);
-  stats = loadJSON(STATS_FILE, { total_upgrades: 0, total_cases: 0 });
-  pendingBans = loadJSON(BANS_FILE, {});
-}
-function savePromos() { saveJSON(PROMO_FILE, promocodes); }
-function saveUsers() { saveJSON(USERS_FILE, users); }
-function saveDeposits() { saveJSON(DEPOSITS_FILE, deposits); }
-function saveWithdraws() { saveJSON(WITHDRAWS_FILE, withdraws); }
-function saveMaintenance() { saveJSON(MAINTENANCE_FILE, maintenance); }
-function saveAnnouncement() { saveJSON(ANNOUNCEMENT_FILE, currentAnnouncement); }
-function saveStats() { saveJSON(STATS_FILE, stats); }
-function saveBans() { saveJSON(BANS_FILE, pendingBans); }
-
+// ================== ХЕЛПЕРЫ ==================
 function getItem(id) {
   if (typeof id !== 'string') return null;
   if (Object.prototype.hasOwnProperty.call(ITEMS, id)) return ITEMS[id];
@@ -222,24 +105,18 @@ function getCase(id) {
   if (Object.prototype.hasOwnProperty.call(CASES, id)) return CASES[id];
   return null;
 }
-
 function secureRandom() { return crypto.randomInt(0, 1000000) / 1000000; }
 function secureRandomInt(min, max) { return crypto.randomInt(min, max); }
-
 function calcUpgradeChance(sourcePrice, targetPrice) {
   if (!sourcePrice || !targetPrice || targetPrice <= sourcePrice) return 0;
   let pct = MAX_CHANCE / (targetPrice / sourcePrice);
   return Math.max(MIN_CHANCE, Math.min(MAX_CHANCE, pct));
 }
 function minesMultiplier(minesCount) {
-  if (minesCount === 2) return 1.04;
-  if (minesCount === 3) return 1.13;
-  if (minesCount === 5) return 1.24;
-  if (minesCount === 10) return 1.37;
-  if (minesCount === 24) return 24.00;
-  return 1 + (minesCount * 0.05);
+  if (minesCount === 2) return 1.04; if (minesCount === 3) return 1.13;
+  if (minesCount === 5) return 1.24; if (minesCount === 10) return 1.37;
+  if (minesCount === 24) return 24.00; return 1 + (minesCount * 0.05);
 }
-
 function updateOnline(telegramId) { if (!telegramId) return; onlineUsers.set(String(telegramId), Date.now()); }
 function getOnlineCount() {
   const now = Date.now(); let count = 0;
@@ -263,7 +140,6 @@ function sendJSON(res, status, data) {
 }
 
 function readBody(req) {
-  if (req.__body !== undefined) return Promise.resolve(req.__body);
   return new Promise((resolve, reject) => {
     let body = '', size = 0, aborted = false;
     req.on('data', (c) => {
@@ -274,8 +150,7 @@ function readBody(req) {
     });
     req.on('end', () => {
       if (aborted) return;
-      try { req.__body = body ? JSON.parse(body) : {}; resolve(req.__body); }
-      catch (e) { reject(new Error('Неверный JSON')); }
+      try { resolve(body ? JSON.parse(body) : {}); } catch (e) { reject(new Error('Неверный JSON')); }
     });
     req.on('error', reject);
   });
@@ -306,7 +181,6 @@ function validateTelegramInitData(initData) {
     return { id: String(u.id), username: String(u.username || '') };
   } catch (e) { return null; }
 }
-
 function getTelegramUser(req) { return validateTelegramInitData(req.headers['x-telegram-init-data']); }
 function requireAdmin(req) {
   const u = getTelegramUser(req);
@@ -326,91 +200,70 @@ setInterval(() => {
   const now = Date.now();
   for (const [k, v] of rateBuckets) { if (now - v.start > RATE_LIMIT_WINDOW_MS * 10) rateBuckets.delete(k); }
 }, 60000);
-function rateKeyForUser(user, ip) { if (user && user.id) return 'u:' + user.id; return 'ip:' + (ip || 'unknown'); }
 
-function normalizeTarget(target) { return String(target || '').trim().replace(/^@+/, ''); }
-function findUserByTarget(target) {
-  const t = normalizeTarget(target); if (!t) return null;
-  if (Object.prototype.hasOwnProperty.call(users, t)) return { id: String(t), user: users[t] };
-  const low = t.toLowerCase();
-  for (const id in users) {
-    if (!Object.prototype.hasOwnProperty.call(users, id)) continue;
-    if (String(users[id].username || '').toLowerCase() === low) return { id: String(id), user: users[id] };
-  }
-  return null;
-}
-function isBannedUser(u) { return !!(u && u.ban && u.ban.active); }
-function banInfo(u) { return { reason: (u.ban && u.ban.reason) || 'Не указана', at: (u.ban && u.ban.at) || null, by: (u.ban && u.ban.by) || '' }; }
-function applyBanToUser(u, reason, admin) {
-  u.ban = { active: true, reason: reason || 'Не указана', at: new Date().toISOString(), by: admin || 'admin' };
-  u.unban_notice = null; u.updated_at = new Date().toISOString();
-}
-function applyPendingBan(userId, u) {
-  if (!u) return false;
-  const un = String(u.username || '').toLowerCase();
-  if (!un || !pendingBans[un]) return false;
-  const p = pendingBans[un];
-  applyBanToUser(u, p.reason || 'Не указана', p.by || 'admin');
-  delete pendingBans[un]; saveBans(); saveUsers(); return true;
-}
-function ensureUser(telegramId, username) {
+// ================== БД ХЕЛПЕРЫ ==================
+async function getUser(telegramId, username) {
   if (!telegramId) telegramId = 'guest_' + Date.now();
-  if (!users[telegramId]) {
-    users[telegramId] = { balance: START_BALANCE, inventory: [], username: username || '', roblox_name: '', custom_nick: '', avatar: '', accent: '', promos_used: [], ban: null, unban_notice: null, best_drop: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
-  } else if (username && users[telegramId].username !== username) {
-    users[telegramId].username = username; users[telegramId].updated_at = new Date().toISOString();
+  let res = await pool.query('SELECT * FROM users WHERE id = $1', [telegramId]);
+  if (res.rows.length === 0) {
+    const newUser = {
+      id: telegramId, balance: START_BALANCE, inventory: [],
+      username: username || '', custom_nick: '', avatar: '',
+      promos_used: [], ban: null, unban_notice: null, best_drop: null
+    };
+    await pool.query(
+      `INSERT INTO users (id, balance, inventory, username, custom_nick, avatar, promos_used, ban, unban_notice, best_drop) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [newUser.id, newUser.balance, JSON.stringify(newUser.inventory), newUser.username, newUser.custom_nick, newUser.avatar, JSON.stringify(newUser.promos_used), null, null, null]
+    );
+    return newUser;
   }
-  const u = users[telegramId];
-  if (!Array.isArray(u.promos_used)) u.promos_used = [];
-  if (!Array.isArray(u.inventory)) u.inventory = [];
-  if (typeof u.balance !== 'number' || !isFinite(u.balance)) u.balance = 0;
-  if (!u.best_drop) u.best_drop = null;
-  applyPendingBan(telegramId, u);
+  const u = res.rows[0];
+  u.inventory = u.inventory || [];
+  u.promos_used = u.promos_used || [];
+  if (username && u.username !== username) {
+    await pool.query('UPDATE users SET username = $1, updated_at = NOW() WHERE id = $2', [username, telegramId]);
+    u.username = username;
+  }
   return u;
 }
-function isAdmin(username) { return ADMIN_USERNAMES.includes((username || '').toLowerCase()); }
 
-function computePendingWithdrawIds(telegramId) {
-  const s = new Set();
-  for (const w of withdraws) { if (w.status === 'pending' && String(w.telegram_id) === String(telegramId)) s.add(w.item_id); }
-  return [...s];
+async function updateUser(telegramId, fields) {
+  const keys = Object.keys(fields);
+  if (keys.length === 0) return;
+  const setClause = keys.map((k, i) => `${k} = $${i + 2}`).join(', ');
+  const values = keys.map(k => {
+    if (typeof fields[k] === 'object' && fields[k] !== null && !(fields[k] instanceof Date)) {
+      return JSON.stringify(fields[k]);
+    }
+    return fields[k];
+  });
+  await pool.query(`UPDATE users SET ${setClause}, updated_at = NOW() WHERE id = $1`, [telegramId, ...values]);
 }
-function computePendingWithdrawDetails(telegramId) {
-  const map = {};
-  for (const w of withdraws) { if (w.status === 'pending' && String(w.telegram_id) === String(telegramId)) map[w.item_id] = { time: w.time_slot, ts: w.created_at }; }
-  return map;
+
+async function getPendingWithdrawIds(telegramId) {
+  const res = await pool.query("SELECT item_id FROM withdraws WHERE telegram_id = $1 AND status = 'pending'", [telegramId]);
+  return res.rows.map(r => r.item_id);
 }
-function publicUser(u, telegramId) {
-  const banned = isBannedUser(u);
+
+function publicUser(u, pendingWithdrawIds = []) {
+  const banned = !!(u.ban && u.ban.active);
   return {
     balance: (typeof u.balance === 'number' && isFinite(u.balance)) ? u.balance : 0,
     inventory: Array.isArray(u.inventory) ? u.inventory : [],
     username: u.username || '', custom_nick: u.custom_nick || '', avatar: u.avatar || '',
-    pending_withdraw_ids: computePendingWithdrawIds(telegramId),
-    pending_withdraw_details: computePendingWithdrawDetails(telegramId),
-    banned, ban: banned ? banInfo(u) : null,
+    pending_withdraw_ids: pendingWithdrawIds,
+    banned, ban: banned ? u.ban : null,
     best_drop: u.best_drop || null,
     unban_notice: (u.unban_notice && !u.unban_notice.seen) ? { reason: u.unban_notice.reason || 'Решение администрации', at: u.unban_notice.at || null } : null
   };
 }
-function denyIfBanned(res, u) {
-  if (isBannedUser(u)) { sendJSON(res, 403, { ok: false, error: 'BANNED', message: 'Вы заблокированы по решению администрации', ban: banInfo(u) }); return true; }
-  return false;
-}
-function listActiveBans() {
-  const list = [];
-  for (const id in users) {
-    if (!Object.prototype.hasOwnProperty.call(users, id)) continue;
-    const u = users[id];
-    if (isBannedUser(u)) list.push({ id, username: u.username || '', reason: u.ban.reason || 'Не указана', at: u.ban.at || null, by: u.ban.by || '', pending: false });
-  }
-  for (const name in pendingBans) {
-    if (!Object.prototype.hasOwnProperty.call(pendingBans, name)) continue;
-    const p = pendingBans[name];
-    list.push({ id: null, username: name, reason: p.reason || 'Не указана', at: p.at || null, by: p.by || '', pending: true });
-  }
-  list.sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')));
-  return list;
+
+async function listActiveBans() {
+  const res = await pool.query("SELECT id, username, ban FROM users WHERE ban IS NOT NULL AND (ban->>'active')::boolean = true");
+  return res.rows.map(r => ({
+    id: r.id, username: r.username || '', reason: r.ban?.reason || 'Не указана', at: r.ban?.at || null, by: r.ban?.by || '', pending: false
+  }));
 }
 
 setInterval(() => {
@@ -418,13 +271,12 @@ setInterval(() => {
   for (const uid in activeMinesGames) {
     const g = activeMinesGames[uid];
     if (g && now - g.started_at > MINES_TTL_MS) {
-      const u = users[uid];
-      if (u && g.total_bet_value > 0) { u.balance += g.total_bet_value; u.updated_at = new Date().toISOString(); saveUsers(); }
       delete activeMinesGames[uid];
     }
   }
 }, 60000);
 
+// ================== СЕРВЕР ==================
 const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { setCORS(res); res.writeHead(204); res.end(); return; }
 
@@ -432,26 +284,31 @@ const server = http.createServer(async (req, res) => {
     setCORS(res);
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify({
-      ok: true, status: 'alive', bot_token_valid: !!BOT_TOKEN, bot_token_length: BOT_TOKEN.length,
-      maintenance: maintenance.enabled, users_count: Object.keys(users).length,
-      uptime_sec: Math.floor(process.uptime()), time: new Date().toISOString()
+      ok: true, status: 'alive', bot_token_valid: !!BOT_TOKEN,
+      maintenance: maintenance.enabled, uptime_sec: Math.floor(process.uptime()), time: new Date().toISOString()
     }));
     return;
   }
 
   try {
+    let body = {};
     if (req.method === 'POST') {
-      try { await readBody(req); }
-      catch (e) { if (e.message === 'BODY_TOO_LARGE') return sendJSON(res, 413, { ok: false, error: 'Слишком большой запрос' }); req.__body = {}; }
+      try { body = await readBody(req); }
+      catch (e) { return sendJSON(res, 413, { ok: false, error: 'Слишком большой запрос' }); }
     }
     const reqUrl = new URL(req.url, 'http://localhost');
     const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
     const preUser = getTelegramUser(req);
-    if (!checkRateLimit(rateKeyForUser(preUser, ip))) return sendJSON(res, 429, { ok: false, error: 'Слишком много запросов, подожди немного' });
+    
+    if (!checkRateLimit(preUser ? 'u:' + preUser.id : 'ip:' + ip)) {
+      return sendJSON(res, 429, { ok: false, error: 'Слишком много запросов, подожди немного' });
+    }
 
+    // ================== ОБЩИЕ ЭНДПОИНТЫ ==================
     if (req.method === 'GET' && req.url === '/api/stats') return sendJSON(res, 200, { ok: true, online: getOnlineCount(), upgrades: stats.total_upgrades, cases: stats.total_cases });
+    
     if (req.method === 'GET' && req.url === '/api/announcement') {
-      if (currentAnnouncement && (Date.now() - currentAnnouncement.timestamp > 10000)) { currentAnnouncement = null; saveAnnouncement(); }
+      if (currentAnnouncement && (Date.now() - currentAnnouncement.timestamp > 10000)) currentAnnouncement = null;
       return sendJSON(res, 200, { ok: true, announcement: currentAnnouncement });
     }
 
@@ -461,91 +318,78 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === 'GET' && req.url === '/api/maintenance') return sendJSON(res, 200, { ok: true, maintenance });
+    
+    // ================== АДМИНКА ==================
     if (req.method === 'POST' && req.url === '/api/admin/maintenance') {
       const adminUser = requireAdmin(req);
       if (!adminUser) return sendJSON(res, 403, { ok: false, error: 'Нет доступа' });
-      const { enabled } = req.__body || {};
-      maintenance = { enabled: !!enabled, since: enabled ? new Date().toISOString() : null, by: enabled ? adminUser.username : '' };
-      saveMaintenance();
+      maintenance = { enabled: !!body.enabled, since: body.enabled ? new Date().toISOString() : null, by: body.enabled ? adminUser.username : '' };
       return sendJSON(res, 200, { ok: true, maintenance });
     }
     if (req.method === 'POST' && req.url === '/api/admin/announce') {
       const adminUser = requireAdmin(req);
       if (!adminUser) return sendJSON(res, 403, { ok: false, error: 'Нет доступа' });
       if (currentAnnouncement && (Date.now() - currentAnnouncement.timestamp <= 10000)) return sendJSON(res, 429, { ok: false, error: 'Подождите, пока текущий анонс не закончится' });
-      const text = String((req.__body || {}).text || '').trim().slice(0, 100);
+      const text = String(body.text || '').trim().slice(0, 100);
       if (!text) return sendJSON(res, 400, { ok: false, error: 'Текст не может быть пустым' });
       currentAnnouncement = { text, timestamp: Date.now(), by: adminUser.username, username: adminUser.username };
-      saveAnnouncement();
       return sendJSON(res, 200, { ok: true, announcement: currentAnnouncement });
     }
+
     if (req.method === 'POST' && req.url === '/api/admin/ban') {
       const adminUser = requireAdmin(req);
       if (!adminUser) return sendJSON(res, 403, { ok: false, error: 'Нет доступа' });
-      const body = req.__body || {};
-      const target = normalizeTarget(body.target);
+      const target = String(body.target || '').trim().replace(/^@+/, '');
       const reason = String(body.reason || '').trim().slice(0, 120) || 'Не указана';
       if (!target) return sendJSON(res, 400, { ok: false, error: 'Введите юзера в тг' });
-      const admin = (adminUser.username || '').toLowerCase();
-      const found = findUserByTarget(target);
-      if (found) {
-        if ((found.user.username || '').toLowerCase() === admin) return sendJSON(res, 400, { ok: false, error: 'Нельзя забанить самого себя' });
-        applyBanToUser(found.user, reason, adminUser.username); saveUsers();
-        return sendJSON(res, 200, { ok: true, banned: true, reason, user: { id: found.id, username: found.user.username || target } });
+      
+      const found = await pool.query("SELECT id, username, ban FROM users WHERE id = $1 OR LOWER(username) = LOWER($2)", [target, target]);
+      if (found.rows.length > 0) {
+        const u = found.rows[0];
+        const ban = { active: true, reason, at: new Date().toISOString(), by: adminUser.username };
+        await pool.query("UPDATE users SET ban = $1, unban_notice = NULL, updated_at = NOW() WHERE id = $2", [JSON.stringify(ban), u.id]);
+        return sendJSON(res, 200, { ok: true, banned: true, reason, user: { id: u.id, username: u.username || target } });
       }
-      if (/^\d+$/.test(target)) return sendJSON(res, 404, { ok: false, error: 'Юзер с таким ID не найден' });
-      const low = target.toLowerCase();
-      if (!/^[a-z0-9_]{2,64}$/i.test(low)) return sendJSON(res, 400, { ok: false, error: 'Неверный юзернейм' });
-      if (Object.keys(pendingBans).length >= 1000) {
-        let oldestKey = null, oldestAt = Infinity;
-        for (const k in pendingBans) { const at = new Date(pendingBans[k].at || 0).getTime(); if (at < oldestAt) { oldestAt = at; oldestKey = k; } }
-        if (oldestKey) delete pendingBans[oldestKey];
-      }
-      pendingBans[low] = { reason, at: new Date().toISOString(), by: adminUser.username };
-      saveBans();
-      return sendJSON(res, 200, { ok: true, banned: true, pending: true, reason, user: { id: null, username: low } });
+      return sendJSON(res, 404, { ok: false, error: 'Юзер не найден в базе' });
     }
     if (req.method === 'POST' && req.url === '/api/admin/unban') {
       const adminUser = requireAdmin(req);
       if (!adminUser) return sendJSON(res, 403, { ok: false, error: 'Нет доступа' });
-      const body = req.__body || {};
-      const target = normalizeTarget(body.target);
+      const target = String(body.target || '').trim().replace(/^@+/, '');
       const reason = String(body.reason || '').trim().slice(0, 120);
-      if (!target) return sendJSON(res, 400, { ok: false, error: 'Введите юзера в тг' });
-      const found = findUserByTarget(target);
-      if (found) {
-        const u = found.user;
-        if (!isBannedUser(u)) return sendJSON(res, 400, { ok: false, error: 'Этот юзер не забанен' });
+      
+      const found = await pool.query("SELECT id, username, ban FROM users WHERE id = $1 OR LOWER(username) = LOWER($2)", [target, target]);
+      if (found.rows.length > 0) {
+        const u = found.rows[0];
+        if (!u.ban || !u.ban.active) return sendJSON(res, 400, { ok: false, error: 'Этот юзер не забанен' });
         const finalReason = reason || u.ban.reason || 'Решение администрации';
-        u.ban = { active: false, reason: u.ban.reason || 'Не указана', at: u.ban.at || null, by: u.ban.by || '', unbanned_at: new Date().toISOString(), unbanned_by: adminUser.username, unban_reason: finalReason };
-        u.unban_notice = { reason: finalReason, at: new Date().toISOString(), by: adminUser.username, seen: false };
-        u.updated_at = new Date().toISOString(); saveUsers();
-        return sendJSON(res, 200, { ok: true, unbanned: true, reason: finalReason, user: { id: found.id, username: u.username || target } });
-      }
-      const low = target.toLowerCase();
-      if (Object.prototype.hasOwnProperty.call(pendingBans, low)) {
-        const finalReason = reason || pendingBans[low].reason || 'Решение администрации';
-        delete pendingBans[low]; saveBans();
-        return sendJSON(res, 200, { ok: true, unbanned: true, pending: true, reason: finalReason, user: { id: null, username: low } });
+        const unban_notice = { reason: finalReason, at: new Date().toISOString(), by: adminUser.username, seen: false };
+        const ban = { ...u.ban, active: false, unbanned_at: new Date().toISOString(), unbanned_by: adminUser.username };
+        await pool.query("UPDATE users SET ban = $1, unban_notice = $2, updated_at = NOW() WHERE id = $3", [JSON.stringify(ban), JSON.stringify(unban_notice), u.id]);
+        return sendJSON(res, 200, { ok: true, unbanned: true, reason: finalReason, user: { id: u.id, username: u.username || target } });
       }
       return sendJSON(res, 404, { ok: false, error: 'Юзер не найден' });
     }
     if (req.method === 'GET' && req.url.startsWith('/api/admin/bans')) {
       const adminUser = requireAdmin(req);
       if (!adminUser) return sendJSON(res, 403, { ok: false, error: 'Нет доступа' });
-      return sendJSON(res, 200, { ok: true, bans: listActiveBans() });
+      return sendJSON(res, 200, { ok: true, bans: await listActiveBans() });
     }
 
+    // ================== ПРОМОКОДЫ ==================
     if (req.method === 'POST' && req.url === '/api/create') {
       const adminUser = requireAdmin(req);
       if (!adminUser) return sendJSON(res, 403, { ok: false, error: 'Нет доступа' });
-      const body = req.__body || {};
       const { code, uses, type, value } = body;
       if (!code || String(code).trim().length < 3) return sendJSON(res, 400, { ok: false, error: 'Название минимум 3 символа' });
       const upperCode = String(code).trim().toUpperCase().slice(0, 20);
-      if (Object.prototype.hasOwnProperty.call(promocodes, upperCode)) return sendJSON(res, 409, { ok: false, error: 'Промокод уже есть' });
+      
+      const exists = await pool.query("SELECT code FROM promocodes WHERE code = $1", [upperCode]);
+      if (exists.rows.length > 0) return sendJSON(res, 409, { ok: false, error: 'Промокод уже есть' });
+      
       const parsedUses = parseInt(uses, 10);
       if (!parsedUses || parsedUses < 1 || parsedUses > 100000) return sendJSON(res, 400, { ok: false, error: 'Некорректное число активаций' });
+      
       let storedValue;
       if (type === 'balance') {
         storedValue = parseInt(value, 10);
@@ -554,143 +398,182 @@ const server = http.createServer(async (req, res) => {
         if (!getItem(value)) return sendJSON(res, 400, { ok: false, error: 'Неизвестный предмет' });
         storedValue = value;
       } else return sendJSON(res, 400, { ok: false, error: 'Неизвестный тип награды' });
-      promocodes[upperCode] = { code: upperCode, uses: parsedUses, type, value: storedValue, createdAt: new Date().toISOString() };
-      savePromos();
-      return sendJSON(res, 200, { ok: true, promo: promocodes[upperCode] });
+      
+      await pool.query("INSERT INTO promocodes (code, uses, type, value) VALUES ($1, $2, $3, $4)", [upperCode, parsedUses, type, String(storedValue)]);
+      return sendJSON(res, 200, { ok: true, promo: { code: upperCode, uses: parsedUses, type, value: storedValue } });
     }
+    
     if (req.method === 'POST' && req.url === '/api/activate') {
       const user = getTelegramUser(req);
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
-      const u = ensureUser(user.id, user.username);
-      if (denyIfBanned(res, u)) return;
-      const { code } = req.__body || {};
-      if (!code) return sendJSON(res, 400, { ok: false, error: 'Введите промокод' });
-      const upperCode = String(code).trim().toUpperCase().slice(0, 20);
-      if (!Array.isArray(u.promos_used)) u.promos_used = [];
-      if (u.promos_used.includes(upperCode)) return sendJSON(res, 409, { ok: false, error: 'Вы уже активировали этот промокод. Один человек — одна активация.' });
-      if (!Object.prototype.hasOwnProperty.call(promocodes, upperCode)) return sendJSON(res, 404, { ok: false, error: 'Промокод не найден' });
-      const promo = promocodes[upperCode];
+      const u = await getUser(user.id, user.username);
+      if (u.ban && u.ban.active) return sendJSON(res, 403, { ok: false, error: 'BANNED' });
+      
+      const upperCode = String(body.code || '').trim().toUpperCase().slice(0, 20);
+      if (!upperCode) return sendJSON(res, 400, { ok: false, error: 'Введите промокод' });
+      
+      if (u.promos_used.includes(upperCode)) return sendJSON(res, 409, { ok: false, error: 'Вы уже активировали этот промокод' });
+      
+      const promoRes = await pool.query("SELECT * FROM promocodes WHERE code = $1", [upperCode]);
+      if (promoRes.rows.length === 0) return sendJSON(res, 404, { ok: false, error: 'Промокод не найден' });
+      
+      const promo = promoRes.rows[0];
       if (promo.uses <= 0) return sendJSON(res, 410, { ok: false, error: 'Промокод больше не активен' });
-      promo.uses -= 1; u.promos_used.push(upperCode);
-      if (promo.type === 'balance') u.balance = (typeof u.balance === 'number' && isFinite(u.balance) ? u.balance : 0) + promo.value;
-      else if (promo.type === 'item') { if (!Array.isArray(u.inventory)) u.inventory = []; u.inventory.push(promo.value); }
-      u.updated_at = new Date().toISOString(); savePromos(); saveUsers();
-      return sendJSON(res, 200, { ok: true, type: promo.type, value: promo.value, remaining: promo.uses });
+      
+      await pool.query("UPDATE promocodes SET uses = uses - 1 WHERE code = $1", [upperCode]);
+      
+      const updates = { promos_used: [...u.promos_used, upperCode] };
+      if (promo.type === 'balance') {
+        updates.balance = u.balance + parseInt(promo.value, 10);
+      } else if (promo.type === 'item') {
+        updates.inventory = [...u.inventory, promo.value];
+      }
+      
+      await updateUser(user.id, updates);
+      return sendJSON(res, 200, { ok: true, type: promo.type, value: promo.type === 'balance' ? parseInt(promo.value, 10) : promo.value, remaining: promo.uses - 1 });
     }
+    
     if (req.method === 'GET' && req.url === '/api/promocodes') {
       const adminUser = requireAdmin(req);
       if (!adminUser) return sendJSON(res, 403, { ok: false, error: 'Нет доступа' });
-      return sendJSON(res, 200, { ok: true, promocodes });
+      const res = await pool.query("SELECT * FROM promocodes");
+      return sendJSON(res, 200, { ok: true, promocodes: res.rows });
     }
 
+    // ================== КЕЙСЫ ==================
     if (req.method === 'POST' && req.url === '/api/case/open') {
       const user = getTelegramUser(req);
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
       updateOnline(user.id);
-      const { case_id, qty } = req.__body || {};
-      const c = getCase(case_id);
+      
+      const c = getCase(body.case_id);
       if (!c) return sendJSON(res, 404, { ok: false, error: 'Кейс не найден' });
-      const quantity = Math.max(1, Math.min(5, parseInt(qty, 10) || 1));
-      const u = ensureUser(user.id, user.username);
-      if (denyIfBanned(res, u)) return;
+      
+      const quantity = Math.max(1, Math.min(5, parseInt(body.qty, 10) || 1));
+      const u = await getUser(user.id, user.username);
+      if (u.ban && u.ban.active) return sendJSON(res, 403, { ok: false, error: 'BANNED' });
+      
       const totalCost = c.price * quantity;
       if (!isFinite(u.balance) || u.balance < totalCost) return sendJSON(res, 400, { ok: false, error: 'Недостаточно монет' });
-      u.balance -= totalCost;
+      
+      let newInv = [...u.inventory];
+      let newBestDrop = u.best_drop;
       const wonItems = [];
+      
       for (let i = 0; i < quantity; i++) {
         const rng = secureRandom() * 100; let acc = 0; let wonId = c.rewards[0].id;
         for (const r of c.rewards) { acc += r.chance; if (rng <= acc) { wonId = r.id; break; } }
-        u.inventory.push(wonId); wonItems.push(wonId);
+        newInv.push(wonId); wonItems.push(wonId);
         
         const wonItemObj = getItem(wonId);
-        if (wonItemObj) {
-          if (!u.best_drop || wonItemObj.price > u.best_drop.price) {
-            u.best_drop = { id: wonId, name: wonItemObj.name, price: wonItemObj.price, won_at: new Date().toISOString() };
-          }
+        if (wonItemObj && (!newBestDrop || wonItemObj.price > newBestDrop.price)) {
+          newBestDrop = { id: wonId, name: wonItemObj.name, price: wonItemObj.price, won_at: new Date().toISOString() };
         }
       }
-      u.updated_at = new Date().toISOString(); saveUsers();
-      stats.total_cases += quantity; saveStats();
-      return sendJSON(res, 200, { ok: true, won: wonItems, new_balance: u.balance, inventory: u.inventory, best_drop: u.best_drop });
+      
+      await updateUser(user.id, { balance: u.balance - totalCost, inventory: newInv, best_drop: newBestDrop });
+      return sendJSON(res, 200, { ok: true, won: wonItems, new_balance: u.balance - totalCost, inventory: newInv, best_drop: newBestDrop });
     }
 
+    // ================== АПГРЕЙД ==================
     if (req.method === 'POST' && req.url === '/api/upgrade') {
       const user = getTelegramUser(req);
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
       updateOnline(user.id);
-      const { source_item_id, target_item_id } = req.__body || {};
-      const src = getItem(source_item_id), tgt = getItem(target_item_id);
+      
+      const src = getItem(body.source_item_id), tgt = getItem(body.target_item_id);
       if (!src || !tgt) return sendJSON(res, 404, { ok: false, error: 'Предмет не найден' });
       if (tgt.price <= src.price) return sendJSON(res, 400, { ok: false, error: 'Цель должна быть дороже' });
-      const u = ensureUser(user.id, user.username);
-      if (denyIfBanned(res, u)) return;
-      const idx = u.inventory.indexOf(source_item_id);
+      
+      const u = await getUser(user.id, user.username);
+      if (u.ban && u.ban.active) return sendJSON(res, 403, { ok: false, error: 'BANNED' });
+      
+      const idx = u.inventory.indexOf(body.source_item_id);
       if (idx === -1) return sendJSON(res, 400, { ok: false, error: 'Исходный предмет не найден' });
-      if (computePendingWithdrawIds(user.id).includes(source_item_id)) return sendJSON(res, 400, { ok: false, error: 'Предмет на выводе' });
-      u.inventory.splice(idx, 1);
+      
+      const pendingW = await getPendingWithdrawIds(user.id);
+      if (pendingW.includes(body.source_item_id)) return sendJSON(res, 400, { ok: false, error: 'Предмет на выводе' });
+      
+      let newInv = [...u.inventory];
+      newInv.splice(idx, 1);
+      
       const chance = calcUpgradeChance(src.price, tgt.price);
       const success = secureRandom() * 100 <= chance;
+      let newBestDrop = u.best_drop;
+      
       if (success) {
-        u.inventory.push(target_item_id);
-        if (!u.best_drop || tgt.price > u.best_drop.price) {
-          u.best_drop = { id: target_item_id, name: tgt.name, price: tgt.price, won_at: new Date().toISOString() };
+        newInv.push(body.target_item_id);
+        if (!newBestDrop || tgt.price > newBestDrop.price) {
+          newBestDrop = { id: body.target_item_id, name: tgt.name, price: tgt.price, won_at: new Date().toISOString() };
         }
       }
-      u.updated_at = new Date().toISOString(); saveUsers();
-      stats.total_upgrades += 1; saveStats();
-      return sendJSON(res, 200, { ok: true, success, chance, won_item: success ? target_item_id : null, new_balance: u.balance, inventory: u.inventory, best_drop: u.best_drop });
+      
+      await updateUser(user.id, { inventory: newInv, best_drop: newBestDrop });
+      return sendJSON(res, 200, { ok: true, success, chance, won_item: success ? body.target_item_id : null, new_balance: u.balance, inventory: newInv, best_drop: newBestDrop });
     }
     
     if (req.method === 'POST' && req.url === '/api/user/reset-best-drop') {
       const user = getTelegramUser(req);
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
-      const u = ensureUser(user.id, user.username);
-      u.best_drop = null;
-      u.updated_at = new Date().toISOString(); saveUsers();
+      await updateUser(user.id, { best_drop: null });
       return sendJSON(res, 200, { ok: true });
     }
 
+    // ================== МАГАЗИН ==================
     if (req.method === 'POST' && req.url === '/api/shop/buy') {
       const user = getTelegramUser(req);
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
       updateOnline(user.id);
-      const { item_id } = req.__body || {};
-      const item = getItem(item_id);
+      const item = getItem(body.item_id);
       if (!item) return sendJSON(res, 404, { ok: false, error: 'Предмет не найден' });
-      const u = ensureUser(user.id, user.username);
-      if (denyIfBanned(res, u)) return;
-      if (!isFinite(u.balance) || u.balance < item.price) return sendJSON(res, 400, { ok: false, error: 'Недостаточно монет' });
-      u.balance -= item.price; u.inventory.push(item_id);
-      u.updated_at = new Date().toISOString(); saveUsers();
-      return sendJSON(res, 200, { ok: true, new_balance: u.balance, inventory: u.inventory });
+      
+      const u = await getUser(user.id, user.username);
+      if (u.ban && u.ban.active) return sendJSON(res, 403, { ok: false, error: 'BANNED' });
+      if (u.balance < item.price) return sendJSON(res, 400, { ok: false, error: 'Недостаточно монет' });
+      
+      const newInv = [...u.inventory, body.item_id];
+      await updateUser(user.id, { balance: u.balance - item.price, inventory: newInv });
+      return sendJSON(res, 200, { ok: true, new_balance: u.balance - item.price, inventory: newInv });
     }
+    
     if (req.method === 'POST' && req.url === '/api/shop/sell') {
       const user = getTelegramUser(req);
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
       updateOnline(user.id);
-      const { item_id } = req.__body || {};
-      const item = getItem(item_id);
+      const item = getItem(body.item_id);
       if (!item) return sendJSON(res, 404, { ok: false, error: 'Предмет не найден' });
-      const u = ensureUser(user.id, user.username);
-      if (denyIfBanned(res, u)) return;
-      const idx = u.inventory.indexOf(item_id);
+      
+      const u = await getUser(user.id, user.username);
+      if (u.ban && u.ban.active) return sendJSON(res, 403, { ok: false, error: 'BANNED' });
+      
+      const idx = u.inventory.indexOf(body.item_id);
       if (idx === -1) return sendJSON(res, 400, { ok: false, error: 'Предмета нет в инвентаре' });
-      if (computePendingWithdrawIds(user.id).includes(item_id)) return sendJSON(res, 400, { ok: false, error: 'Предмет на выводе' });
-      u.inventory.splice(idx, 1); u.balance += item.price;
-      u.updated_at = new Date().toISOString(); saveUsers();
-      return sendJSON(res, 200, { ok: true, new_balance: u.balance, inventory: u.inventory });
+      
+      const pendingW = await getPendingWithdrawIds(user.id);
+      if (pendingW.includes(body.item_id)) return sendJSON(res, 400, { ok: false, error: 'Предмет на выводе' });
+      
+      const newInv = [...u.inventory];
+      newInv.splice(idx, 1);
+      
+      await updateUser(user.id, { balance: u.balance + item.price, inventory: newInv });
+      return sendJSON(res, 200, { ok: true, new_balance: u.balance + item.price, inventory: newInv });
     }
 
+    // ================== МИНЫ ==================
     if (req.method === 'POST' && req.url === '/api/mines/start') {
       const user = getTelegramUser(req);
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
-      const { item_ids, mines_count } = req.__body || {};
+      
+      const item_ids = body.item_ids;
       if (!Array.isArray(item_ids) || item_ids.length === 0 || item_ids.length > 5) return sendJSON(res, 400, { ok: false, error: 'Выберите от 1 до 5 предметов' });
-      const u = ensureUser(user.id, user.username);
-      if (denyIfBanned(res, u)) return;
+      
+      const u = await getUser(user.id, user.username);
+      if (u.ban && u.ban.active) return sendJSON(res, 403, { ok: false, error: 'BANNED' });
       if (activeMinesGames[user.id]) return sendJSON(res, 400, { ok: false, error: 'Сначала завершите текущую игру' });
-      const pendingW = computePendingWithdrawIds(user.id);
+      
+      const pendingW = await getPendingWithdrawIds(user.id);
       let totalBetValue = 0;
+      
       for (const id of item_ids) {
         const it = getItem(id);
         if (!it) return sendJSON(res, 400, { ok: false, error: 'Неизвестный предмет' });
@@ -699,180 +582,269 @@ const server = http.createServer(async (req, res) => {
         totalBetValue += it.price;
       }
       if (totalBetValue <= 0) return sendJSON(res, 400, { ok: false, error: 'Ставка слишком мала' });
-      item_ids.forEach(id => { const idx = u.inventory.indexOf(id); if (idx !== -1) u.inventory.splice(idx, 1); });
-      const safeMinesCount = Math.min(24, Math.max(1, parseInt(mines_count, 10) || 2));
+      
+      const newInv = [...u.inventory];
+      item_ids.forEach(id => { const idx = newInv.indexOf(id); if (idx !== -1) newInv.splice(idx, 1); });
+      
+      const safeMinesCount = Math.min(24, Math.max(1, parseInt(body.mines_count, 10) || 2));
       const minesPositions = new Set();
       while (minesPositions.size < safeMinesCount) minesPositions.add(secureRandomInt(0, 25));
-      activeMinesGames[user.id] = { bet_items: item_ids.slice(), total_bet_value: totalBetValue, mines_count: minesPositions.size, mines_positions: [...minesPositions], opened: [], started_at: Date.now() };
-      u.updated_at = new Date().toISOString(); saveUsers();
-      return sendJSON(res, 200, { ok: true, inventory: u.inventory, mines_count: minesPositions.size, total_bet_value: totalBetValue });
+      
+      activeMinesGames[user.id] = { 
+        bet_items: item_ids.slice(), total_bet_value: totalBetValue, 
+        mines_count: minesPositions.size, mines_positions: [...minesPositions], 
+        opened: [], started_at: Date.now() 
+      };
+      
+      await updateUser(user.id, { inventory: newInv });
+      return sendJSON(res, 200, { ok: true, inventory: newInv, mines_count: minesPositions.size, total_bet_value: totalBetValue });
     }
+    
     if (req.method === 'POST' && req.url === '/api/mines/open') {
       const user = getTelegramUser(req);
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
-      const { cell_index } = req.__body || {};
+      
+      const cell_index = body.cell_index;
       if (!Number.isInteger(cell_index) || cell_index < 0 || cell_index > 24) return sendJSON(res, 400, { ok: false, error: 'Некорректная ячейка' });
+      
       const game = activeMinesGames[user.id];
       if (!game) return sendJSON(res, 400, { ok: false, error: 'Игра не найдена' });
       if (game.opened.includes(cell_index)) return sendJSON(res, 400, { ok: false, error: 'Ячейка уже открыта' });
+      
       const isBomb = game.mines_positions.includes(cell_index);
       game.opened.push(cell_index);
+      
       if (isBomb) {
         delete activeMinesGames[user.id];
-        return sendJSON(res, 200, { ok: true, is_bomb: true, win_amount: 0, opened: game.opened, inventory: users[user.id].inventory, new_balance: users[user.id].balance });
+        const u = await getUser(user.id);
+        return sendJSON(res, 200, { ok: true, is_bomb: true, win_amount: 0, opened: game.opened, inventory: u.inventory, new_balance: u.balance });
       } else {
         const totalSafe = 25 - game.mines_count;
         if (game.opened.length === totalSafe) {
           const mult = minesMultiplier(game.mines_count);
           const winAmount = Math.floor(game.total_bet_value * mult);
-          const u = users[user.id];
-          u.balance = (typeof u.balance === 'number' && isFinite(u.balance) ? u.balance : 0) + winAmount;
-          saveUsers(); delete activeMinesGames[user.id];
-          return sendJSON(res, 200, { ok: true, is_bomb: false, win_amount: winAmount, opened: game.opened, inventory: u.inventory, new_balance: u.balance });
+          const u = await getUser(user.id);
+          await updateUser(user.id, { balance: u.balance + winAmount });
+          delete activeMinesGames[user.id];
+          return sendJSON(res, 200, { ok: true, is_bomb: false, win_amount: winAmount, opened: game.opened, inventory: u.inventory, new_balance: u.balance + winAmount });
         }
         return sendJSON(res, 200, { ok: true, is_bomb: false, opened: game.opened });
       }
     }
+    
     if (req.method === 'POST' && req.url === '/api/mines/cashout') {
       const user = getTelegramUser(req);
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
+      
       const game = activeMinesGames[user.id];
       if (!game) return sendJSON(res, 400, { ok: false, error: 'Игра не найдена' });
       if (game.opened.length === 0) return sendJSON(res, 400, { ok: false, error: 'Открой хотя бы одну ячейку' });
+      
       const mult = minesMultiplier(game.mines_count);
       const winAmount = Math.floor(game.total_bet_value * mult);
-      const u = users[user.id];
-      u.balance = (typeof u.balance === 'number' && isFinite(u.balance) ? u.balance : 0) + winAmount;
-      saveUsers(); delete activeMinesGames[user.id];
-      return sendJSON(res, 200, { ok: true, win_amount: winAmount, new_balance: u.balance, inventory: u.inventory });
+      const u = await getUser(user.id);
+      
+      await updateUser(user.id, { balance: u.balance + winAmount });
+      delete activeMinesGames[user.id];
+      
+      return sendJSON(res, 200, { ok: true, win_amount: winAmount, new_balance: u.balance + winAmount, inventory: u.inventory });
     }
 
+    // ================== ДЕПОЗИТЫ ==================
     if (req.method === 'POST' && req.url === '/api/deposit/create') {
       const user = getTelegramUser(req);
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
       updateOnline(user.id);
-      const body = req.__body || {};
+      
       const item_id = body.item_id;
       const roblox_name = String(body.roblox_name || '').trim().slice(0, 40);
       if (!item_id || !roblox_name) return sendJSON(res, 400, { ok: false, error: 'Не хватает данных' });
+      
       const item = getItem(item_id);
       if (!item) return sendJSON(res, 404, { ok: false, error: 'Предмет не найден' });
-      const u = ensureUser(user.id, user.username);
-      if (denyIfBanned(res, u)) return;
+      
+      const u = await getUser(user.id, user.username);
+      if (u.ban && u.ban.active) return sendJSON(res, 403, { ok: false, error: 'BANNED' });
+      
       const idx = u.inventory.indexOf(item_id);
       if (idx === -1) return sendJSON(res, 400, { ok: false, error: 'Предмета нет в инвентаре' });
-      if (computePendingWithdrawIds(user.id).includes(item_id)) return sendJSON(res, 400, { ok: false, error: 'Предмет на выводе' });
-      u.inventory.splice(idx, 1); u.updated_at = new Date().toISOString(); saveUsers();
-      const dep = { id: 'dep_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex'), telegram_id: user.id, username: user.username || '', item_id, item_name: item.name, item_price: item.price, base_price: item.price, roblox_name, status: 'pending', created_at: new Date().toISOString() };
-      deposits.push(dep); saveDeposits();
-      return sendJSON(res, 200, { ok: true, deposit: dep, new_balance: u.balance, inventory: u.inventory });
+      
+      const pendingW = await getPendingWithdrawIds(user.id);
+      if (pendingW.includes(item_id)) return sendJSON(res, 400, { ok: false, error: 'Предмет на выводе' });
+      
+      const newInv = [...u.inventory];
+      newInv.splice(idx, 1);
+      await updateUser(user.id, { inventory: newInv });
+      
+      const depId = 'dep_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex');
+      await pool.query(
+        "INSERT INTO deposits (id, telegram_id, username, item_id, item_name, item_price, roblox_name, status) VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')",
+        [depId, user.id, user.username || '', item_id, item.name, item.price, roblox_name]
+      );
+      
+      return sendJSON(res, 200, { ok: true, deposit: { id: depId, item_id, roblox_name }, new_balance: u.balance, inventory: newInv });
     }
+    
     if (req.method === 'GET' && req.url.startsWith('/api/deposits')) {
       const adminUser = requireAdmin(req);
       if (!adminUser) return sendJSON(res, 403, { ok: false, error: 'Нет доступа' });
-      return sendJSON(res, 200, { ok: true, deposits });
+      const res = await pool.query("SELECT * FROM deposits ORDER BY created_at DESC");
+      return sendJSON(res, 200, { ok: true, deposits: res.rows });
     }
+    
     if (req.method === 'POST' && req.url === '/api/deposit/status') {
       const adminUser = requireAdmin(req);
       if (!adminUser) return sendJSON(res, 403, { ok: false, error: 'Нет доступа' });
-      const { id, status } = req.__body || {};
+      
+      const { id, status } = body;
       if (!id || !['accepted', 'rejected'].includes(status)) return sendJSON(res, 400, { ok: false, error: 'Неверные данные' });
-      const dep = deposits.find(d => d.id === id);
-      if (!dep) return sendJSON(res, 404, { ok: false, error: 'Заявка не найдена' });
+      
+      const depRes = await pool.query("SELECT * FROM deposits WHERE id = $1", [id]);
+      if (depRes.rows.length === 0) return sendJSON(res, 404, { ok: false, error: 'Заявка не найдена' });
+      
+      const dep = depRes.rows[0];
       if (dep.status !== 'pending') return sendJSON(res, 409, { ok: false, error: 'Уже обработана' });
-      dep.status = status; dep.processed_at = new Date().toISOString(); dep.processed_by = adminUser.username;
-      const u = ensureUser(dep.telegram_id, dep.username);
-      if (status === 'accepted') u.balance = (typeof u.balance === 'number' && isFinite(u.balance) ? u.balance : 0) + dep.item_price;
-      else if (status === 'rejected') u.inventory.push(dep.item_id);
-      u.updated_at = new Date().toISOString(); saveUsers(); saveDeposits();
-      return sendJSON(res, 200, { ok: true, deposit: dep });
+      
+      await pool.query("UPDATE deposits SET status = $1, processed_at = NOW(), processed_by = $2 WHERE id = $3", [status, adminUser.username, id]);
+      
+      const u = await getUser(dep.telegram_id, dep.username);
+      if (status === 'accepted') {
+        await updateUser(dep.telegram_id, { balance: u.balance + dep.item_price });
+      } else if (status === 'rejected') {
+        await updateUser(dep.telegram_id, { inventory: [...u.inventory, dep.item_id] });
+      }
+      return sendJSON(res, 200, { ok: true, deposit: { ...dep, status } });
     }
 
+    // ================== ВЫВОДЫ ==================
     if (req.method === 'POST' && req.url === '/api/withdraw/create') {
       const user = getTelegramUser(req);
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
       updateOnline(user.id);
-      const body = req.__body || {};
+      
       const item_id = body.item_id;
       const roblox_name = String(body.roblox_name || '').trim().slice(0, 40);
       const time_slot = String(body.time_slot || '').trim().slice(0, 60);
+      
       if (!item_id || !roblox_name || !time_slot) return sendJSON(res, 400, { ok: false, error: 'Не хватает данных' });
       if (!/^\d{1,2}:\d{2}\s+МСК\s+\d{1,2}\s+[а-яё]+$/i.test(time_slot)) return sendJSON(res, 400, { ok: false, error: 'Неверный формат времени' });
+      
       const item = getItem(item_id);
       if (!item) return sendJSON(res, 404, { ok: false, error: 'Предмет не найден' });
-      const u = ensureUser(user.id, user.username);
-      if (denyIfBanned(res, u)) return;
-      if (u.inventory.indexOf(item_id) === -1) return sendJSON(res, 400, { ok: false, error: 'Предмет не найден в инвентаре' });
-      if (withdraws.some(w => w.status === 'pending' && String(w.telegram_id) === String(user.id) && w.item_id === item_id)) return sendJSON(res, 409, { ok: false, error: 'Предмет уже на выводе' });
-      const wd = { id: 'wd_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex'), telegram_id: user.id, username: user.username || '', item_id, item_name: item.name, item_price: item.price, roblox_name, time_slot, comment: '', status: 'pending', created_at: new Date().toISOString() };
-      withdraws.push(wd); saveWithdraws();
-      return sendJSON(res, 200, { ok: true, withdraw: wd });
+      
+      const u = await getUser(user.id, user.username);
+      if (u.ban && u.ban.active) return sendJSON(res, 403, { ok: false, error: 'BANNED' });
+      if (!u.inventory.includes(item_id)) return sendJSON(res, 400, { ok: false, error: 'Предмет не найден в инвентаре' });
+      
+      const wdRes = await pool.query("SELECT id FROM withdraws WHERE telegram_id = $1 AND item_id = $2 AND status = 'pending'", [user.id, item_id]);
+      if (wdRes.rows.length > 0) return sendJSON(res, 409, { ok: false, error: 'Предмет уже на выводе' });
+      
+      const wdId = 'wd_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex');
+      await pool.query(
+        "INSERT INTO withdraws (id, telegram_id, username, item_id, item_name, item_price, roblox_name, time_slot, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending')",
+        [wdId, user.id, user.username || '', item_id, item.name, item.price, roblox_name, time_slot]
+      );
+      
+      return sendJSON(res, 200, { ok: true, withdraw: { id: wdId, item_id, time_slot } });
     }
+    
     if (req.method === 'GET' && req.url.startsWith('/api/withdraws')) {
       const adminUser = requireAdmin(req);
       if (!adminUser) return sendJSON(res, 403, { ok: false, error: 'Нет доступа' });
-      return sendJSON(res, 200, { ok: true, withdraws });
+      const res = await pool.query("SELECT * FROM withdraws ORDER BY created_at DESC");
+      return sendJSON(res, 200, { ok: true, withdraws: res.rows });
     }
+    
     if (req.method === 'POST' && req.url === '/api/withdraw/status') {
       const adminUser = requireAdmin(req);
       if (!adminUser) return sendJSON(res, 403, { ok: false, error: 'Нет доступа' });
-      const { id, status } = req.__body || {};
+      
+      const { id, status } = body;
       if (!id || !['accepted', 'rejected'].includes(status)) return sendJSON(res, 400, { ok: false, error: 'Неверные данные' });
-      const wd = withdraws.find(w => w.id === id);
-      if (!wd) return sendJSON(res, 404, { ok: false, error: 'Заявка не найдена' });
+      
+      const wdRes = await pool.query("SELECT * FROM withdraws WHERE id = $1", [id]);
+      if (wdRes.rows.length === 0) return sendJSON(res, 404, { ok: false, error: 'Заявка не найдена' });
+      
+      const wd = wdRes.rows[0];
       if (wd.status !== 'pending') return sendJSON(res, 409, { ok: false, error: 'Уже обработана' });
-      wd.status = status; wd.processed_at = new Date().toISOString(); wd.processed_by = adminUser.username;
-      const u = ensureUser(wd.telegram_id, wd.username);
+      
+      await pool.query("UPDATE withdraws SET status = $1, processed_at = NOW(), processed_by = $2 WHERE id = $3", [status, adminUser.username, id]);
+      
       if (status === 'accepted') {
+        const u = await getUser(wd.telegram_id, wd.username);
         const i = u.inventory.indexOf(wd.item_id);
-        if (i === -1) { wd.status = 'failed'; saveWithdraws(); return sendJSON(res, 409, { ok: false, error: 'Предмета уже нет в инвентаре. Заявка помечена как failed.' }); }
-        u.inventory.splice(i, 1); u.updated_at = new Date().toISOString(); saveUsers();
+        if (i === -1) {
+          await pool.query("UPDATE withdraws SET status = 'failed' WHERE id = $1", [id]);
+          return sendJSON(res, 409, { ok: false, error: 'Предмета уже нет в инвентаре' });
+        }
+        const newInv = [...u.inventory];
+        newInv.splice(i, 1);
+        await updateUser(wd.telegram_id, { inventory: newInv });
       }
-      saveWithdraws();
-      return sendJSON(res, 200, { ok: true, withdraw: wd });
+      return sendJSON(res, 200, { ok: true, withdraw: { ...wd, status } });
     }
 
+    // ================== БАНЫ И ЮЗЕР ==================
     if (req.method === 'GET' && req.url.startsWith('/api/ban/status')) {
       const id = String(reqUrl.searchParams.get('telegram_id') || '');
-      const uname = normalizeTarget(reqUrl.searchParams.get('username') || '');
+      const uname = String(reqUrl.searchParams.get('username') || '').replace(/^@+/, '');
       if (!id) return sendJSON(res, 200, { ok: true, banned: false, ban: null, unban_notice: null });
-      const u = ensureUser(id, uname);
-      const banned = isBannedUser(u);
-      return sendJSON(res, 200, { ok: true, banned, ban: banned ? banInfo(u) : null, unban_notice: (u.unban_notice && !u.unban_notice.seen) ? { reason: u.unban_notice.reason || 'Решение администрации', at: u.unban_notice.at || null } : null });
+      
+      const u = await getUser(id, uname);
+      const banned = !!(u.ban && u.ban.active);
+      return sendJSON(res, 200, { ok: true, banned, ban: banned ? u.ban : null, unban_notice: (u.unban_notice && !u.unban_notice.seen) ? { reason: u.unban_notice.reason || 'Решение администрации', at: u.unban_notice.at || null } : null });
     }
+    
     if (req.method === 'POST' && req.url === '/api/unban/ack') {
       const user = getTelegramUser(req);
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
-      const u = users[user.id];
-      if (u && u.unban_notice) { u.unban_notice.seen = true; saveUsers(); }
+      const u = await getUser(user.id);
+      if (u.unban_notice) {
+        const notice = { ...u.unban_notice, seen: true };
+        await updateUser(user.id, { unban_notice: notice });
+      }
       return sendJSON(res, 200, { ok: true });
     }
-
+    
     if (req.method === 'GET' && req.url.startsWith('/api/user/')) {
       const user = getTelegramUser(req);
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
+      
       const requestedId = decodeURIComponent(reqUrl.pathname.slice('/api/user/'.length));
       if (String(requestedId) !== String(user.id)) return sendJSON(res, 403, { ok: false, error: 'Нет доступа к чужому профилю' });
+      
       updateOnline(user.id);
-      const u = ensureUser(user.id, user.username); saveUsers();
-      return sendJSON(res, 200, { ok: true, user: publicUser(u, user.id) });
+      const u = await getUser(user.id, user.username);
+      const pendingW = await getPendingWithdrawIds(user.id);
+      return sendJSON(res, 200, { ok: true, user: publicUser(u, pendingW) });
     }
+    
     if (req.method === 'POST' && req.url === '/api/user/update') {
       const user = getTelegramUser(req);
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
       updateOnline(user.id);
-      const { custom_nick, avatar } = req.__body || {};
-      const u = ensureUser(user.id, user.username);
-      if (denyIfBanned(res, u)) return;
-      if (typeof custom_nick === 'string') { u.custom_nick = custom_nick.replace(/[<>&"']/g, '').trim().slice(0, 20); }
-      if (typeof avatar === 'string') {
-        if (avatar === '') u.avatar = '';
-        else if (/^data:image\/(png|jpe?g|gif|webp);base64,[A-Za-z0-9+/=]+$/i.test(avatar) && avatar.length <= 700000) u.avatar = avatar;
-        else if (/^https?:\/\/[^\s"'<>]+$/i.test(avatar) && avatar.length <= 2048) u.avatar = avatar;
+      
+      const u = await getUser(user.id, user.username);
+      if (u.ban && u.ban.active) return sendJSON(res, 403, { ok: false, error: 'BANNED' });
+      
+      const updates = {};
+      if (typeof body.custom_nick === 'string') {
+        updates.custom_nick = body.custom_nick.replace(/[<>&"']/g, '').trim().slice(0, 20);
+      }
+      if (typeof body.avatar === 'string') {
+        if (body.avatar === '') updates.avatar = '';
+        else if (/^data:image\/(png|jpe?g|gif|webp);base64,[A-Za-z0-9+/=]+$/i.test(body.avatar) && body.avatar.length <= 700000) updates.avatar = body.avatar;
+        else if (/^https?:\/\/[^\s"'<>]+$/i.test(body.avatar) && body.avatar.length <= 2048) updates.avatar = body.avatar;
         else return sendJSON(res, 400, { ok: false, error: 'Некорректный аватар' });
       }
-      u.updated_at = new Date().toISOString(); saveUsers();
-      return sendJSON(res, 200, { ok: true, user: publicUser(u, user.id) });
+      
+      if (Object.keys(updates).length > 0) {
+        await updateUser(user.id, updates);
+      }
+      
+      const fresh = await getUser(user.id);
+      const pendingW = await getPendingWithdrawIds(user.id);
+      return sendJSON(res, 200, { ok: true, user: publicUser(fresh, pendingW) });
     }
 
     sendJSON(res, 404, { ok: false, error: 'Метод не найден' });
@@ -881,18 +853,6 @@ const server = http.createServer(async (req, res) => {
     sendJSON(res, 500, { ok: false, error: 'Server Error' });
   }
 });
-
-loadAll();
-(function migrateBalances() {
-  let changed = 0;
-  for (const id in users) {
-    if (!Object.prototype.hasOwnProperty.call(users, id)) continue;
-    if (typeof users[id].balance !== 'number' || !isFinite(users[id].balance)) { users[id].balance = START_BALANCE; changed++; }
-    if (!Array.isArray(users[id].inventory)) { users[id].inventory = []; changed++; }
-    if (!Object.prototype.hasOwnProperty.call(users[id], 'best_drop')) { users[id].best_drop = null; changed++; }
-  }
-  if (changed > 0) { saveUsers(); console.log('[MIGRATE] Исправлено ' + changed + ' пользователей'); }
-})();
 
 server.listen(PORT, () => {
   console.log('🚀 Brainrot Game server started on port ' + PORT);
