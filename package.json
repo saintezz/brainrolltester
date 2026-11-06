@@ -1,16 +1,15 @@
 {
-  "name": "ggbrainx-server",
+  "name": "brainroll-backend",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "engines": {
-    "node": "18.20.4"
-  },
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "better-sqlite3": "^11.5.0"
+    "pg": "^8.11.3",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
