@@ -15,7 +15,6 @@
    BRAINROLL — PREMIUM DARK NEON DESIGN SYSTEM
    ============================================================ */
 :root{
-  /* ---- palette ---- */
   --bg-void:#07060c;
   --bg-deep:#0a0912;
   --bg-surface:#100e1a;
@@ -35,7 +34,6 @@
   --lilac-line:rgba(183,148,246,.48);
   --lilac-glow:0 0 12px rgba(183,148,246,.85), 0 0 34px rgba(183,148,246,.42), 0 0 64px rgba(183,148,246,.18);
   --lilac-glow-soft:0 0 10px rgba(183,148,246,.45), 0 0 26px rgba(183,148,246,.18);
-  --lilac-glow-inset:inset 0 0 26px rgba(183,148,246,.14);
 
   --green:#5cf0b0;
   --green-soft:rgba(92,240,176,.12);
@@ -63,7 +61,6 @@
   --font-main:'Science Gothic', system-ui, -apple-system, sans-serif;
   --font-display:'Unbounded', 'Science Gothic', sans-serif;
 
-  /* ---- radii ---- */
   --r-xs:6px;
   --r-sm:9px;
   --r-md:13px;
@@ -71,7 +68,6 @@
   --r-xl:24px;
   --r-full:999px;
 
-  /* ---- spacing scale ---- */
   --s-1:4px;
   --s-2:8px;
   --s-3:12px;
@@ -82,7 +78,6 @@
   --s-8:40px;
   --s-9:52px;
 
-  /* ---- shadows ---- */
   --shadow-card:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 26px rgba(0,0,0,.45);
   --shadow-lift:0 14px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(183,148,246,.14);
   --shadow-deep:0 24px 70px rgba(0,0,0,.65);
@@ -94,7 +89,6 @@
   --accent-line: var(--lilac-line);
 }
 
-/* ---------- reset ---------- */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;font-family:var(--font-main);font-weight:500;letter-spacing:0}
 *{user-select:none;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth;height:100%;-webkit-text-size-adjust:100%}
@@ -126,7 +120,6 @@ button,input,select{font:inherit;color:inherit}
 button{cursor:pointer;background:none;border:none}
 button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-offset:2px}
 
-/* ---------- scrollbars ---------- */
 ::-webkit-scrollbar{width:9px;height:9px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:linear-gradient(180deg, var(--lilac-deep), rgba(124,95,191,.5));border-radius:9px;border:2px solid var(--bg-void)}
@@ -134,15 +127,109 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 *{scrollbar-width:thin;scrollbar-color:var(--lilac-deep) transparent}
 
 #toastContainer{display:none}
-.app-wrapper{display:flex;width:100%;min-height:100vh;position:relative;z-index:1}
+
+/* ============================================================
+   LAYOUT: SIDEBAR + СУЖЕНИЕ
+   ============================================================ */
+.app-wrapper{
+  display:flex;
+  width:100%;
+  min-height:100vh;
+  position:relative;
+  z-index:1;
+  max-width:1180px;
+  margin:0 auto;
+}
 .app-content{flex:1;min-width:0;display:flex;flex-direction:column}
-.app{padding:0 var(--s-5) var(--s-8);max-width:1440px;margin:0 auto;width:100%;display:flex;flex-direction:column}
+.app{padding:0 var(--s-5) var(--s-8);max-width:none;margin:0;width:100%;display:flex;flex-direction:column}
 .tab-panel{display:none;width:100%}
 .tab-panel.active{display:block;animation:fadeUp .32s var(--ease-out)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 /* ============================================================
-   MOBILE MENU
+   SIDEBAR
+   ============================================================ */
+.side-nav{
+  position:sticky;
+  top:0;
+  align-self:flex-start;
+  width:220px;
+  flex-shrink:0;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:22px 12px;
+  background:linear-gradient(180deg, rgba(20,17,32,.92), rgba(13,11,22,.75));
+  border-right:1px solid var(--line-mid);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  z-index:90;
+}
+.side-nav-logo{
+  padding:0 8px 18px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:10px;
+  display:flex;
+  justify-content:center;
+}
+.side-nav-logo img{
+  height:58px;
+  width:auto;
+  filter:drop-shadow(0 0 14px rgba(183,148,246,.65)) drop-shadow(0 0 32px rgba(183,148,246,.25));
+}
+.side-nav-btn{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:11px 14px;
+  border-radius:var(--r-md);
+  border:1px solid transparent;
+  background:transparent;
+  color:var(--text-muted);
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.02em;
+  cursor:pointer;
+  transition:all .18s var(--ease);
+  text-align:left;
+  width:100%;
+}
+.side-nav-btn:hover{color:#fff;background:rgba(183,148,246,.07)}
+.side-nav-btn.active{
+  color:#fff;
+  background:linear-gradient(135deg, rgba(183,148,246,.20), rgba(183,148,246,.06));
+  border-color:var(--lilac-line);
+  box-shadow:var(--lilac-glow-soft), inset 0 0 20px rgba(183,148,246,.14);
+}
+.side-nav-btn .sn-icon{
+  width:18px;height:18px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.side-nav-btn .sn-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+.side-nav-spacer{flex:1}
+.side-nav-footer{
+  padding:10px 8px 0;
+  border-top:1px solid var(--line);
+  display:flex;
+  gap:8px;
+}
+.side-nav-overlay{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(5,4,10,.78);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  z-index:690;
+}
+.side-nav-overlay.open{display:block}
+
+/* Топ-бар без горизонтальных вкладок */
+.top-nav-panel{display:none !important}
+
+/* ============================================================
+   MOBILE MENU (старый бургер)
    ============================================================ */
 .burger-btn{
   display:none;background:var(--bg-glass);border:1px solid var(--line-mid);
@@ -153,44 +240,6 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 }
 .burger-btn:active{transform:scale(.94)}
 .burger-btn svg{width:24px;height:24px;stroke:currentColor;stroke-width:2.4}
-.mobile-menu-overlay{
-  display:none;position:fixed;inset:0;background:rgba(5,4,10,.78);z-index:600;
-  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  opacity:0;transition:opacity .25s var(--ease);
-}
-.mobile-menu-overlay.open{display:block;opacity:1}
-.mobile-menu-panel{
-  position:fixed;top:0;left:-320px;width:300px;height:100%;background:var(--bg-surface);
-  border-right:1px solid var(--line-mid);z-index:700;transition:left .3s var(--ease-out);
-  display:flex;flex-direction:column;padding:var(--s-5) 0;
-  box-shadow:8px 0 60px rgba(0,0,0,.6), 0 0 40px rgba(183,148,246,.14);
-}
-.mobile-menu-panel::before{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg, rgba(183,148,246,.06), transparent 30%);
-}
-.mobile-menu-panel.open{left:0}
-.mobile-menu-header{
-  padding:0 var(--s-5) var(--s-4);border-bottom:1px solid var(--line);
-  display:flex;justify-content:space-between;align-items:center;position:relative;
-}
-.mobile-menu-close{
-  background:var(--bg-elevated);border:1px solid var(--line);color:var(--text-muted);
-  font-size:16px;cursor:pointer;width:34px;height:34px;border-radius:var(--r-sm);
-  display:flex;align-items:center;justify-content:center;transition:all .15s;
-}
-.mobile-menu-close:hover{color:#fff;border-color:var(--lilac-line);box-shadow:var(--lilac-glow-soft)}
-.mobile-nav-btn{
-  background:transparent;border:none;color:var(--text-muted);
-  padding:15px var(--s-5);text-align:left;font-size:14px;font-weight:700;
-  cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .18s var(--ease);
-  border-left:3px solid transparent;letter-spacing:.02em;position:relative;
-}
-.mobile-nav-btn:hover{color:#fff;background:rgba(183,148,246,.05)}
-.mobile-nav-btn.active{
-  color:#fff;background:linear-gradient(90deg, var(--lilac-soft), transparent);
-  border-left-color:var(--lilac);box-shadow:inset 0 0 24px rgba(183,148,246,.14);
-}
 
 /* ============================================================
    TOP BAR
@@ -207,7 +256,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 .top-left{display:flex;align-items:center;gap:var(--s-5);flex:1;margin-left:0;min-width:0}
 .logo-container{display:flex;align-items:center;gap:var(--s-2);flex-shrink:0}
 .logo-img{
-  height:72px;width:auto;object-fit:contain;
+  height:60px;width:auto;object-fit:contain;
   filter:drop-shadow(0 0 16px rgba(183,148,246,.7)) drop-shadow(0 0 40px rgba(183,148,246,.28));
   transition:transform .3s var(--ease);
 }
@@ -239,7 +288,6 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 }
 .topup-btn:hover{transform:scale(1.14) rotate(90deg);box-shadow:0 0 20px var(--green), 0 0 44px rgba(92,240,176,.5)}
 .topup-btn:active{transform:scale(.96)}
-
 .icon-btn{
   width:42px;height:42px;border-radius:var(--r-md);
   background:var(--bg-surface-hover);border:1px solid var(--line-mid);
@@ -249,24 +297,6 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 .icon-btn:hover{background:var(--bg-surface-hover);color:#fff;border-color:var(--lilac-line);box-shadow:var(--lilac-glow-soft)}
 .icon-btn.avatar-btn{border-color:var(--lilac-line);box-shadow:var(--lilac-glow-soft)}
 .icon-btn img{width:100%;height:100%;object-fit:cover;border-radius:calc(var(--r-md) - 3px)}
-
-.top-nav-panel{display:flex;flex-direction:row;flex-wrap:nowrap;gap:3px;overflow-x:auto;scrollbar-width:none;align-items:center}
-.top-nav-panel::-webkit-scrollbar{display:none}
-.nav-btn{
-  background:transparent;border:1px solid transparent;border-radius:var(--r-sm);
-  color:var(--text-muted);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  padding:9px 15px;transition:all .18s var(--ease);flex-shrink:0;
-  font-size:12.5px;font-weight:700;white-space:nowrap;letter-spacing:.02em;
-  position:relative;
-}
-.nav-btn:hover{color:#fff;background:rgba(183,148,246,.06)}
-.nav-btn.active{
-  color:#fff;
-  background:linear-gradient(135deg, rgba(183,148,246,.20), rgba(183,148,246,.08));
-  border:1px solid var(--lilac-line);
-  box-shadow:var(--lilac-glow-soft), inset 0 0 22px rgba(183,148,246,.18);
-}
 
 /* ============================================================
    GENERIC SURFACES
@@ -296,9 +326,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 .bonus-card-sub{font-size:12px;font-weight:500;color:var(--text-muted);letter-spacing:.02em;margin-bottom:var(--s-5);line-height:1.6}
 .bonus-card-sub b{color:var(--lilac-bright);font-weight:800}
 
-/* ============================================================
-   USERNAME CASE
-   ============================================================ */
+/* USERNAME CASE */
 .username-case-wrap{display:flex;gap:var(--s-6);align-items:center;flex-wrap:wrap}
 .username-case-img{
   width:104px;height:104px;object-fit:contain;flex-shrink:0;
@@ -314,10 +342,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
   border:1px solid var(--lilac-line);padding:4px 11px;border-radius:var(--r-xs);
   letter-spacing:.02em;box-shadow:var(--lilac-glow-soft);
 }
-.uc-username-badge.bad{
-  color:var(--red);background:var(--red-soft);border-color:var(--red-line);
-  box-shadow:var(--red-glow-soft);
-}
+.uc-username-badge.bad{color:var(--red);background:var(--red-soft);border-color:var(--red-line);box-shadow:var(--red-glow-soft)}
 .username-case-reward-list{display:flex;gap:7px;flex-wrap:wrap;margin-top:3px}
 .uc-reward-pill{
   display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:var(--r-xs);
@@ -341,9 +366,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 .uc-hint{font-size:11px;font-weight:600;color:var(--text-muted);letter-spacing:.01em;line-height:1.5;margin-top:3px}
 .uc-hint b{color:var(--lilac-bright);font-weight:800}
 
-/* ============================================================
-   PROMO INPUT
-   ============================================================ */
+/* PROMO INPUT */
 .promo-new{
   display:flex;gap:var(--s-5);align-items:center;flex-wrap:wrap;
   padding:var(--s-6);border-radius:var(--r-lg);
@@ -372,9 +395,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 .promo-new-right button:hover:not(:disabled){background:linear-gradient(135deg, rgba(183,148,246,.3), rgba(183,148,246,.14));box-shadow:var(--lilac-glow)}
 .promo-new-right button:disabled{opacity:.5;cursor:not-allowed}
 
-/* ============================================================
-   STAKING
-   ============================================================ */
+/* STAKING */
 .staking-input-row{display:flex;gap:var(--s-3);flex-wrap:wrap;align-items:center;margin-bottom:var(--s-4)}
 .staking-input-row input{
   flex:1;min-width:140px;height:48px;padding:0 16px;border-radius:var(--r-md);
@@ -422,9 +443,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 .staking-claim-btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
 .staking-claim-btn:not(:disabled):hover{background:linear-gradient(135deg, rgba(183,148,246,.3), rgba(183,148,246,.14));box-shadow:var(--lilac-glow)}
 
-/* ============================================================
-   PROFILE
-   ============================================================ */
+/* PROFILE */
 .profile-page{
   padding:0 0 var(--s-8);
   background:linear-gradient(160deg, var(--bg-surface), var(--bg-elevated));
@@ -544,9 +563,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 .profile-inventory-empty{text-align:center;color:var(--text-muted);font-size:12px;font-weight:600;padding:var(--s-6);line-height:1.4;grid-column:1/-1}
 .customize-in-profile{padding:0 var(--s-5) var(--s-6)}
 
-/* ============================================================
-   UPGRADER
-   ============================================================ */
+/* UPGRADER */
 .upg-container{display:flex;flex-direction:column;gap:var(--s-5);max-width:980px;margin:0 auto;padding:var(--s-2) 0 0;position:relative}
 .progress-section{display:flex;justify-content:center;padding:var(--s-7) 0 var(--s-2) 0;position:relative}
 .progress-wrapper{position:relative;width:320px;height:320px;z-index:1}
@@ -617,10 +634,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
   box-shadow:var(--yellow-glow-soft);position:relative;
 }
 .upg-card .price img{width:15px;height:15px;margin:0}
-.swap-arrow{
-  font-size:26px;color:var(--lilac);line-height:1;font-weight:700;flex-shrink:0;
-  display:flex;align-items:center;text-shadow:0 0 14px rgba(183,148,246,.9);
-}
+.swap-arrow{font-size:26px;color:var(--lilac);line-height:1;font-weight:700;flex-shrink:0;display:flex;align-items:center;text-shadow:0 0 14px rgba(183,148,246,.9)}
 
 .stage-controls{display:flex;justify-content:center;gap:var(--s-3);margin-top:var(--s-1)}
 .upgrade-main-btn{
@@ -665,9 +679,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
   border:1px solid var(--lilac-line);box-shadow:var(--lilac-glow-soft);
 }
 
-/* ============================================================
-   MINES
-   ============================================================ */
+/* MINES */
 .mines-layout{display:flex;gap:var(--s-5);max-width:1020px;margin:0 auto;padding:var(--s-3) 0 var(--s-5);align-items:flex-start}
 .mines-board-wrap{
   flex:1;min-width:0;display:flex;justify-content:center;padding:var(--s-4);
@@ -749,9 +761,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 }
 .mines-start-btn.cashout:hover{box-shadow:var(--yellow-glow)}
 
-/* ============================================================
-   PROMO BANNER
-   ============================================================ */
+/* PROMO BANNER */
 .promo-banner{
   margin:var(--s-5) 0;
   padding:var(--s-7) var(--s-8);border-radius:var(--r-xl);
@@ -830,9 +840,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 }
 .activate-btn:hover{background:linear-gradient(135deg, rgba(183,148,246,.32), rgba(183,148,246,.14));box-shadow:var(--lilac-glow);transform:translateY(-1px)}
 
-/* ============================================================
-   CASES HERO + TOOLBAR
-   ============================================================ */
+/* CASES HERO + TOOLBAR */
 .cases-hero{
   position:relative;margin:var(--s-5) 0 var(--s-5);padding:var(--s-7) var(--s-8);
   border-radius:var(--r-xl);overflow:hidden;
@@ -886,9 +894,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 }
 .cases-search input::placeholder{color:var(--text-faint)}
 
-/* ============================================================
-   CASE CARDS
-   ============================================================ */
+/* CASE CARDS */
 .cases-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:var(--s-5);padding:2px 0 var(--s-3)}
 .case-card{
   position:relative;border-radius:var(--r-lg);overflow:hidden;cursor:pointer;
@@ -937,9 +943,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 .case-card:hover .case-open-hint svg{transform:translateX(4px)}
 .cases-empty{grid-column:1/-1;text-align:center;padding:var(--s-9) var(--s-5);color:var(--text-muted);font-size:13.5px;font-weight:600;letter-spacing:.02em}
 
-/* ============================================================
-   CASE OPEN MODAL
-   ============================================================ */
+/* CASE OPEN MODAL */
 .case-open-modal{
   position:fixed;inset:0;z-index:4000;display:none;flex-direction:column;align-items:center;
   background:radial-gradient(ellipse 80% 50% at 50% 0%, rgba(183,148,246,.08), transparent 70%), var(--bg-void);
@@ -996,13 +1000,33 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
   width:100%;position:relative;overflow:hidden;border-radius:var(--r-md);
   background:var(--bg-surface);border:1px solid var(--lilac-line);height:136px;
   box-shadow:inset 0 0 50px rgba(183,148,246,.08), var(--lilac-glow-soft);
+  will-change:transform;
+  transform:translate3d(0,0,0);
+  --edge-fade:0;
+  transition:box-shadow .3s ease;
 }
 .case-roulette-row::before,.case-roulette-row::after{
-  content:'';position:absolute;top:0;bottom:0;width:80px;z-index:8;pointer-events:none;
+  content:'';position:absolute;top:0;bottom:0;z-index:8;pointer-events:none;
+  width:calc(80px + var(--edge-fade,0px));
+  transition:width .3s ease;
 }
-.case-roulette-row::before{left:0;background:linear-gradient(90deg, var(--bg-void), transparent)}
-.case-roulette-row::after{right:0;background:linear-gradient(-90deg, var(--bg-void), transparent)}
-.case-roulette-track{display:flex;align-items:center;height:100%;will-change:transform}
+.case-roulette-row::before{
+  left:0;
+  background:linear-gradient(90deg, var(--bg-void) 0%, rgba(7,6,12,.85) 40%, transparent 100%);
+}
+.case-roulette-row::after{
+  right:0;
+  background:linear-gradient(-90deg, var(--bg-void) 0%, rgba(7,6,12,.85) 40%, transparent 100%);
+}
+.case-roulette-row.spinning{
+  --edge-fade:40px;
+  box-shadow:inset 0 0 70px rgba(183,148,246,.16), var(--lilac-glow);
+}
+.case-roulette-track{
+  display:flex;align-items:center;height:100%;
+  will-change:transform;
+  transform:translate3d(0,0,0);
+}
 .case-roulette-item{
   flex:0 0 120px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:7px;padding:9px;border-right:1px solid var(--line);position:relative;transition:background .15s;
@@ -1010,6 +1034,12 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 .case-roulette-item.winning{
   background:var(--yellow-soft);
   box-shadow:inset 0 0 0 1px var(--yellow-line), var(--yellow-glow);z-index:9;
+  animation:winPulse .8s ease-out;
+}
+@keyframes winPulse{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.08)}
+  100%{transform:scale(1)}
 }
 .case-roulette-item img{width:54px;height:54px;object-fit:contain}
 .case-roulette-item .roulette-name{
@@ -1078,9 +1108,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 .case-possible-item .cp-price{font-size:11.5px;font-weight:800;color:var(--lilac);display:flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums}
 .case-possible-item .cp-price img{width:11px;height:11px}
 
-/* ============================================================
-   INVENTORY PAGE
-   ============================================================ */
+/* INVENTORY PAGE */
 .inventory-page{padding:var(--s-1) 0 var(--s-5)}
 .inventory-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:var(--s-4);margin-bottom:var(--s-4);padding:0 var(--s-1);flex-wrap:wrap}
 .inventory-hero-title{
@@ -1180,9 +1208,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 .empty-inv{color:var(--text-muted);font-size:13px;font-weight:600;text-align:center;width:100%;padding:var(--s-5);grid-column:1/-1;line-height:1.4}
 .selectable{display:flex;flex-direction:column;align-items:center;width:100%;cursor:pointer}
 
-/* ============================================================
-   TARGET LIST
-   ============================================================ */
+/* TARGET LIST */
 .target-list{display:flex;flex-direction:column;gap:7px;max-height:60vh;overflow-y:auto;padding:5px}
 .target-list-item{
   display:grid;grid-template-columns:46px 1fr auto;align-items:center;gap:11px;
@@ -1197,9 +1223,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 .target-list-item .tl-price img{width:12px;height:12px}
 .target-list-item .tl-chance{font-size:11.5px;font-weight:800;color:var(--lilac-bright)}
 
-/* ============================================================
-   CUSTOMIZE
-   ============================================================ */
+/* CUSTOMIZE */
 .customize-section{
   background:linear-gradient(160deg, var(--bg-surface-hover), rgba(23,20,37,.5));
   border:1px solid var(--line-mid);border-radius:var(--r-md);padding:var(--s-4);margin-bottom:var(--s-3);
@@ -1238,9 +1262,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 }
 .reset-avatar-btn:hover{color:#fff;border-color:var(--line-strong)}
 
-/* ============================================================
-   MODALS
-   ============================================================ */
+/* MODALS */
 .modal{
   position:fixed;inset:0;background:rgba(5,4,10,.84);display:flex;justify-content:center;align-items:center;
   z-index:3000;opacity:0;pointer-events:none;transition:opacity .22s var(--ease);
@@ -1281,7 +1303,6 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 .msg.err{color:var(--red)}
 .msg.wait{color:var(--lilac-bright)}
 
-/* topup grid */
 .topup-grid{
   display:grid;grid-template-columns:repeat(4,1fr);gap:7px;max-height:270px;overflow-y:auto;
   padding:7px;background:var(--bg-elevated);border-radius:var(--r-md);margin-bottom:11px;
@@ -1309,7 +1330,6 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 .topup-price-line .tpl-value{font-weight:800;color:var(--lilac);display:flex;align-items:center;gap:5px;line-height:1.3;font-variant-numeric:tabular-nums}
 .topup-price-line .tpl-value img{width:14px;height:14px}
 
-/* admin */
 .admin-header{
   background:linear-gradient(135deg, rgba(183,148,246,.14), rgba(183,148,246,.05));
   border:1px solid var(--lilac-line);border-radius:var(--r-md);padding:var(--s-4);
@@ -1418,9 +1438,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 }
 .ban-list-badge.pending{color:var(--yellow);border-color:var(--yellow-line);background:var(--yellow-soft)}
 
-/* ============================================================
-   BAN OVERLAY
-   ============================================================ */
+/* BAN OVERLAY */
 .ban-overlay{
   position:fixed;inset:0;z-index:9999997;display:none;align-items:center;justify-content:center;
   padding:var(--s-6);overflow-y:auto;background:var(--bg-void);
@@ -1463,9 +1481,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
   border:1px solid var(--line-mid);color:var(--green);
 }
 
-/* ============================================================
-   MAINTENANCE
-   ============================================================ */
+/* MAINTENANCE */
 .maintenance-overlay{
   position:fixed;inset:0;z-index:999998;background:var(--bg-void);
   display:flex;align-items:center;justify-content:center;padding:var(--s-7) var(--s-5);
@@ -1490,9 +1506,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 .maintenance-hint{font-size:13px;font-weight:600;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase}
 @keyframes spin{100%{transform:rotate(360deg)}}
 
-/* ============================================================
-   DEPOSITS / WITHDRAW WARNING
-   ============================================================ */
+/* DEPOSITS */
 .deposits-block{max-width:660px;margin:11px auto 0;padding:var(--s-4);background:var(--bg-elevated);border:1px solid var(--line-mid);border-radius:var(--r-md)}
 .deposits-block-title{
   font-size:13px;font-weight:800;color:var(--lilac);letter-spacing:.06em;text-transform:uppercase;
@@ -1526,9 +1540,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 
 .mutation-badge{position:absolute;width:20px;height:20px;object-fit:contain;top:5px;left:5px;z-index:3;pointer-events:none;filter:drop-shadow(0 0 6px rgba(255,217,122,.6))}
 
-/* ============================================================
-   ANNOUNCEMENT
-   ============================================================ */
+/* ANNOUNCEMENT */
 .announcement-container{
   position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:999999;
   pointer-events:none;display:flex;justify-content:center;width:100%;max-width:620px;padding:0 var(--s-5);
@@ -1552,12 +1564,23 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 /* ============================================================
    RESPONSIVE
    ============================================================ */
-@media (max-width: 860px) {
-  .top-nav-panel{display:none}
-  .burger-btn{display:flex}
+@media (max-width:900px){
+  .side-nav{
+    position:fixed;
+    left:0;top:0;
+    height:100vh;
+    width:260px;
+    transform:translateX(-100%);
+    transition:transform .3s var(--ease-out);
+    box-shadow:8px 0 60px rgba(0,0,0,.6), 0 0 40px rgba(183,148,246,.12);
+    z-index:700;
+  }
+  .side-nav.open{transform:translateX(0)}
+  .side-nav-overlay.open{display:block}
+  .burger-btn{display:flex !important}
   .top-bar{padding:13px 15px 13px 52px}
-  .top-left{margin-left:0;gap:13px}
-  .logo-img{height:50px}
+  .top-left{gap:13px}
+  .logo-img{height:48px}
   .app{padding:0 var(--s-4) var(--s-6)}
   .upg-container{max-width:100%;padding:0 10px}
   .progress-wrapper{width:270px;height:270px}
@@ -1601,9 +1624,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
   .case-qty-row{padding:0 var(--s-4)}
 }
 
-@media (max-width: 480px) {
+@media (max-width:480px){
   .top-bar{padding:11px 12px 11px 48px;gap:11px}
-  .logo-img{height:44px}
+  .logo-img{height:42px}
   .balance-wrap{padding:6px 10px;gap:6px}
   .balance{font-size:13px}
   .coin-icon{width:15px;height:15px}
@@ -1628,7 +1651,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
   .admin-grid{grid-template-columns:repeat(3,1fr)}
 }
 
-@media (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
   html{scroll-behavior:auto}
 }
@@ -1638,29 +1661,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 
 <div id="telegramWarning">ВЫ НЕ В ТЕЛЕГРАММ</div>
 
-<button class="burger-btn" onclick="toggleMobileMenu()" aria-label="Меню">
+<button class="burger-btn" onclick="toggleSideNav()" aria-label="Меню">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
     <line x1="3" y1="12" x2="21" y2="12"></line>
     <line x1="3" y1="6" x2="21" y2="6"></line>
     <line x1="3" y1="18" x2="21" y2="18"></line>
   </svg>
 </button>
-
-<div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="toggleMobileMenu()"></div>
-<div class="mobile-menu-panel" id="mobileMenuPanel">
-  <div class="mobile-menu-header">
-    <div class="logo-container">
-        <img src="https://github.com/saintezz/brainrolltester/blob/main/BGlogo.png?raw=true" alt="BrainRoll" class="logo-img" style="height:42px;">
-    </div>
-    <button class="mobile-menu-close" onclick="toggleMobileMenu()" aria-label="Закрыть">✕</button>
-  </div>
-  <button class="mobile-nav-btn active" id="mNavMenu" onclick="switchTab('menu'); toggleMobileMenu()">Главное меню</button>
-  <button class="mobile-nav-btn" id="mNavUpgrade" onclick="switchTab('upgrade'); toggleMobileMenu()">Апгрейдер</button>
-  <button class="mobile-nav-btn" id="mNavCatch" onclick="switchTab('catch'); toggleMobileMenu()">Мины</button>
-  <button class="mobile-nav-btn" id="mNavInventory" onclick="switchTab('inventory'); toggleMobileMenu()">Инвентарь</button>
-  <button class="mobile-nav-btn" id="mNavBonuses" onclick="switchTab('bonuses'); toggleMobileMenu()">Бонусы</button>
-  <button class="mobile-nav-btn" id="mNavProfile" onclick="switchTab('profile'); toggleMobileMenu()">Профиль</button>
-</div>
 
 <div class="announcement-container" id="announcementContainer"></div>
 
@@ -1929,353 +1936,392 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
   <div class="case-possible-grid" id="casePossibleGrid"></div>
 </div>
 
+<div class="side-nav-overlay" id="sideNavOverlay" onclick="toggleSideNav()"></div>
+
 <div class="app-wrapper">
-    <div class="app-content">
-        <div class="app" id="mainApp">
-            <div class="top-bar">
-                <div class="top-left">
-                    <div class="logo-container">
-                        <img src="https://github.com/saintezz/brainrolltester/blob/main/BGlogo.png?raw=true" alt="BrainRoll" class="logo-img">
-                    </div>
-                    <div class="top-nav-panel">
-                        <button class="nav-btn active" id="navMenu" onclick="switchTab('menu')"><span>Главное меню</span></button>
-                        <button class="nav-btn" id="navUpgrade" onclick="switchTab('upgrade')"><span>Апгрейдер</span></button>
-                        <button class="nav-btn" id="navCatch" onclick="switchTab('catch')"><span>Мины</span></button>
-                        <button class="nav-btn" id="navInventory" onclick="switchTab('inventory')"><span>Инвентарь</span></button>
-                        <button class="nav-btn" id="navBonuses" onclick="switchTab('bonuses')"><span>Бонусы</span></button>
-                        <button class="nav-btn" id="navProfile" onclick="switchTab('profile')"><span>Профиль</span></button>
-                    </div>
-                </div>
-                <div class="top-right">
-                    <div class="balance-wrap" id="balanceBox">
-                        <div class="balance">
-                            <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin" class="coin-icon">
-                            <span id="balanceDisplay">0</span>
-                        </div>
-                        <button class="topup-btn" onclick="openTopup()" aria-label="Пополнить">+</button>
-                    </div>
-                    <div class="icon-btn avatar-btn" onclick="switchTab('profile')">
-                        <img id="topAvatarImg" src="https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg" alt="avatar">
-                    </div>
-                </div>
-            </div>
 
-            <div class="tab-panel active" id="panelMenu">
-                <div class="promo-banner">
-                    <div class="banner-left">
-                        <div class="title">АВТО-ПРОМОКОД</div>
-                        <div class="main-title">НОВЫЙ БОНУС К ДЕПОЗИТУ</div>
-                        <div class="sub-title">КАЖДЫЕ 2 ЧАСА</div>
-                    </div>
-                    <div class="banner-center">
-                        <div class="banner-timer-block">
-                            <div class="bt-label">ОСТАЛОСЬ</div>
-                            <div class="bt-value" id="autoPromoTimer">01:45:46</div>
-                        </div>
-                        <div class="banner-bonus-block">
-                            <div class="bb-label">БОНУС</div>
-                            <div class="bb-value" id="autoPromoBonus">+15%</div>
-                        </div>
-                    </div>
-                    <div class="banner-right">
-                        <div class="promo-code-display">
-                            <span class="pcd-code" id="autoPromoCode">JACKPOT</span>
-                            <button class="pcd-copy" onclick="copyAutoPromoCode()" title="Копировать">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            </button>
-                        </div>
-                        <button class="activate-btn" onclick="activateAutoPromo()">АКТИВИРОВАТЬ</button>
-                    </div>
-                </div>
-
-                <div class="cases-hero">
-                    <div class="cases-hero-left">
-                        <div class="cases-hero-kicker">Коллекция кейсов</div>
-                        <div class="cases-hero-title">Открой свой<br>лучший дроп</div>
-                        <div class="cases-hero-sub">10 кейсов — от дешёвых разогревов до legendary-дропов. Выбирай, открывай, апгрейди и собирай коллекцию.</div>
-                    </div>
-                    <div class="cases-hero-stats">
-                        <div class="cases-stat-pill"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin"><span id="casesHeroCount">10 кейсов</span></div>
-                        <div class="cases-stat-pill"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin"><span id="casesHeroBalance">0</span></div>
-                    </div>
-                </div>
-
-                <div class="cases-toolbar">
-                    <div class="cases-search">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
-                        <input type="text" id="casesSearchInput" placeholder="Поиск кейса..." autocomplete="off" oninput="renderMenuCases()">
-                    </div>
-                </div>
-
-                <div class="cases-grid" id="menuCasesGrid"></div>
-            </div>
-
-            <div class="tab-panel" id="panelUpgrade">
-                <div class="upg-container">
-                    <div class="progress-section">
-                        <div class="progress-wrapper" id="wheelWrapper">
-                            <svg class="progress-svg" viewBox="0 0 340 340">
-                                <defs>
-                                    <linearGradient id="progressGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stop-color="#dcc8ff"/>
-                                        <stop offset="50%" stop-color="#b794f6"/>
-                                        <stop offset="100%" stop-color="#7c5fbf"/>
-                                    </linearGradient>
-                                </defs>
-                                <circle class="progress-outer-ring" cx="170" cy="170" r="149"></circle>
-                                <circle class="progress-track" cx="170" cy="170" r="130"></circle>
-                                <circle class="progress-track-inner" cx="170" cy="170" r="130"></circle>
-                                <circle class="progress-bar no-chance" id="progressBar" cx="170" cy="170" r="130"></circle>
-                            </svg>
-                            <div class="progress-ticks" id="progressTicks"></div>
-                            <div class="arrow-container" id="arrowContainer"><div class="arrow-pointer"></div></div>
-                            <div class="progress-center">
-                                <div class="chance-big" id="chanceBig">?%</div>
-                                <div class="chance-label">ШАНС</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="items-row">
-                        <div class="upg-card" id="upgCardLeft" onclick="document.getElementById('invAnchor').scrollIntoView({behavior: 'smooth'})">
-                            <div class="txt">ВЫБЕРИТЕ В ИНВЕНТАРЕ</div>
-                        </div>
-                        <div class="swap-arrow">»</div>
-                        <div class="upg-card" id="upgCardRight" onclick="openTargetList()">
-                            <div class="txt">ВЫБРАТЬ ЦЕЛЬ</div>
-                            <div class="txt sub">Нажми на меня</div>
-                        </div>
-                    </div>
-                    <div class="stage-controls">
-                        <button class="upgrade-main-btn" id="upgradeBtn" onclick="upgrade()" disabled><span>АПГРЕЙД</span></button>
-                        <button class="fast-btn" id="fastUpgradeBtn" onclick="toggleFastMode()" title="Быстрый режим">
-                            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                        </button>
-                    </div>
-                    <div class="segmented-control" style="margin-top: 12px;">
-                        <div class="segment active" id="segmentMyItems" onclick="switchUpgradeTab('my')">МОИ ПРЕДМЕТЫ</div>
-                        <div class="segment" id="segmentShop" onclick="switchUpgradeTab('shop')">МАГАЗИН</div>
-                    </div>
-                    <div id="inventorySection" style="display: block; margin-top: 14px;">
-                        <div class="section-title" id="invAnchor">Инвентарь</div>
-                        <div class="inventory-row" id="inventoryRow"></div>
-                    </div>
-                    <div id="shopSection" style="display: none; margin-top: 14px;">
-                        <div class="section-title">Магазин</div>
-                        <div class="shop-scroll"><div class="shop-grid" id="shopRow"></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-panel" id="panelCatch">
-                <div class="mines-layout">
-                    <div class="mines-board-wrap">
-                        <div class="mines-board" id="minesBoard"></div>
-                    </div>
-                    <div class="mines-controls">
-                        <div class="mines-control-title">Мин на поле</div>
-                        <div class="mines-bet-input">
-                            <button onclick="changeMines(-1)">−</button>
-                            <input type="number" id="minesCountInput" value="2" min="1" max="24" readonly>
-                            <button onclick="changeMines(1)">+</button>
-                        </div>
-                        <div class="mines-multipliers" id="minesMultipliers">
-                            <div class="mines-mult-btn" onclick="setMinesMultiplier(2)">2</div>
-                            <div class="mines-mult-btn" onclick="setMinesMultiplier(3)">3</div>
-                            <div class="mines-mult-btn" onclick="setMinesMultiplier(5)">5</div>
-                            <div class="mines-mult-btn" onclick="setMinesMultiplier(10)">10</div>
-                            <div class="mines-mult-btn" onclick="setMinesMultiplier(24)">24</div>
-                        </div>
-                        <div class="mines-info-row">
-                            <span>Коэффициент</span>
-                            <span id="minesCurrentMult">x1.04</span>
-                        </div>
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label class="form-label" style="margin-bottom: 5px;">Выбери предметы для ставки</label>
-                            <div class="shop-scroll" style="max-height: 156px; border: 1px solid var(--line-mid); border-radius: var(--r-md); padding: 5px;">
-                                <div class="inventory-row" id="minesBetGrid" style="gap: 8px; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));"></div>
-                            </div>
-                        </div>
-                        <div class="mines-info-row" style="background:transparent; border:none; padding:0; margin-top: 4px;">
-                            <span>Ставка:</span>
-                            <span style="display:flex; align-items:center; gap:7px;"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" style="width:16px;height:16px;"> <span id="minesBetAmount">0</span></span>
-                        </div>
-                        <button class="mines-start-btn" id="minesStartBtn" onclick="startMinesGame()">ИГРАТЬ</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-panel" id="panelInventory">
-                <div class="inventory-page">
-                    <div class="inventory-hero">
-                        <div>
-                            <div class="inventory-hero-title">Мой инвентарь</div>
-                            <div class="inventory-hero-sub">Все твои брейнроты в одном месте</div>
-                        </div>
-                        <div class="inventory-hero-stats">
-                            <div class="inv-hero-pill" id="invHeroCount">0 предметов</div>
-                            <div class="inv-hero-pill gold" id="invHeroValue"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin"><span>0</span></div>
-                        </div>
-                    </div>
-                    <div id="inventoryTabGrid" class="inventory-tab-grid"></div>
-                </div>
-            </div>
-
-            <div class="tab-panel" id="panelBonuses">
-                <div class="bonus-page">
-                    <div class="bonus-card">
-                        <div class="bonus-card-title">Username Case</div>
-                        <div class="bonus-card-sub">Добавь <b>@BrainrotGGame</b> в конец своего ника в Telegram (например: <b>saint @BrainrotGGame</b>) и открывай кейс раз в 12 часов</div>
-                        <div class="username-case-wrap">
-                            <img class="username-case-img" src="https://github.com/saintezz/BrainrotWin/blob/main/UserCase.png?raw=true" alt="Username Case">
-                            <div class="username-case-info">
-                                <div class="username-case-line">
-                                    <span class="uc-key">Твой ник:</span>
-                                    <span class="uc-username-badge" id="ucMyUsername">—</span>
-                                </div>
-                                <div class="username-case-reward-list">
-                                    <div class="uc-reward-pill"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin">2 монеты <span class="uc-chance">· 50%</span></div>
-                                    <div class="uc-reward-pill">La Grande <span class="uc-chance">· 49.9%</span></div>
-                                    <div class="uc-reward-pill">Dragon Cannelloni <span class="uc-chance">· 0.1%</span></div>
-                                </div>
-                                <div class="uc-timer" id="ucTimer">Проверка...</div>
-                                <div class="uc-hint" id="ucHint">В нике должна быть приписка <b>@BrainrotGGame</b></div>
-                                <button class="username-case-btn" id="ucOpenBtn" onclick="openUsernameCase()" disabled>Открыть кейс</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="promo-new">
-                        <div class="promo-new-left">
-                            <div class="promo-new-title">Введи промокод</div>
-                            <div class="promo-new-sub">И получи награду!</div>
-                        </div>
-                        <div class="promo-new-right">
-                            <input type="text" id="promoInput" placeholder="ПРОМОКОД" maxlength="20" autocomplete="off">
-                            <button id="promoActivateBtn" onclick="activatePromo()">Забрать</button>
-                        </div>
-                    </div>
-                    <div class="msg" id="promoMsg" style="margin-top:-8px;padding-left:6px;"></div>
-
-                    <div class="bonus-card">
-                        <div class="bonus-card-title">Стейкинг</div>
-                        <div class="bonus-card-sub">Заморозь монеты и получи бонус к сумме по истечении срока</div>
-
-                        <div id="stakingActiveBox" style="display:none;"></div>
-
-                        <div id="stakingFormBox">
-                            <div class="staking-input-row">
-                                <input type="number" id="stakingAmount" placeholder="Сумма (мин. 100)" min="100" step="1">
-                                <div class="inv-hero-pill gold" style="font-size:13px;padding:13px 20px;flex-shrink:0;">
-                                    <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin">
-                                    <span id="stakingBalanceLabel">0</span>
-                                </div>
-                            </div>
-                            <div class="staking-tiers" id="stakingTiers">
-                                <div class="staking-tier" data-tier="week" onclick="selectStakingTier('week')">
-                                    <div class="staking-tier-label">Неделя</div>
-                                    <div class="staking-tier-bonus">+10%</div>
-                                    <div class="staking-tier-sub">к сумме</div>
-                                </div>
-                                <div class="staking-tier" data-tier="twoWeek" onclick="selectStakingTier('twoWeek')">
-                                    <div class="staking-tier-label">2 недели</div>
-                                    <div class="staking-tier-bonus">+25%</div>
-                                    <div class="staking-tier-sub">к сумме</div>
-                                </div>
-                                <div class="staking-tier" data-tier="month" onclick="selectStakingTier('month')">
-                                    <div class="staking-tier-label">Месяц</div>
-                                    <div class="staking-tier-bonus">+40%</div>
-                                    <div class="staking-tier-sub">к сумме</div>
-                                </div>
-                            </div>
-                            <button class="username-case-btn" id="stakingStartBtn" onclick="startStaking()" style="width:100%;max-width:none;">Заморозить</button>
-                            <div class="msg" id="stakingMsg"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-panel" id="panelProfile">
-                <div class="profile-page">
-                    <div class="profile-hero">
-                        <div class="profile-avatar-wrap">
-                            <div class="profile-avatar-frame">
-                                <div class="profile-avatar-inner">
-                                    <img id="profileAvatarImg" src="https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg" alt="avatar">
-                                </div>
-                            </div>
-                            <div class="profile-avatar-status"></div>
-                        </div>
-                        <div class="profile-nick-big" id="profileNick">Игрок</div>
-                        <a class="profile-tg-big" id="profileTg" href="#" target="_blank"><span id="profileTgText">@username</span></a>
-                    </div>
-                    
-                    <div class="profile-stats-grid">
-                        <div class="profile-stat-card">
-                            <div class="profile-stat-label">Баланс</div>
-                            <div class="profile-stat-value"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png"><span id="profileBalance">0</span></div>
-                        </div>
-                        <div class="profile-stat-card">
-                            <div class="profile-stat-label">Предметов</div>
-                            <div class="profile-stat-value"><span id="profileItemsCount">0</span><span style="font-size:12px;color:var(--text-muted);margin-left:4px;">шт.</span></div>
-                        </div>
-                        <div class="profile-stat-card">
-                            <div class="profile-stat-label">Стоимость инвентаря</div>
-                            <div class="profile-stat-value" style="color:var(--lilac);"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png"><span id="profileInvValue">0</span></div>
-                        </div>
-                    </div>
-
-                    <div class="best-drop-section">
-                        <div style="margin-bottom:12px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;">Лучший дроп за всё время</div>
-                        <div id="bestDropContainer"></div>
-                    </div>
-
-                    <div class="profile-inventory-section">
-                        <button class="profile-inventory-toggle" id="inventoryToggle" onclick="toggleInventoryDrawer()">
-                            <div class="pt-text">
-                                <div class="pt-title">Мой инвентарь</div>
-                                <div class="pt-value"><span id="inventoryCountLabel">0 предметов</span></div>
-                            </div>
-                        </button>
-                        <div class="profile-inventory-drawer" id="inventoryDrawer">
-                            <div class="profile-inventory-grid" id="profileInventoryGrid"></div>
-                        </div>
-                    </div>
-                    <div class="deposits-block" id="depositsBlock" style="display:none;">
-                        <div class="deposits-block-title">Заявки на пополнение <span class="deposits-count" id="depositsCount">0</span></div>
-                        <div id="depositsList"></div>
-                    </div>
-                    <div style="max-width:660px;margin:11px auto 0;padding:0 24px;">
-                        <button class="action-btn" id="adminPanelBtn" style="display:none;" onclick="openAdminPanel()">Открыть админ-панель</button>
-                    </div>
-                    <div class="customize-in-profile">
-                        <div style="margin-top:24px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;margin-bottom:12px;">Настройки профиля</div>
-                        <div class="customize-section">
-                            <div class="customize-section-title">Аватарка</div>
-                            <div class="avatar-upload-row">
-                                <img class="avatar-preview" id="avatarPreview" src="https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg" alt="preview">
-                                <div class="avatar-upload-buttons">
-                                    <label class="upload-btn" for="avatarFileInput">Загрузить</label>
-                                    <button class="reset-avatar-btn" onclick="resetAvatar()">Сбросить</button>
-                                </div>
-                                <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
-                            </div>
-                        </div>
-                        <div class="customize-section">
-                            <div class="customize-section-title">Никнейм</div>
-                            <input type="text" class="form-input" id="customizeNickInput" placeholder="Введи свой ник" maxlength="20">
-                            <button class="action-btn" onclick="saveCustomNick()">Сохранить ник</button>
-                        </div>
-                        <div class="msg" id="customizeMsg"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <aside class="side-nav" id="sideNav">
+    <div class="side-nav-logo">
+      <img src="https://github.com/saintezz/brainrolltester/blob/main/BGlogo.png?raw=true" alt="BrainRoll">
     </div>
+
+    <button class="side-nav-btn active" id="sNavMenu" onclick="switchTab('menu')">
+      <span class="sn-icon"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg></span>
+      Главное меню
+    </button>
+    <button class="side-nav-btn" id="sNavUpgrade" onclick="switchTab('upgrade')">
+      <span class="sn-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>
+      Апгрейдер
+    </button>
+    <button class="side-nav-btn" id="sNavCatch" onclick="switchTab('catch')">
+      <span class="sn-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg></span>
+      Мины
+    </button>
+    <button class="side-nav-btn" id="sNavInventory" onclick="switchTab('inventory')">
+      <span class="sn-icon"><svg viewBox="0 0 24 24"><path d="M3 7h18v13H3z"/><path d="M8 7V4h8v3"/></svg></span>
+      Инвентарь
+    </button>
+    <button class="side-nav-btn" id="sNavBonuses" onclick="switchTab('bonuses')">
+      <span class="sn-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg></span>
+      Бонусы
+    </button>
+    <button class="side-nav-btn" id="sNavProfile" onclick="switchTab('profile')">
+      <span class="sn-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg></span>
+      Профиль
+    </button>
+
+    <div class="side-nav-spacer"></div>
+
+    <div class="side-nav-footer">
+      <div class="balance-wrap" style="width:100%;justify-content:space-between;">
+        <div class="balance">
+          <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin" class="coin-icon">
+          <span id="balanceDisplay">0</span>
+        </div>
+        <button class="topup-btn" onclick="openTopup()" aria-label="Пополнить">+</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="app-content">
+    <div class="app" id="mainApp">
+
+      <div class="top-bar">
+        <div class="top-left">
+          <div class="logo-container">
+            <img src="https://github.com/saintezz/brainrolltester/blob/main/BGlogo.png?raw=true" alt="BrainRoll" class="logo-img">
+          </div>
+        </div>
+        <div class="top-right">
+          <div class="balance-wrap" id="balanceBox">
+            <div class="balance">
+              <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin" class="coin-icon">
+              <span id="balanceDisplayTop">0</span>
+            </div>
+            <button class="topup-btn" onclick="openTopup()" aria-label="Пополнить">+</button>
+          </div>
+          <div class="icon-btn avatar-btn" onclick="switchTab('profile')">
+            <img id="topAvatarImg" src="https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg" alt="avatar">
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel active" id="panelMenu">
+        <div class="promo-banner">
+          <div class="banner-left">
+            <div class="title">АВТО-ПРОМОКОД</div>
+            <div class="main-title">НОВЫЙ БОНУС К ДЕПОЗИТУ</div>
+            <div class="sub-title">КАЖДЫЕ 2 ЧАСА</div>
+          </div>
+          <div class="banner-center">
+            <div class="banner-timer-block">
+              <div class="bt-label">ОСТАЛОСЬ</div>
+              <div class="bt-value" id="autoPromoTimer">01:45:46</div>
+            </div>
+            <div class="banner-bonus-block">
+              <div class="bb-label">БОНУС</div>
+              <div class="bb-value" id="autoPromoBonus">+15%</div>
+            </div>
+          </div>
+          <div class="banner-right">
+            <div class="promo-code-display">
+              <span class="pcd-code" id="autoPromoCode">JACKPOT</span>
+              <button class="pcd-copy" onclick="copyAutoPromoCode()" title="Копировать">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              </button>
+            </div>
+            <button class="activate-btn" onclick="activateAutoPromo()">АКТИВИРОВАТЬ</button>
+          </div>
+        </div>
+
+        <div class="cases-hero">
+          <div class="cases-hero-left">
+            <div class="cases-hero-kicker">Коллекция кейсов</div>
+            <div class="cases-hero-title">Открой свой<br>лучший дроп</div>
+            <div class="cases-hero-sub">10 кейсов — от дешёвых разогревов до legendary-дропов. Выбирай, открывай, апгрейди и собирай коллекцию.</div>
+          </div>
+          <div class="cases-hero-stats">
+            <div class="cases-stat-pill"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin"><span id="casesHeroCount">10 кейсов</span></div>
+            <div class="cases-stat-pill"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin"><span id="casesHeroBalance">0</span></div>
+          </div>
+        </div>
+
+        <div class="cases-toolbar">
+          <div class="cases-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+            <input type="text" id="casesSearchInput" placeholder="Поиск кейса..." autocomplete="off" oninput="renderMenuCases()">
+          </div>
+        </div>
+
+        <div class="cases-grid" id="menuCasesGrid"></div>
+      </div>
+
+      <div class="tab-panel" id="panelUpgrade">
+        <div class="upg-container">
+          <div class="progress-section">
+            <div class="progress-wrapper" id="wheelWrapper">
+              <svg class="progress-svg" viewBox="0 0 340 340">
+                <defs>
+                  <linearGradient id="progressGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#dcc8ff"/>
+                    <stop offset="50%" stop-color="#b794f6"/>
+                    <stop offset="100%" stop-color="#7c5fbf"/>
+                  </linearGradient>
+                </defs>
+                <circle class="progress-outer-ring" cx="170" cy="170" r="149"></circle>
+                <circle class="progress-track" cx="170" cy="170" r="130"></circle>
+                <circle class="progress-track-inner" cx="170" cy="170" r="130"></circle>
+                <circle class="progress-bar no-chance" id="progressBar" cx="170" cy="170" r="130"></circle>
+              </svg>
+              <div class="progress-ticks" id="progressTicks"></div>
+              <div class="arrow-container" id="arrowContainer"><div class="arrow-pointer"></div></div>
+              <div class="progress-center">
+                <div class="chance-big" id="chanceBig">?%</div>
+                <div class="chance-label">ШАНС</div>
+              </div>
+            </div>
+          </div>
+          <div class="items-row">
+            <div class="upg-card" id="upgCardLeft" onclick="document.getElementById('invAnchor').scrollIntoView({behavior: 'smooth'})">
+              <div class="txt">ВЫБЕРИТЕ В ИНВЕНТАРЕ</div>
+            </div>
+            <div class="swap-arrow">»</div>
+            <div class="upg-card" id="upgCardRight" onclick="openTargetList()">
+              <div class="txt">ВЫБРАТЬ ЦЕЛЬ</div>
+              <div class="txt sub">Нажми на меня</div>
+            </div>
+          </div>
+          <div class="stage-controls">
+            <button class="upgrade-main-btn" id="upgradeBtn" onclick="upgrade()" disabled><span>АПГРЕЙД</span></button>
+            <button class="fast-btn" id="fastUpgradeBtn" onclick="toggleFastMode()" title="Быстрый режим">
+              <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </button>
+          </div>
+          <div class="segmented-control" style="margin-top: 12px;">
+            <div class="segment active" id="segmentMyItems" onclick="switchUpgradeTab('my')">МОИ ПРЕДМЕТЫ</div>
+            <div class="segment" id="segmentShop" onclick="switchUpgradeTab('shop')">МАГАЗИН</div>
+          </div>
+          <div id="inventorySection" style="display: block; margin-top: 14px;">
+            <div class="section-title" id="invAnchor">Инвентарь</div>
+            <div class="inventory-row" id="inventoryRow"></div>
+          </div>
+          <div id="shopSection" style="display: none; margin-top: 14px;">
+            <div class="section-title">Магазин</div>
+            <div class="shop-scroll"><div class="shop-grid" id="shopRow"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="panelCatch">
+        <div class="mines-layout">
+          <div class="mines-board-wrap">
+            <div class="mines-board" id="minesBoard"></div>
+          </div>
+          <div class="mines-controls">
+            <div class="mines-control-title">Мин на поле</div>
+            <div class="mines-bet-input">
+              <button onclick="changeMines(-1)">−</button>
+              <input type="number" id="minesCountInput" value="2" min="1" max="24" readonly>
+              <button onclick="changeMines(1)">+</button>
+            </div>
+            <div class="mines-multipliers" id="minesMultipliers">
+              <div class="mines-mult-btn" onclick="setMinesMultiplier(2)">2</div>
+              <div class="mines-mult-btn" onclick="setMinesMultiplier(3)">3</div>
+              <div class="mines-mult-btn" onclick="setMinesMultiplier(5)">5</div>
+              <div class="mines-mult-btn" onclick="setMinesMultiplier(10)">10</div>
+              <div class="mines-mult-btn" onclick="setMinesMultiplier(24)">24</div>
+            </div>
+            <div class="mines-info-row">
+              <span>Коэффициент</span>
+              <span id="minesCurrentMult">x1.04</span>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="margin-bottom: 5px;">Выбери предметы для ставки</label>
+              <div class="shop-scroll" style="max-height: 156px; border: 1px solid var(--line-mid); border-radius: var(--r-md); padding: 5px;">
+                <div class="inventory-row" id="minesBetGrid" style="gap: 8px; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));"></div>
+              </div>
+            </div>
+            <div class="mines-info-row" style="background:transparent; border:none; padding:0; margin-top: 4px;">
+              <span>Ставка:</span>
+              <span style="display:flex; align-items:center; gap:7px;"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" style="width:16px;height:16px;"> <span id="minesBetAmount">0</span></span>
+            </div>
+            <button class="mines-start-btn" id="minesStartBtn" onclick="startMinesGame()">ИГРАТЬ</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="panelInventory">
+        <div class="inventory-page">
+          <div class="inventory-hero">
+            <div>
+              <div class="inventory-hero-title">Мой инвентарь</div>
+              <div class="inventory-hero-sub">Все твои брейнроты в одном месте</div>
+            </div>
+            <div class="inventory-hero-stats">
+              <div class="inv-hero-pill" id="invHeroCount">0 предметов</div>
+              <div class="inv-hero-pill gold" id="invHeroValue"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin"><span>0</span></div>
+            </div>
+          </div>
+          <div id="inventoryTabGrid" class="inventory-tab-grid"></div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="panelBonuses">
+        <div class="bonus-page">
+          <div class="bonus-card">
+            <div class="bonus-card-title">Username Case</div>
+            <div class="bonus-card-sub">Добавь <b>BrainrotGGame</b> в конец своего ника в Telegram (например: <b>saint BrainrotGGame</b>) и открывай кейс раз в 12 часов</div>
+            <div class="username-case-wrap">
+              <img class="username-case-img" src="https://github.com/saintezz/BrainrotWin/blob/main/UserCase.png?raw=true" alt="Username Case">
+              <div class="username-case-info">
+                <div class="username-case-line">
+                  <span class="uc-key">Твой ник:</span>
+                  <span class="uc-username-badge" id="ucMyUsername">—</span>
+                </div>
+                <div class="username-case-reward-list">
+                  <div class="uc-reward-pill"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin">2 монеты <span class="uc-chance">· 50%</span></div>
+                  <div class="uc-reward-pill">La Grande <span class="uc-chance">· 49.9%</span></div>
+                  <div class="uc-reward-pill">Dragon Cannelloni <span class="uc-chance">· 0.1%</span></div>
+                </div>
+                <div class="uc-timer" id="ucTimer">Проверка...</div>
+                <div class="uc-hint" id="ucHint">В нике должна быть приписка <b>BrainrotGGame</b></div>
+                <button class="username-case-btn" id="ucOpenBtn" onclick="openUsernameCase()" disabled>Открыть кейс</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="promo-new">
+            <div class="promo-new-left">
+              <div class="promo-new-title">Введи промокод</div>
+              <div class="promo-new-sub">И получи награду!</div>
+            </div>
+            <div class="promo-new-right">
+              <input type="text" id="promoInput" placeholder="ПРОМОКОД" maxlength="20" autocomplete="off">
+              <button id="promoActivateBtn" onclick="activatePromo()">Забрать</button>
+            </div>
+          </div>
+          <div class="msg" id="promoMsg" style="margin-top:-8px;padding-left:6px;"></div>
+
+          <div class="bonus-card">
+            <div class="bonus-card-title">Стейкинг</div>
+            <div class="bonus-card-sub">Заморозь монеты и получи бонус к сумме по истечении срока</div>
+
+            <div id="stakingActiveBox" style="display:none;"></div>
+
+            <div id="stakingFormBox">
+              <div class="staking-input-row">
+                <input type="number" id="stakingAmount" placeholder="Сумма (мин. 100)" min="100" step="1">
+                <div class="inv-hero-pill gold" style="font-size:13px;padding:13px 20px;flex-shrink:0;">
+                  <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin">
+                  <span id="stakingBalanceLabel">0</span>
+                </div>
+              </div>
+              <div class="staking-tiers" id="stakingTiers">
+                <div class="staking-tier" data-tier="week" onclick="selectStakingTier('week')">
+                  <div class="staking-tier-label">Неделя</div>
+                  <div class="staking-tier-bonus">+10%</div>
+                  <div class="staking-tier-sub">к сумме</div>
+                </div>
+                <div class="staking-tier" data-tier="twoWeek" onclick="selectStakingTier('twoWeek')">
+                  <div class="staking-tier-label">2 недели</div>
+                  <div class="staking-tier-bonus">+25%</div>
+                  <div class="staking-tier-sub">к сумме</div>
+                </div>
+                <div class="staking-tier" data-tier="month" onclick="selectStakingTier('month')">
+                  <div class="staking-tier-label">Месяц</div>
+                  <div class="staking-tier-bonus">+40%</div>
+                  <div class="staking-tier-sub">к сумме</div>
+                </div>
+              </div>
+              <button class="username-case-btn" id="stakingStartBtn" onclick="startStaking()" style="width:100%;max-width:none;">Заморозить</button>
+              <div class="msg" id="stakingMsg"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="panelProfile">
+        <div class="profile-page">
+          <div class="profile-hero">
+            <div class="profile-avatar-wrap">
+              <div class="profile-avatar-frame">
+                <div class="profile-avatar-inner">
+                  <img id="profileAvatarImg" src="https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg" alt="avatar">
+                </div>
+              </div>
+              <div class="profile-avatar-status"></div>
+            </div>
+            <div class="profile-nick-big" id="profileNick">Игрок</div>
+            <a class="profile-tg-big" id="profileTg" href="#" target="_blank"><span id="profileTgText">@username</span></a>
+          </div>
+
+          <div class="profile-stats-grid">
+            <div class="profile-stat-card">
+              <div class="profile-stat-label">Баланс</div>
+              <div class="profile-stat-value"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png"><span id="profileBalance">0</span></div>
+            </div>
+            <div class="profile-stat-card">
+              <div class="profile-stat-label">Предметов</div>
+              <div class="profile-stat-value"><span id="profileItemsCount">0</span><span style="font-size:12px;color:var(--text-muted);margin-left:4px;">шт.</span></div>
+            </div>
+            <div class="profile-stat-card">
+              <div class="profile-stat-label">Стоимость инвентаря</div>
+              <div class="profile-stat-value" style="color:var(--lilac);"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png"><span id="profileInvValue">0</span></div>
+            </div>
+          </div>
+
+          <div class="best-drop-section">
+            <div style="margin-bottom:12px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;">Лучший дроп за всё время</div>
+            <div id="bestDropContainer"></div>
+          </div>
+
+          <div class="profile-inventory-section">
+            <button class="profile-inventory-toggle" id="inventoryToggle" onclick="toggleInventoryDrawer()">
+              <div class="pt-text">
+                <div class="pt-title">Мой инвентарь</div>
+                <div class="pt-value"><span id="inventoryCountLabel">0 предметов</span></div>
+              </div>
+            </button>
+            <div class="profile-inventory-drawer" id="inventoryDrawer">
+              <div class="profile-inventory-grid" id="profileInventoryGrid"></div>
+            </div>
+          </div>
+          <div class="deposits-block" id="depositsBlock" style="display:none;">
+            <div class="deposits-block-title">Заявки на пополнение <span class="deposits-count" id="depositsCount">0</span></div>
+            <div id="depositsList"></div>
+          </div>
+          <div style="max-width:660px;margin:11px auto 0;padding:0 24px;">
+            <button class="action-btn" id="adminPanelBtn" style="display:none;" onclick="openAdminPanel()">Открыть админ-панель</button>
+          </div>
+          <div class="customize-in-profile">
+            <div style="margin-top:24px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;margin-bottom:12px;">Настройки профиля</div>
+            <div class="customize-section">
+              <div class="customize-section-title">Аватарка</div>
+              <div class="avatar-upload-row">
+                <img class="avatar-preview" id="avatarPreview" src="https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg" alt="preview">
+                <div class="avatar-upload-buttons">
+                  <label class="upload-btn" for="avatarFileInput">Загрузить</label>
+                  <button class="reset-avatar-btn" onclick="resetAvatar()">Сбросить</button>
+                </div>
+                <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
+              </div>
+            </div>
+            <div class="customize-section">
+              <div class="customize-section-title">Никнейм</div>
+              <input type="text" class="form-input" id="customizeNickInput" placeholder="Введи свой ник" maxlength="20">
+              <button class="action-btn" onclick="saveCustomNick()">Сохранить ник</button>
+            </div>
+            <div class="msg" id="customizeMsg"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
 // ================== КОНСТАНТЫ ==================
-const API_URL = 'https://brainrolltester.onrender.com';
+const API_URL = 'https://brainrotwin.onrender.com';
 const ADMIN_USERNAMES = ['saintezz7', 'vortyn1'];
 const COIN_IMG = 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png';
 const DEFAULT_AVATAR = 'https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg';
@@ -2464,8 +2510,8 @@ function escapeHtml(s) {
 
 function nickHasRequiredTag(nick) {
   if (!nick || typeof nick !== 'string') return false;
-  const cleaned = nick.replace(/@/g, ' ').toLowerCase();
-  return cleaned.includes(REQUIRED_TAG_LOWER);
+  const cleaned = String(nick).toLowerCase().replace(/@/g, '');
+  return cleaned.includes('brainrotggame');
 }
 
 (function initTelegramUser() {
@@ -2581,7 +2627,6 @@ async function loadUserFromServer() {
   } catch (e) { console.warn('[SYNC] сервер недоступен:', e.message); }
 }
 
-// ================== АНОНСЫ ==================
 async function checkAnnouncement() {
   try {
     const res = await fetch(API_URL + '/api/announcement', { cache: 'no-store' });
@@ -2602,7 +2647,6 @@ function renderAnnouncement(ann) {
   container.appendChild(el);
 }
 
-// ================== ТЕХПЕРЕРЫВ ==================
 function applyMaintenanceState(enabled) {
   maintenanceEnabled = !!enabled;
   const ov = document.getElementById('maintenanceOverlay');
@@ -2630,7 +2674,6 @@ async function checkMaintenance() {
   } catch (e) {}
 }
 
-// ================== БАНЫ ==================
 function refreshBodyScrollLock() {
   const anyOpen =
     !!document.querySelector('.modal.open') ||
@@ -2708,17 +2751,20 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) chec
 
 function updateBalanceUI() {
   const bd = document.getElementById('balanceDisplay');
+  const bdTop = document.getElementById('balanceDisplayTop');
+  const txt = balance.toLocaleString('ru-RU');
+  if (bd) bd.innerText = txt;
+  if (bdTop) bdTop.innerText = txt;
   const pb = document.getElementById('profileBalance');
   const pic = document.getElementById('profileItemsCount');
-  if (bd) bd.innerText = balance.toLocaleString('ru-RU');
-  if (pb) pb.innerText = balance.toLocaleString('ru-RU');
+  if (pb) pb.innerText = txt;
   if (pic) pic.innerText = inventory.length;
   const label = document.getElementById('inventoryCountLabel');
   if (label) label.textContent = inventory.length + ' ' + getItemsWord(inventory.length);
   const hb = document.getElementById('casesHeroBalance');
-  if (hb) hb.textContent = balance.toLocaleString('ru-RU');
+  if (hb) hb.textContent = txt;
   const stBal = document.getElementById('stakingBalanceLabel');
-  if (stBal) stBal.textContent = balance.toLocaleString('ru-RU');
+  if (stBal) stBal.textContent = txt;
 
   const piv = document.getElementById('profileInvValue');
   if (piv) {
@@ -2792,7 +2838,6 @@ window.resetBestDrop = async function() {
   }
 };
 
-// ================== ЗВУКИ ==================
 let audioCtx = null;
 function getAudioCtx() { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { audioCtx = null; } } if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{}); return audioCtx; }
 function playOsc(f, d, t='sine', v=0.05, dl=0, ff=null) { const c=getAudioCtx(); if(!c)return; try{const o=c.createOscillator(),g=c.createGain(); o.type=t;o.frequency.setValueAtTime(f,c.currentTime+dl); let l=o; if(ff){const fi=c.createBiquadFilter(); fi.type='lowpass';fi.frequency.value=ff;o.connect(fi);l=fi;} g.gain.setValueAtTime(0.0001,c.currentTime+dl);g.gain.exponentialRampToValueAtTime(v,c.currentTime+dl+0.02);g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+dl+d);l.connect(g);g.connect(c.destination);o.start(c.currentTime+dl);o.stop(c.currentTime+dl+d+0.05);}catch(e){} }
@@ -2806,25 +2851,39 @@ function playUpgradeStart(){const c=getAudioCtx();if(!c)return;try{const o=c.cre
 function vibrate(ms=15){try{if(navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
 function vibratePattern(p){try{if(navigator.vibrate)navigator.vibrate(p);}catch(e){}}
 
-// ================== МОДАЛКИ / НАВИГАЦИЯ ==================
 window.openModal = function(id) { const el = document.getElementById(id); if (el) el.classList.add('open'); refreshBodyScrollLock(); };
 window.closeModal = function(id) { const el = document.getElementById(id); if (el) el.classList.remove('open'); refreshBodyScrollLock(); };
 document.querySelectorAll('.modal').forEach(m => { m.addEventListener('click', (e) => { if (e.target === m) { m.classList.remove('open'); refreshBodyScrollLock(); } }); });
-window.toggleMobileMenu = function() { document.getElementById('mobileMenuOverlay').classList.toggle('open'); document.getElementById('mobileMenuPanel').classList.toggle('open'); playClick(); };
+
+window.toggleSideNav = function() {
+  const nav = document.getElementById('sideNav');
+  const ov = document.getElementById('sideNavOverlay');
+  if (!nav || !ov) return;
+  nav.classList.toggle('open');
+  ov.classList.toggle('open');
+  playClick();
+};
+
 window.switchTab = function(tab) {
   if (maintenanceEnabled && !isCurrentUserAdmin()) return;
   if (document.body.classList.contains('upgrade-locked')) return;
   playClick(); vibrate(10);
+
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.mobile-nav-btn').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.side-nav-btn').forEach(t => t.classList.remove('active'));
+
   const cap = tab.charAt(0).toUpperCase() + tab.slice(1);
   const panel = document.getElementById('panel' + cap);
-  const navBtn = document.getElementById('nav' + cap);
-  const mNavBtn = document.getElementById('mNav' + cap);
+  const navBtn = document.getElementById('sNav' + cap);
+
   if (panel) panel.classList.add('active');
   if (navBtn) navBtn.classList.add('active');
-  if (mNavBtn) mNavBtn.classList.add('active');
+
+  if (window.innerWidth <= 900) {
+    document.getElementById('sideNav')?.classList.remove('open');
+    document.getElementById('sideNavOverlay')?.classList.remove('open');
+  }
+
   if (tab === 'profile') { updateProfile(); const cn = document.getElementById('customizeNickInput'); if (cn) cn.value = customNick || USER.nick; }
   if (tab === 'menu') renderMenuCases();
   if (tab === 'upgrade') { renderInventory(); renderShop(); updateUpgradeScreen(); }
@@ -2833,7 +2892,6 @@ window.switchTab = function(tab) {
   if (tab === 'bonuses') { loadUsernameCaseStatus(); loadStakingInfo(); }
 };
 
-// ================== ПРОФИЛЬ ==================
 function applyCustomAvatar() {
   const src = customAvatar || DEFAULT_AVATAR;
   ['profileAvatarImg','topAvatarImg','avatarPreview'].forEach(id => { const el = document.getElementById(id); if (el) el.src = src; });
@@ -2899,7 +2957,6 @@ window.saveCustomNick = function() {
   applyUserToProfile(); syncCosmeticsToServer();
 };
 
-// ================== ПОПОЛНЕНИЕ ==================
 window.openTopup = function() {
   if (maintenanceEnabled && !isCurrentUserAdmin()) return;
   if (document.body.classList.contains('upgrade-locked')) return;
@@ -2942,7 +2999,6 @@ window.createDeposit = async function() {
   } else { if (msg) { msg.className='msg err'; msg.textContent = data.error || 'Ошибка'; } playLose(); }
 };
 
-// ================== ДЕПОЗИТЫ ==================
 async function loadDeposits() {
   try {
     const initDataRaw = window.Telegram?.WebApp?.initData || '';
@@ -2968,7 +3024,7 @@ window.processDeposit = async function(id, status) {
   else playLose();
 };
 
-// ================== USERNAME CASE ==================
+// ================== USERNAME CASE (FIXED) ==================
 async function loadUsernameCaseStatus() {
   if (!USER.id) {
     const timerEl = document.getElementById('ucTimer');
@@ -2986,7 +3042,11 @@ async function loadUsernameCaseStatus() {
 
   try {
     const initDataRaw = window.Telegram?.WebApp?.initData || '';
-    const url = API_URL + '/api/username-case/status?nick=' + encodeURIComponent(USER.nick || '');
+    const nickCandidates = [
+      USER.firstName, USER.lastName, USER.nick, USER.username, customNick
+    ].filter(Boolean).join('|');
+
+    const url = API_URL + '/api/username-case/status?nick=' + encodeURIComponent(nickCandidates);
 
     const res = await fetch(url, {
       headers: { 'X-Telegram-Init-Data': initDataRaw },
@@ -2996,13 +3056,14 @@ async function loadUsernameCaseStatus() {
     clearTimeout(timeoutId);
 
     if (!res.ok) throw new Error('HTTP ' + res.status);
-
     const data = await res.json();
     if (!data || !data.ok) throw new Error((data && data.error) || 'BAD_RESPONSE');
 
-    const serverHas = !!data.has_required_username;
-    const localHas = nickHasRequiredTag(USER.nick || '');
-    ucStatus = { ...data, has_required_username: serverHas && localHas };
+    ucStatus = {
+      ...data,
+      has_required_username: !!data.has_required_username,
+      display_nick: data.display_nick || USER.nick
+    };
 
     renderUsernameCaseStatus();
     if (ucInterval) clearInterval(ucInterval);
@@ -3029,22 +3090,22 @@ function renderUsernameCaseStatus() {
   const btn = document.getElementById('ucOpenBtn');
   if (!myEl || !timerEl || !btn) return;
 
-  myEl.textContent = USER.nick || '—';
+  myEl.textContent = ucStatus.display_nick || USER.nick || '—';
   const hasTag = !!ucStatus.has_required_username;
   myEl.classList.toggle('bad', !hasTag);
 
   if (hintEl) {
     if (!hasTag) {
-      hintEl.innerHTML = `В нике должна быть приписка <b>@BrainrotGGame</b>. Пример: <b>saint @BrainrotGGame</b>`;
+      hintEl.innerHTML = `В нике должна быть приписка <b>BrainrotGGame</b> (без @, т.к. Telegram не разрешает @ в имени). Пример: <b>saint BrainrotGGame</b>`;
       hintEl.style.color = 'var(--red)';
     } else {
-      hintEl.innerHTML = `Ник содержит <b>@BrainrotGGame</b> — всё верно!`;
+      hintEl.innerHTML = `Ник содержит <b>BrainrotGGame</b> — всё верно!`;
       hintEl.style.color = 'var(--text-muted)';
     }
   }
 
   if (!hasTag) {
-    timerEl.textContent = 'Добавь @BrainrotGGame в ник';
+    timerEl.textContent = 'Добавь BrainrotGGame в ник';
     timerEl.style.color = 'var(--red)';
     btn.disabled = true;
     btn.textContent = 'Ник неверный';
@@ -3077,7 +3138,7 @@ window.openUsernameCase = async function() {
   const data = await api('/api/username-case/open', { nick: USER.nick || '' });
   if (!data.ok) {
     playLose();
-    if (data.error === 'USERNAME_REQUIRED') alert('Добавь @BrainrotGGame в свой ник в Telegram (например: saint @BrainrotGGame)');
+    if (data.error === 'USERNAME_REQUIRED') alert('Добавь BrainrotGGame в свой ник в Telegram (например: saint BrainrotGGame)');
     else if (data.error === 'COOLDOWN') alert('Кейс ещё на кулдауне');
     else alert(data.error || 'Ошибка');
     await loadUsernameCaseStatus();
@@ -3098,7 +3159,6 @@ window.openUsernameCase = async function() {
   renderUsernameCaseStatus();
 };
 
-// ================== STAKING ==================
 window.selectStakingTier = function(tier) {
   stakingTierSelected = tier;
   document.querySelectorAll('.staking-tier').forEach(el => el.classList.toggle('active', el.dataset.tier === tier));
@@ -3201,7 +3261,6 @@ window.claimStaking = async function() {
   await loadStakingInfo();
 };
 
-// ================== АДМИН ==================
 window.selectPromoType = function(type) {
   playClick(); promoType = type;
   document.querySelectorAll('.radio-option').forEach(o => o.classList.toggle('active', o.dataset.type === type));
@@ -3322,7 +3381,6 @@ window.sendAnnouncement = async function() {
   }
 };
 
-// ================== АДМИН: БАНЫ ==================
 function banTargetArg(s) { return String(s == null ? '' : s).replace(/[^A-Za-z0-9_@-]/g, ''); }
 function setBanMsg(kind, text) {
   const msg = document.getElementById('adminBanMsg');
@@ -3440,7 +3498,6 @@ window.processWithdraw = async function(id, status) {
   } else playLose();
 };
 
-// ================== ТЕХПЕРЕРЫВ (АДМИН) ==================
 async function loadMaintenanceStatus() {
   const el = document.getElementById('maintenanceStatus');
   const btn = document.getElementById('maintenanceToggleBtn');
@@ -3483,7 +3540,6 @@ window.toggleMaintenance = async function() {
   }
 };
 
-// ================== МАГАЗИН / ИНВЕНТАРЬ ==================
 window.toggleFastMode = function() {
   if (document.body.classList.contains('upgrade-locked')) return;
   fastModeEnabled = !fastModeEnabled;
@@ -3574,7 +3630,6 @@ window.pickTargetFromList = function(targetId) {
   playClick(); vibrate(15);
 };
 
-// ================== ШАНС ==================
 function calcUpgradeChance(sourcePrice, targetPrice) {
   if (!sourcePrice || !targetPrice || targetPrice <= sourcePrice) return 0;
   let pct = MAX_CHANCE / (targetPrice / sourcePrice);
@@ -3674,12 +3729,23 @@ window.upgrade = function() {
   performUpgrade(fastModeEnabled ? SPIN_DURATION_FAST : SPIN_DURATION);
 };
 
-// ================== КЕЙСЫ ==================
+// ================== КЕЙСЫ (улучшенный спин) ==================
 const CASE_ROW_ITEMS = 60;
 const CASE_ITEM_WIDTH = 120;
 const CASE_WIN_INDEX = 50;
 const CASE_SPIN_MS = 6800;
 let caseSpinTimeout = null;
+
+const CASE_EASING = 'cubic-bezier(0.08, 0.62, 0.02, 1)';
+
+function scheduleCaseTicks(durationMs, totalTicks = 34) {
+  for (let i = 0; i < totalTicks; i++) {
+    const t = i / totalTicks;
+    const easedT = 1 - Math.pow(1 - t, 1 / 3);
+    const delay = easedT * durationMs;
+    setTimeout(() => playTick(), delay);
+  }
+}
 
 function renderMenuCases() {
   const grid = document.getElementById('menuCasesGrid');
@@ -3734,6 +3800,7 @@ function buildCaseTrack(track, c) {
 function resetCaseModal() {
   if (caseSpinTimeout) { clearTimeout(caseSpinTimeout); caseSpinTimeout = null; }
   isCaseOpening = false;
+  document.querySelectorAll('.case-roulette-row').forEach(r => r.classList.remove('spinning'));
   const btn = document.getElementById('caseOpenActionBtn');
   if (btn) { btn.disabled = false; btn.textContent = 'ОТКРЫТЬ КЕЙС'; }
 }
@@ -3765,7 +3832,7 @@ window.openCaseDetail = function(caseId) {
     track.id = `caseRouletteTrack_${q}`;
     track.dataset.qty = q;
     track.style.transition = 'none';
-    track.style.transform = 'translateX(0px)';
+    track.style.transform = 'translate3d(0,0,0)';
     buildCaseTrack(track, c);
     row.appendChild(track);
     const p = document.createElement('div');
@@ -3807,12 +3874,12 @@ function computeTrackOffset(track) {
   const row = track.parentElement;
   const rowWidth = row ? row.clientWidth : 0;
   const targetLeft = CASE_WIN_INDEX * CASE_ITEM_WIDTH;
-  const offset = targetLeft + CASE_ITEM_WIDTH / 2 - rowWidth / 2;
-  return Math.max(0, offset);
+  return Math.max(0, targetLeft + CASE_ITEM_WIDTH / 2 - rowWidth / 2);
 }
 
-window.confirmOpenCase = async function() {
-  const c = CASES.find(x => x.id === currentCaseId); if (!c) return;
+window.confirmOpenCase = async function () {
+  const c = CASES.find(x => x.id === currentCaseId);
+  if (!c) return;
   if (isCaseOpening) return;
   if (maintenanceEnabled && !isCurrentUserAdmin()) return;
 
@@ -3820,9 +3887,12 @@ window.confirmOpenCase = async function() {
   const btn = document.getElementById('caseOpenActionBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'ОТКРЫВАЕМ...'; }
 
+  const rows = document.querySelectorAll('.case-roulette-row');
+  rows.forEach(r => r.classList.add('spinning'));
+
   document.querySelectorAll('.case-roulette-track').forEach(t => {
     t.style.transition = 'none';
-    t.style.transform = 'translateX(0px)';
+    t.style.transform = 'translate3d(0,0,0)';
     t.querySelectorAll('.case-roulette-item.winning').forEach(el => el.classList.remove('winning'));
   });
 
@@ -3830,13 +3900,16 @@ window.confirmOpenCase = async function() {
   if (!data.ok) {
     isCaseOpening = false;
     if (btn) { btn.disabled = false; btn.textContent = 'ОТКРЫТЬ КЕЙС'; }
+    rows.forEach(r => r.classList.remove('spinning'));
     playLose(); vibrate(30);
     return;
   }
+
   const wonList = Array.isArray(data.won) ? data.won : [];
   if (!wonList.length) {
     isCaseOpening = false;
     if (btn) { btn.disabled = false; btn.textContent = 'ОТКРЫТЬ КЕЙС'; }
+    rows.forEach(r => r.classList.remove('spinning'));
     playLose();
     return;
   }
@@ -3844,42 +3917,52 @@ window.confirmOpenCase = async function() {
   requestAnimationFrame(() => {
     setTimeout(() => {
       const tracks = document.querySelectorAll('.case-roulette-track');
+      const offsets = [];
+      tracks.forEach(track => offsets.push(computeTrackOffset(track)));
+
       wonList.forEach((wonId, q) => {
         const track = tracks[q];
         if (!track) return;
 
         const items = track.children;
-
         if (items[CASE_WIN_INDEX]) {
           const wonItem = getItemById(wonId);
           if (wonItem) {
             items[CASE_WIN_INDEX].dataset.itemId = wonItem.id;
-            items[CASE_WIN_INDEX].innerHTML = `<img src="${wonItem.img}" alt="${escapeHtml(wonItem.name)}" loading="lazy" decoding="async" ${FALLBACK_ATTR}><div class="roulette-name">${escapeHtml(wonItem.name)}</div><div class="roulette-price"><img src="${COIN_IMG}">${wonItem.price}</div>`;
+            items[CASE_WIN_INDEX].innerHTML = `
+              <img src="${wonItem.img}" alt="${escapeHtml(wonItem.name)}"
+                   loading="lazy" decoding="async" ${FALLBACK_ATTR}>
+              <div class="roulette-name">${escapeHtml(wonItem.name)}</div>
+              <div class="roulette-price"><img src="${COIN_IMG}">${wonItem.price}</div>`;
           }
         }
 
-        const offset = computeTrackOffset(track);
+        const offset = offsets[q];
 
         track.style.transition = 'none';
-        track.style.transform = 'translateX(0px)';
+        track.style.transform = 'translate3d(0,0,0)';
         void track.offsetWidth;
 
-        track.style.transition = `transform ${CASE_SPIN_MS}ms cubic-bezier(0.10, 0.82, 0.10, 1)`;
-        track.style.transform = `translateX(-${offset}px)`;
+        track.style.transition = `transform ${CASE_SPIN_MS}ms ${CASE_EASING}`;
+        track.style.transform = `translate3d(-${offset}px,0,0)`;
       });
 
-      const ticks = 26;
-      const tickInterval = CASE_SPIN_MS / ticks;
-      for (let i = 0; i < ticks; i++) setTimeout(() => playTick(), i * tickInterval);
+      scheduleCaseTicks(CASE_SPIN_MS, 34);
 
-      caseSpinTimeout = setTimeout(() => {
+      let finished = false;
+      const finish = () => {
+        if (finished) return;
+        finished = true;
+
         document.querySelectorAll('.case-roulette-track').forEach(t => {
           const items = t.children;
           if (items[CASE_WIN_INDEX]) items[CASE_WIN_INDEX].classList.add('winning');
         });
+        rows.forEach(r => r.classList.remove('spinning'));
 
         applyServerUser({ balance: data.new_balance, inventory: data.inventory, best_drop: data.best_drop });
         playWin(); vibratePattern([30,50,30,50,60]);
+
         isCaseOpening = false;
         if (btn) { btn.disabled = false; btn.textContent = 'ОТКРЫТЬ КЕЙС'; }
 
@@ -3887,14 +3970,19 @@ window.confirmOpenCase = async function() {
         if (cb) cb.textContent = balance.toLocaleString('ru-RU');
 
         renderInventory(); renderInventoryTab(); renderProfileInventory();
-
         caseSpinTimeout = null;
-      }, CASE_SPIN_MS + 250);
-    }, 120);
+      };
+
+      const lastTrack = tracks[tracks.length - 1];
+      if (lastTrack) {
+        lastTrack.addEventListener('transitionend', finish, { once: true });
+      }
+
+      caseSpinTimeout = setTimeout(finish, CASE_SPIN_MS + 400);
+    }, 100);
   });
 };
 
-// ================== ВЫВОД ==================
 let withdrawSelectedIndexes = [];
 let withdrawAgree = false;
 window.setInvFilter = function(f) {
@@ -4009,7 +4097,6 @@ window.showWithdrawInfo = function(itemId) {
   openModal('withdrawInfoModal');
 };
 
-// ================== АВТО-ПРОМО ==================
 const AUTO_PROMOS = [{ code: 'KRAKEN121', bonus: 5 }, { code: 'SAINT213', bonus: 8 }, { code: 'EASYROLL', bonus: 7 }, { code: 'MOON334', bonus: 7 }, { code: 'SUN21', bonus: 4 }, { code: 'STAR482', bonus: 3 }, { code: 'NIGHT73', bonus: 2 }, { code: 'CLOUD56', bonus: 8 }];
 const AUTO_PROMO_INTERVAL = 60 * 60 * 1000;
 function getCurrentAutoPromo() { const now = Date.now(); const startOfDay = new Date().setHours(0, 0, 0, 0); const elapsed = now - startOfDay; const index = Math.floor(elapsed / AUTO_PROMO_INTERVAL) % AUTO_PROMOS.length; const promo = AUTO_PROMOS[index]; const nextChangeTime = startOfDay + (Math.floor(elapsed / AUTO_PROMO_INTERVAL) + 1) * AUTO_PROMO_INTERVAL; return { ...promo, nextChangeTime }; }
@@ -4024,7 +4111,6 @@ window.copyAutoPromoCode = function() { const promo = getCurrentAutoPromo(); nav
 window.activateAutoPromo = function() { const promo = getCurrentAutoPromo(); activePromo = { code: promo.code, bonus: promo.bonus }; playWin(); vibrate(20); if (document.getElementById('topupModal').classList.contains('open')) updateTopupPromoDisplay(); };
 function updateTopupPromoDisplay() { const infoBlock = document.getElementById('activePromoInfo'); const bonusSpan = document.getElementById('activePromoBonus'); if (activePromo) { if (infoBlock) infoBlock.style.display = 'block'; if (bonusSpan) bonusSpan.textContent = '+' + activePromo.bonus + '%'; } else if (infoBlock) infoBlock.style.display = 'none'; updateTopupPrice(); }
 
-// ================== МИНЫ ==================
 let minesGameActive = false;
 let minesOpenedCells = new Set();
 let minesMinesCount = 2;
@@ -4207,7 +4293,6 @@ async function startMinesGame() {
   vibrate(15);
 }
 
-// ================== СТАРТ ==================
 async function init() {
   isSpinning = false; document.body.classList.remove('upgrade-locked');
   selectedSourceIndex = null; selectedTargetId = null;
