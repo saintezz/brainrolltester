@@ -84,9 +84,6 @@
 
   --ease:cubic-bezier(.22,.8,.24,1);
   --ease-out:cubic-bezier(.16,1,.3,1);
-
-  --accent-soft: var(--lilac-soft);
-  --accent-line: var(--lilac-line);
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;font-family:var(--font-main);font-weight:500;letter-spacing:0}
@@ -129,7 +126,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 #toastContainer{display:none}
 
 /* ============================================================
-   LAYOUT: SIDEBAR + СУЖЕНИЕ
+   LAYOUT
    ============================================================ */
 .app-wrapper{
   display:flex;
@@ -209,27 +206,66 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 }
 .side-nav-btn .sn-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
 .side-nav-spacer{flex:1}
-.side-nav-footer{
-  padding:10px 8px 0;
-  border-top:1px solid var(--line);
+
+/* ★ TGC LINK — вместо баланса в сайдбаре */
+.side-nav-tgc{
   display:flex;
-  gap:8px;
+  align-items:center;
+  gap:11px;
+  padding:11px 14px;
+  border-radius:var(--r-md);
+  background:linear-gradient(135deg, rgba(92,240,176,.14), rgba(92,240,176,.05));
+  border:1px solid var(--green-line);
+  text-decoration:none;
+  color:#fff;
+  font-size:12.5px;
+  font-weight:800;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  transition:all .18s var(--ease);
+  box-shadow:var(--green-glow-soft);
+  margin-top:8px;
 }
+.side-nav-tgc:hover{
+  background:linear-gradient(135deg, rgba(92,240,176,.22), rgba(92,240,176,.08));
+  box-shadow:var(--green-glow);
+  transform:translateY(-1px);
+}
+.side-nav-tgc img{
+  width:28px;height:28px;
+  object-fit:contain;
+  filter:drop-shadow(0 0 6px rgba(92,240,176,.7));
+  flex-shrink:0;
+}
+.side-nav-tgc .tgc-text{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  line-height:1.15;
+}
+.side-nav-tgc .tgc-label{
+  font-size:9px;
+  font-weight:700;
+  color:var(--text-muted);
+  letter-spacing:.14em;
+}
+.side-nav-tgc .tgc-title{
+  font-size:13px;
+  color:var(--green);
+  text-shadow:0 0 8px rgba(92,240,176,.6);
+}
+
 .side-nav-overlay{
   display:none;
   position:fixed;inset:0;
-  background:rgba(5,4,10,.78);
-  backdrop-filter:blur(6px);
-  -webkit-backdrop-filter:blur(6px);
+  background:rgba(5,4,10,.72);
   z-index:690;
 }
-.side-nav-overlay.open{display:block}
 
-/* Топ-бар без горизонтальных вкладок */
 .top-nav-panel{display:none !important}
 
 /* ============================================================
-   MOBILE MENU (старый бургер)
+   MOBILE MENU
    ============================================================ */
 .burger-btn{
   display:none;background:var(--bg-glass);border:1px solid var(--line-mid);
@@ -298,6 +334,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 .icon-btn.avatar-btn{border-color:var(--lilac-line);box-shadow:var(--lilac-glow-soft)}
 .icon-btn img{width:100%;height:100%;object-fit:cover;border-radius:calc(var(--r-md) - 3px)}
 
+/* ★ Скрываем логотип в топ-баре на ПК (он уже в сайдбаре) */
+.top-bar .logo-container { display: none; }
+
 /* ============================================================
    GENERIC SURFACES
    ============================================================ */
@@ -325,46 +364,6 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 }
 .bonus-card-sub{font-size:12px;font-weight:500;color:var(--text-muted);letter-spacing:.02em;margin-bottom:var(--s-5);line-height:1.6}
 .bonus-card-sub b{color:var(--lilac-bright);font-weight:800}
-
-/* USERNAME CASE */
-.username-case-wrap{display:flex;gap:var(--s-6);align-items:center;flex-wrap:wrap}
-.username-case-img{
-  width:104px;height:104px;object-fit:contain;flex-shrink:0;
-  filter:drop-shadow(0 0 20px rgba(183,148,246,.6)) drop-shadow(0 0 44px rgba(183,148,246,.2));
-  animation:floatSlow 4s ease-in-out infinite;
-}
-@keyframes floatSlow{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.username-case-info{flex:1;min-width:220px;display:flex;flex-direction:column;gap:9px}
-.username-case-line{font-size:12px;font-weight:700;color:#fff;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
-.username-case-line .uc-key{color:var(--text-muted);text-transform:uppercase;font-size:10px;letter-spacing:.16em;font-weight:800}
-.uc-username-badge{
-  font-size:12px;font-weight:800;color:var(--lilac);background:var(--lilac-soft);
-  border:1px solid var(--lilac-line);padding:4px 11px;border-radius:var(--r-xs);
-  letter-spacing:.02em;box-shadow:var(--lilac-glow-soft);
-}
-.uc-username-badge.bad{color:var(--red);background:var(--red-soft);border-color:var(--red-line);box-shadow:var(--red-glow-soft)}
-.username-case-reward-list{display:flex;gap:7px;flex-wrap:wrap;margin-top:3px}
-.uc-reward-pill{
-  display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:var(--r-xs);
-  background:rgba(255,255,255,.025);border:1px solid var(--line);
-  font-size:10px;font-weight:700;color:var(--text-soft);
-}
-.uc-reward-pill img{width:14px;height:14px;object-fit:contain}
-.uc-reward-pill .uc-chance{color:var(--lilac);font-weight:800}
-.username-case-btn{
-  padding:12px 22px;border-radius:var(--r-md);border:1px solid var(--lilac-line);
-  background:linear-gradient(135deg, rgba(183,148,246,.20), rgba(183,148,246,.08));
-  color:var(--lilac-bright);font-size:12.5px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.1em;cursor:pointer;transition:all .2s var(--ease);
-  width:100%;max-width:340px;
-  box-shadow:var(--lilac-glow-soft), inset 0 1px 0 rgba(255,255,255,.06);
-}
-.username-case-btn:disabled{opacity:.4;cursor:not-allowed;background:var(--bg-surface-hover);color:var(--text-muted);border-color:var(--line);box-shadow:none}
-.username-case-btn:not(:disabled):hover{background:linear-gradient(135deg, rgba(183,148,246,.3), rgba(183,148,246,.14));box-shadow:var(--lilac-glow);transform:translateY(-1px)}
-.username-case-btn:not(:disabled):active{transform:translateY(0)}
-.uc-timer{font-size:12px;font-weight:700;color:var(--lilac-bright);letter-spacing:.02em;font-variant-numeric:tabular-nums}
-.uc-hint{font-size:11px;font-weight:600;color:var(--text-muted);letter-spacing:.01em;line-height:1.5;margin-top:3px}
-.uc-hint b{color:var(--lilac-bright);font-weight:800}
 
 /* PROMO INPUT */
 .promo-new{
@@ -1565,20 +1564,28 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
    RESPONSIVE
    ============================================================ */
 @media (max-width:900px){
+  /* ★ ФИКС МУТИ: панель без полупрозрачности, чтобы не было двойного затемнения */
   .side-nav{
     position:fixed;
     left:0;top:0;
     height:100vh;
-    width:260px;
+    width:280px;
     transform:translateX(-100%);
     transition:transform .3s var(--ease-out);
-    box-shadow:8px 0 60px rgba(0,0,0,.6), 0 0 40px rgba(183,148,246,.12);
+    box-shadow:8px 0 60px rgba(0,0,0,.75);
     z-index:700;
+    background:#0d0b16;               /* ★ непрозрачный фон */
+    backdrop-filter:none;             /* ★ убираем blur */
+    -webkit-backdrop-filter:none;
   }
   .side-nav.open{transform:translateX(0)}
   .side-nav-overlay.open{display:block}
   .burger-btn{display:flex !important}
   .top-bar{padding:13px 15px 13px 52px}
+
+  /* ★ на мобиле показываем логотип в топ-баре */
+  .top-bar .logo-container { display: flex; }
+
   .top-left{gap:13px}
   .logo-img{height:48px}
   .app{padding:0 var(--s-4) var(--s-6)}
@@ -1611,9 +1618,6 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
   .promo-new-right{flex-direction:column;min-width:100%}
   .promo-new-right input{width:100%;height:46px;font-size:13px}
   .promo-new-right button{width:100%;height:46px}
-  .username-case-wrap{flex-direction:column;align-items:flex-start;gap:var(--s-4)}
-  .username-case-img{width:84px;height:84px}
-  .username-case-btn{max-width:100%}
   .staking-tiers{grid-template-columns:1fr}
   .cases-hero{padding:var(--s-5);gap:var(--s-4);flex-direction:column;align-items:flex-start}
   .cases-hero-stats{width:100%}
@@ -1911,7 +1915,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
   <div class="case-open-header">
     <button class="case-back-btn" onclick="closeCaseOpen()">← Назад</button>
     <div class="case-open-balance">
-      <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin">
+      <img src="https://github.com/saintezz/brainrolltester/blob/main/bgmonet.png?raw=true" alt="coin">
       <span id="caseOpenBalance">0</span>
     </div>
   </div>
@@ -1972,15 +1976,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 
     <div class="side-nav-spacer"></div>
 
-    <div class="side-nav-footer">
-      <div class="balance-wrap" style="width:100%;justify-content:space-between;">
-        <div class="balance">
-          <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin" class="coin-icon">
-          <span id="balanceDisplay">0</span>
-        </div>
-        <button class="topup-btn" onclick="openTopup()" aria-label="Пополнить">+</button>
+    <!-- ★ НАШ ТГК вместо баланса -->
+    <a class="side-nav-tgc" href="https://t.me/BrainrotGGame" target="_blank" rel="noopener noreferrer">
+      <img src="https://github.com/saintezz/brainrolltester/blob/main/TELEGRAMM.png?raw=true" alt="Telegram">
+      <div class="tgc-text">
+        <span class="tgc-label">Подпишись</span>
+        <span class="tgc-title">НАШ ТГК</span>
       </div>
-    </div>
+    </a>
   </aside>
 
   <div class="app-content">
@@ -1995,7 +1998,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
         <div class="top-right">
           <div class="balance-wrap" id="balanceBox">
             <div class="balance">
-              <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin" class="coin-icon">
+              <img src="https://github.com/saintezz/brainrolltester/blob/main/bgmonet.png?raw=true" alt="coin" class="coin-icon">
               <span id="balanceDisplayTop">0</span>
             </div>
             <button class="topup-btn" onclick="openTopup()" aria-label="Пополнить">+</button>
@@ -2038,11 +2041,11 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
           <div class="cases-hero-left">
             <div class="cases-hero-kicker">Коллекция кейсов</div>
             <div class="cases-hero-title">Открой свой<br>лучший дроп</div>
-            <div class="cases-hero-sub">10 кейсов — от дешёвых разогревов до legendary-дропов. Выбирай, открывай, апгрейди и собирай коллекцию.</div>
+            <div class="cases-hero-sub">Кейсы — от дешёвых разогревов до legendary-дропов. Выбирай, открывай, апгрейди и собирай коллекцию.</div>
           </div>
           <div class="cases-hero-stats">
-            <div class="cases-stat-pill"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin"><span id="casesHeroCount">10 кейсов</span></div>
-            <div class="cases-stat-pill"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin"><span id="casesHeroBalance">0</span></div>
+            <div class="cases-stat-pill"><img src="https://github.com/saintezz/brainrolltester/blob/main/bgmonet.png?raw=true" alt="coin"><span id="casesHeroCount">Кейсы</span></div>
+            <div class="cases-stat-pill"><img src="https://github.com/saintezz/brainrolltester/blob/main/bgmonet.png?raw=true" alt="coin"><span id="casesHeroBalance">0</span></div>
           </div>
         </div>
 
@@ -2143,7 +2146,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
             </div>
             <div class="mines-info-row" style="background:transparent; border:none; padding:0; margin-top: 4px;">
               <span>Ставка:</span>
-              <span style="display:flex; align-items:center; gap:7px;"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" style="width:16px;height:16px;"> <span id="minesBetAmount">0</span></span>
+              <span style="display:flex; align-items:center; gap:7px;"><img src="https://github.com/saintezz/brainrolltester/blob/main/bgmonet.png?raw=true" style="width:16px;height:16px;"> <span id="minesBetAmount">0</span></span>
             </div>
             <button class="mines-start-btn" id="minesStartBtn" onclick="startMinesGame()">ИГРАТЬ</button>
           </div>
@@ -2159,7 +2162,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
             </div>
             <div class="inventory-hero-stats">
               <div class="inv-hero-pill" id="invHeroCount">0 предметов</div>
-              <div class="inv-hero-pill gold" id="invHeroValue"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin"><span>0</span></div>
+              <div class="inv-hero-pill gold" id="invHeroValue"><img src="https://github.com/saintezz/brainrolltester/blob/main/bgmonet.png?raw=true" alt="coin"><span>0</span></div>
             </div>
           </div>
           <div id="inventoryTabGrid" class="inventory-tab-grid"></div>
@@ -2168,27 +2171,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 
       <div class="tab-panel" id="panelBonuses">
         <div class="bonus-page">
-          <div class="bonus-card">
-            <div class="bonus-card-title">Username Case</div>
-            <div class="bonus-card-sub">Добавь <b>BrainrotGGame</b> в конец своего ника в Telegram (например: <b>saint BrainrotGGame</b>) и открывай кейс раз в 12 часов</div>
-            <div class="username-case-wrap">
-              <img class="username-case-img" src="https://github.com/saintezz/BrainrotWin/blob/main/UserCase.png?raw=true" alt="Username Case">
-              <div class="username-case-info">
-                <div class="username-case-line">
-                  <span class="uc-key">Твой ник:</span>
-                  <span class="uc-username-badge" id="ucMyUsername">—</span>
-                </div>
-                <div class="username-case-reward-list">
-                  <div class="uc-reward-pill"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin">2 монеты <span class="uc-chance">· 50%</span></div>
-                  <div class="uc-reward-pill">La Grande <span class="uc-chance">· 49.9%</span></div>
-                  <div class="uc-reward-pill">Dragon Cannelloni <span class="uc-chance">· 0.1%</span></div>
-                </div>
-                <div class="uc-timer" id="ucTimer">Проверка...</div>
-                <div class="uc-hint" id="ucHint">В нике должна быть приписка <b>BrainrotGGame</b></div>
-                <button class="username-case-btn" id="ucOpenBtn" onclick="openUsernameCase()" disabled>Открыть кейс</button>
-              </div>
-            </div>
-          </div>
+          <!-- ★ Username Case удалён -->
 
           <div class="promo-new">
             <div class="promo-new-left">
@@ -2212,7 +2195,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
               <div class="staking-input-row">
                 <input type="number" id="stakingAmount" placeholder="Сумма (мин. 100)" min="100" step="1">
                 <div class="inv-hero-pill gold" style="font-size:13px;padding:13px 20px;flex-shrink:0;">
-                  <img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png" alt="coin">
+                  <img src="https://github.com/saintezz/brainrolltester/blob/main/bgmonet.png?raw=true" alt="coin">
                   <span id="stakingBalanceLabel">0</span>
                 </div>
               </div>
@@ -2233,7 +2216,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
                   <div class="staking-tier-sub">к сумме</div>
                 </div>
               </div>
-              <button class="username-case-btn" id="stakingStartBtn" onclick="startStaking()" style="width:100%;max-width:none;">Заморозить</button>
+              <button class="username-case-btn" id="stakingStartBtn" onclick="startStaking()" style="width:100%;max-width:none;border-radius:var(--r-md);border:1px solid var(--lilac-line);background:linear-gradient(135deg, rgba(183,148,246,.20), rgba(183,148,246,.08));color:var(--lilac-bright);font-size:12.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;padding:12px;box-shadow:var(--lilac-glow-soft);">Заморозить</button>
               <div class="msg" id="stakingMsg"></div>
             </div>
           </div>
@@ -2258,7 +2241,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
           <div class="profile-stats-grid">
             <div class="profile-stat-card">
               <div class="profile-stat-label">Баланс</div>
-              <div class="profile-stat-value"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png"><span id="profileBalance">0</span></div>
+              <div class="profile-stat-value"><img src="https://github.com/saintezz/brainrolltester/blob/main/bgmonet.png?raw=true"><span id="profileBalance">0</span></div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-label">Предметов</div>
@@ -2266,7 +2249,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-label">Стоимость инвентаря</div>
-              <div class="profile-stat-value" style="color:var(--lilac);"><img src="https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png"><span id="profileInvValue">0</span></div>
+              <div class="profile-stat-value" style="color:var(--lilac);"><img src="https://github.com/saintezz/brainrolltester/blob/main/bgmonet.png?raw=true"><span id="profileInvValue">0</span></div>
             </div>
           </div>
 
@@ -2321,9 +2304,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--lilac);outline-
 
 <script>
 // ================== КОНСТАНТЫ ==================
-const API_URL = 'https://brainrolltester.onrender.com';
+const API_URL = 'https://brainrotwin.onrender.com';
 const ADMIN_USERNAMES = ['saintezz7', 'vortyn1'];
-const COIN_IMG = 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/bw.png';
+// ★ новая картинка монеты
+const COIN_IMG = 'https://github.com/saintezz/brainrolltester/blob/main/bgmonet.png?raw=true';
 const DEFAULT_AVATAR = 'https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/avavatarochka.jpg';
 const FALLBACK_IMG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60'><rect width='100%25' height='100%25' fill='%230b0a12'/><text x='50%25' y='55%25' fill='%23b794f6' font-size='20' text-anchor='middle'>?</text></svg>";
 const FALLBACK_ATTR = `onerror="this.onerror=null;this.src='${FALLBACK_IMG}'"`;
@@ -2336,9 +2320,6 @@ const MUTATION_ICONS = {
 
 const MINES_SAFE_IMG = 'https://raw.githubusercontent.com/forerer-afk/brainroterX/main/lagrande.webp';
 const MINES_BOMB_IMG = 'https://raw.githubusercontent.com/forerer-afk/brainroterX/main/nuclearo.png';
-
-const REQUIRED_TAG = 'BrainrotGGame';
-const REQUIRED_TAG_LOWER = 'brainrotggame';
 
 const ITEMS = [
   { id: 'tangtang', name: 'Tang Tang Keletang', price: 17, img: 'https://github.com/forerer-afk/brainroterX/blob/main/tangtang.png?raw=true' },
@@ -2408,15 +2389,24 @@ const CASE_ONLY_ITEMS = [
   { id: 'lavastrawberry', name: 'Lava Strawberry Elephant', price: 56000, img: 'https://raw.githubusercontent.com/saintezz/ggbrainXv2/main/LavaStrawberry.webp', mutation: 'lava' }
 ];
 
+// ★ ДОБАВЛЕНЫ НОВЫЕ КЕЙСЫ
 const CASES = [
   { id: 'school', name: 'School Case', price: 12, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/schoolcase1.png', rewards: [
     { id: 'lagrande', chance: 40 }, { id: 'nuclearo', chance: 25 }, { id: 'tangtang', chance: 15 },
     { id: 'tictacsahur', chance: 10 }, { id: 'worl', chance: 5 }, { id: 'lostangsitos', chance: 4 },
     { id: 'garama', chance: 0.9 }, { id: 'burguro', chance: 0.1 }
   ]},
+  { id: 'orange', name: 'Orange Case', price: 29, img: 'https://github.com/saintezz/brainrolltester/blob/main/orange.png?raw=true', rewards: [
+    { id: 'tangtang', chance: 55 }, { id: 'worl', chance: 25 }, { id: 'witchbroom', chance: 10 },
+    { id: 'garama', chance: 5 }, { id: 'sammyni', chance: 3 }, { id: 'popcuru', chance: 2 }
+  ]},
   { id: 'sun', name: 'Sun Case', price: 39, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/suncase1.png', rewards: [
     { id: 'tictacsahur', chance: 50 }, { id: 'worl', chance: 30 }, { id: 'garama', chance: 17 },
     { id: 'burguro', chance: 2 }, { id: 'cerberus', chance: 1 }
+  ]},
+  { id: 'apple', name: 'Apple Case', price: 59, img: 'https://github.com/saintezz/brainrolltester/blob/main/apple.png?raw=true', rewards: [
+    { id: 'witchbroom', chance: 50 }, { id: 'garama', chance: 25 },
+    { id: 'sammyni', chance: 15 }, { id: 'burguro', chance: 10 }
   ]},
   { id: 'winter', name: 'Winter Case', price: 61, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/wintercase1.png', rewards: [
     { id: 'lostangsitos', chance: 40 }, { id: 'garama', chance: 30 }, { id: 'burguro', chance: 10 },
@@ -2441,6 +2431,10 @@ const CASES = [
     { id: 'rubiko', chance: 50 }, { id: 'ricodinero', chance: 20 }, { id: 'lacasaboo', chance: 20 },
     { id: 'ketupas', chance: 8 }, { id: 'skelly', chance: 2 }
   ]},
+  // ★ ALL IN case — спецкейс с 20 монетами как дропом
+  { id: 'allin', name: 'ALL IN Case', price: 590, img: 'https://github.com/saintezz/brainrolltester/blob/main/AllOrNoth.png?raw=true', rewards: [
+    { id: 'coin20', chance: 60 }, { id: 'dragon', chance: 39.9 }, { id: 'skibidi', chance: 0.1 }
+  ]},
   { id: 'summer', name: 'Summer Case', price: 3241, img: 'https://raw.githubusercontent.com/saintezz/BrainrotWin/main/summercase1.png', rewards: [
     { id: 'kraken', chance: 50 }, { id: 'lasupreme', chance: 20 }, { id: 'digi', chance: 15 },
     { id: 'dragonaquanini', chance: 10 }, { id: 'antonio', chance: 4 }, { id: 'skibidi', chance: 1 }
@@ -2454,6 +2448,11 @@ const CASES = [
     { id: 'strawberryelephant', chance: 99 }, { id: 'headless', chance: 1 }
   ]}
 ];
+
+// ★ Виртуальные "coin" предметы — конвертируются в баланс
+const COIN_REWARDS = {
+  coin20: { name: '20 монет', price: 20, coinAmount: 20 }
+};
 
 const MAX_CHANCE = 80;
 const MIN_CHANCE = 0.01;
@@ -2494,24 +2493,12 @@ let isPromoActivating = false;
 let banPollInterval = null;
 let currentBan = null;
 let pendingUnbanNotice = null;
-
-let ucStatus = null;
-let ucInterval = null;
-let ucFetchController = null;
 let stakingInfo = null;
 let stakingTierSelected = null;
 let stakingInterval = null;
 
-let invFilter = 'all';
-
 function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
-
-function nickHasRequiredTag(nick) {
-  if (!nick || typeof nick !== 'string') return false;
-  const cleaned = String(nick).toLowerCase().replace(/@/g, '');
-  return cleaned.includes('brainrotggame');
 }
 
 (function initTelegramUser() {
@@ -2561,7 +2548,13 @@ function getTelegramId() {
 }
 function getDisplayNick() { return customNick || USER.nick; }
 function isCurrentUserAdmin() { return ADMIN_USERNAMES.includes((USER.username || '').toLowerCase()); }
-function getItemById(id) { return ITEMS.find(item => item.id === id) || CASE_ONLY_ITEMS.find(item => item.id === id); }
+function getItemById(id) {
+  if (COIN_REWARDS[id]) {
+    const c = COIN_REWARDS[id];
+    return { id, name: c.name, price: c.price, img: COIN_IMG, isCoin: true, coinAmount: c.coinAmount };
+  }
+  return ITEMS.find(item => item.id === id) || CASE_ONLY_ITEMS.find(item => item.id === id);
+}
 
 async function api(path, body) {
   if (maintenanceEnabled && !isCurrentUserAdmin()) return { ok: false, error: 'MAINTENANCE' };
@@ -2750,10 +2743,8 @@ async function checkBanStatus() {
 document.addEventListener('visibilitychange', () => { if (!document.hidden) checkBanStatus(); });
 
 function updateBalanceUI() {
-  const bd = document.getElementById('balanceDisplay');
   const bdTop = document.getElementById('balanceDisplayTop');
   const txt = balance.toLocaleString('ru-RU');
-  if (bd) bd.innerText = txt;
   if (bdTop) bdTop.innerText = txt;
   const pb = document.getElementById('profileBalance');
   const pic = document.getElementById('profileItemsCount');
@@ -2889,7 +2880,7 @@ window.switchTab = function(tab) {
   if (tab === 'upgrade') { renderInventory(); renderShop(); updateUpgradeScreen(); }
   if (tab === 'catch') { initMinesGame(); }
   if (tab === 'inventory') renderInventoryTab();
-  if (tab === 'bonuses') { loadUsernameCaseStatus(); loadStakingInfo(); }
+  if (tab === 'bonuses') { loadStakingInfo(); }
 };
 
 function applyCustomAvatar() {
@@ -3024,141 +3015,7 @@ window.processDeposit = async function(id, status) {
   else playLose();
 };
 
-// ================== USERNAME CASE (FIXED) ==================
-async function loadUsernameCaseStatus() {
-  if (!USER.id) {
-    const timerEl = document.getElementById('ucTimer');
-    if (timerEl) { timerEl.textContent = 'Заходи через Telegram'; timerEl.style.color = 'var(--text-muted)'; }
-    return;
-  }
-
-  const timerEl = document.getElementById('ucTimer');
-  if (timerEl && (!ucStatus)) timerEl.textContent = 'Проверка...';
-
-  if (ucFetchController) { try { ucFetchController.abort(); } catch (e) {} }
-  ucFetchController = new AbortController();
-  const controller = ucFetchController;
-  const timeoutId = setTimeout(() => { try { controller.abort(); } catch (e) {} }, 12000);
-
-  try {
-    const initDataRaw = window.Telegram?.WebApp?.initData || '';
-    const nickCandidates = [
-      USER.firstName, USER.lastName, USER.nick, USER.username, customNick
-    ].filter(Boolean).join('|');
-
-    const url = API_URL + '/api/username-case/status?nick=' + encodeURIComponent(nickCandidates);
-
-    const res = await fetch(url, {
-      headers: { 'X-Telegram-Init-Data': initDataRaw },
-      cache: 'no-store',
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
-
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    if (!data || !data.ok) throw new Error((data && data.error) || 'BAD_RESPONSE');
-
-    ucStatus = {
-      ...data,
-      has_required_username: !!data.has_required_username,
-      display_nick: data.display_nick || USER.nick
-    };
-
-    renderUsernameCaseStatus();
-    if (ucInterval) clearInterval(ucInterval);
-    ucInterval = setInterval(renderUsernameCaseStatus, 1000);
-  } catch (e) {
-    clearTimeout(timeoutId);
-    if (ucInterval) { clearInterval(ucInterval); ucInterval = null; }
-    const timerEl2 = document.getElementById('ucTimer');
-    if (timerEl2) {
-      timerEl2.textContent = (e.name === 'AbortError') ? 'Сервер не отвечает' : 'Ошибка проверки';
-      timerEl2.style.color = 'var(--red)';
-    }
-    const btn = document.getElementById('ucOpenBtn');
-    if (btn) { btn.disabled = true; btn.textContent = 'Недоступно'; }
-    setTimeout(() => { if (!ucStatus) loadUsernameCaseStatus(); }, 5000);
-  }
-}
-
-function renderUsernameCaseStatus() {
-  if (!ucStatus) return;
-  const myEl = document.getElementById('ucMyUsername');
-  const timerEl = document.getElementById('ucTimer');
-  const hintEl = document.getElementById('ucHint');
-  const btn = document.getElementById('ucOpenBtn');
-  if (!myEl || !timerEl || !btn) return;
-
-  myEl.textContent = ucStatus.display_nick || USER.nick || '—';
-  const hasTag = !!ucStatus.has_required_username;
-  myEl.classList.toggle('bad', !hasTag);
-
-  if (hintEl) {
-    if (!hasTag) {
-      hintEl.innerHTML = `В нике должна быть приписка <b>BrainrotGGame</b> (без @, т.к. Telegram не разрешает @ в имени). Пример: <b>saint BrainrotGGame</b>`;
-      hintEl.style.color = 'var(--red)';
-    } else {
-      hintEl.innerHTML = `Ник содержит <b>BrainrotGGame</b> — всё верно!`;
-      hintEl.style.color = 'var(--text-muted)';
-    }
-  }
-
-  if (!hasTag) {
-    timerEl.textContent = 'Добавь BrainrotGGame в ник';
-    timerEl.style.color = 'var(--red)';
-    btn.disabled = true;
-    btn.textContent = 'Ник неверный';
-    return;
-  }
-  timerEl.style.color = 'var(--lilac-bright)';
-
-  const now = Date.now();
-  const next = ucStatus.next_available_at || 0;
-  if (now < next) {
-    const diff = next - now;
-    const h = Math.floor(diff / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-    timerEl.textContent = `Доступно через: ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    btn.disabled = true;
-    btn.textContent = 'На кулдауне';
-  } else {
-    timerEl.textContent = 'Кейс доступен!';
-    btn.disabled = false;
-    btn.textContent = 'Открыть кейс';
-  }
-}
-
-window.openUsernameCase = async function() {
-  if (!ucStatus || !ucStatus.can_open) return;
-  playClick(); vibrate(10);
-  const btn = document.getElementById('ucOpenBtn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Открываем...'; }
-  const data = await api('/api/username-case/open', { nick: USER.nick || '' });
-  if (!data.ok) {
-    playLose();
-    if (data.error === 'USERNAME_REQUIRED') alert('Добавь BrainrotGGame в свой ник в Telegram (например: saint BrainrotGGame)');
-    else if (data.error === 'COOLDOWN') alert('Кейс ещё на кулдауне');
-    else alert(data.error || 'Ошибка');
-    await loadUsernameCaseStatus();
-    return;
-  }
-  playWin(); vibratePattern([30,50,30,50,60]);
-  if (data.reward_type === 'balance') {
-    alert(`Вы получили ${data.reward_value} монет!`);
-  } else {
-    const it = getItemById(data.reward_value);
-    alert(`Вы получили: ${it ? it.name : data.reward_value}`);
-  }
-  if (typeof data.new_balance === 'number') balance = data.new_balance;
-  if (Array.isArray(data.inventory)) inventory = data.inventory;
-  updateBalanceUI();
-  renderInventory(); renderInventoryTab(); renderProfileInventory();
-  if (data.next_available_at) ucStatus.next_available_at = data.next_available_at;
-  renderUsernameCaseStatus();
-};
-
+// STAKING
 window.selectStakingTier = function(tier) {
   stakingTierSelected = tier;
   document.querySelectorAll('.staking-tier').forEach(el => el.classList.toggle('active', el.dataset.tier === tier));
