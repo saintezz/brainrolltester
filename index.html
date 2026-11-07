@@ -133,6 +133,115 @@ body{
   text-shadow:0 0 10px rgba(183,148,246,.9);
 }
 
+/* --- НОВЫЙ БАННЕР --- */
+.promo-banner-image {
+  position: relative;
+  width: 100%;
+  margin: 16px 0;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid var(--lilac-line);
+  box-shadow: var(--lilac-glow-soft);
+  aspect-ratio: 1200 / 280;
+  background: url('https://github.com/saintezz/BrainrotWin/blob/main/%D0%91%D0%B0%D0%BD%D0%BD%D0%B5%D1%80.webp?raw=true') center/cover no-repeat;
+  min-height: 180px;
+}
+
+.banner-overlay {
+  position: absolute;
+  inset: 0;
+  padding: 3% 4%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.banner-text-blue {
+  color: #3b82f6;
+  font-weight: 900;
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.8), 0 2px 4px rgba(0,0,0,0.8);
+  letter-spacing: 0.5px;
+}
+
+.banner-top-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(10px, 1.5vw, 14px);
+  margin-bottom: 1%;
+}
+
+.banner-main-bonus {
+  font-size: clamp(24px, 4vw, 42px);
+  line-height: 1;
+  margin-bottom: 2%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #ffd97a;
+}
+.banner-main-bonus span {
+  font-size: clamp(18px, 3vw, 32px);
+}
+
+.banner-click-zone {
+  position: absolute;
+  bottom: 12%;
+  left: 3.5%;
+  width: 45%;
+  height: 30%;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 10;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+.banner-click-zone:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.banner-code-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(12px, 1.8vw, 18px);
+  font-weight: 800;
+  color: #fff;
+  margin-top: 4px;
+}
+.banner-code-display span {
+  color: #3b82f6;
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.9);
+  letter-spacing: 2px;
+}
+
+.banner-copy-btn {
+  background: transparent;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  opacity: 0.8;
+  transition: opacity 0.15s;
+}
+.banner-copy-btn:hover { opacity: 1; }
+.banner-copy-btn svg { width: 16px; height: 16px; filter: drop-shadow(0 0 4px rgba(59,130,246,0.8)); }
+
+@media (max-width: 768px) {
+  .promo-banner-image {
+    aspect-ratio: 4 / 3;
+    background-size: contain;
+    background-color: #12101b;
+    min-height: 260px;
+  }
+  .banner-overlay { padding: 10px; }
+  .banner-click-zone { width: 100%; height: 40%; bottom: 10%; left: 0; }
+}
+
 .bonus-page{padding:8px 0 40px;display:flex;flex-direction:column;gap:18px;}
 .bonus-card{
   position:relative;border-radius:var(--r-lg);overflow:hidden;padding:22px;
@@ -1042,31 +1151,34 @@ body{
             </div>
 
             <div class="tab-panel active" id="panelMenu">
-                <div class="promo-banner">
-                    <div class="banner-left">
-                        <div class="title">АВТО-ПРОМОКОД</div>
-                        <div class="main-title">НОВЫЙ БОНУС К ДЕПОЗИТУ</div>
-                        <div class="sub-title">КАЖДЫЕ 2 ЧАСА</div>
-                    </div>
-                    <div class="banner-center">
-                        <div class="banner-timer-block">
-                            <div class="bt-label">ОСТАЛОСЬ</div>
-                            <div class="bt-value" id="autoPromoTimer">01:45:46</div>
+                <!-- НОВЫЙ БАННЕР -->
+                <div class="promo-banner-image">
+                    <div class="banner-overlay">
+                        <!-- Верхняя строка -->
+                        <div class="banner-top-text">
+                            <span style="color:#ffd97a; font-weight:800; font-size:11px; letter-spacing:1px;">АВТО-ПРОМОКОД</span>
+                            <span style="color:var(--text-muted); font-size:11px;">• Новый код через</span>
+                            <span class="banner-text-blue" id="autoPromoTimer">01:45:46</span>
                         </div>
-                        <div class="banner-bonus-block">
-                            <div class="bb-label">БОНУС</div>
-                            <div class="bb-value" id="autoPromoBonus">+15%</div>
+
+                        <!-- Основной текст: Бонус + Процент -->
+                        <div class="banner-main-bonus">
+                            Бонус:
+                            <span class="banner-text-blue" id="autoPromoBonus">+15%</span>
                         </div>
-                    </div>
-                    <div class="banner-right">
-                        <div class="promo-code-display">
-                            <span class="pcd-code" id="autoPromoCode">JACKPOT</span>
-                            <button class="pcd-copy" onclick="copyAutoPromoCode()" title="Копировать">
+
+                        <!-- Текст с кодом -->
+                        <div class="banner-code-display">
+                            <span style="color:var(--text-muted); font-size:10px; font-weight:600; letter-spacing:0;">Код</span>
+                            <span id="autoPromoCode">JACKPOT</span>
+                            <button class="banner-copy-btn" onclick="copyAutoPromoCode()" title="Копировать">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             </button>
                         </div>
-                        <button class="activate-btn" onclick="activateAutoPromo()">АКТИВИРОВАТЬ</button>
                     </div>
+                    
+                    <!-- Невидимая кнопка для активации -->
+                    <div class="banner-click-zone" onclick="activateAutoPromo()" title="Активировать промокод"></div>
                 </div>
 
                 <div class="cases-hero">
