@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -133,113 +134,121 @@ body{
   text-shadow:0 0 10px rgba(183,148,246,.9);
 }
 
-/* --- НОВЫЙ БАННЕР --- */
-.promo-banner-image {
+/* --- УЛУЧШЕННАЯ ПЛАШКА ПРОМОКОДА --- */
+.promo-banner {
   position: relative;
-  width: 100%;
   margin: 16px 0;
-  border-radius: var(--r-lg);
-  overflow: hidden;
+  padding: 24px 32px;
+  border-radius: var(--r-xl);
+  background: linear-gradient(145deg, rgba(24, 21, 39, 0.9), rgba(15, 13, 23, 0.95));
   border: 1px solid var(--lilac-line);
-  box-shadow: var(--lilac-glow-soft);
-  aspect-ratio: 1200 / 280;
-  background: url('https://github.com/saintezz/BrainrotWin/blob/main/%D0%91%D0%B0%D0%BD%D0%BD%D0%B5%D1%80.webp?raw=true') center/cover no-repeat;
-  min-height: 180px;
-}
-
-.banner-overlay {
-  position: absolute;
-  inset: 0;
-  padding: 3% 4%;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  box-shadow: inset 0 0 80px rgba(183,148,246,.06), 0 10px 40px -20px rgba(183,148,246,.5);
+  overflow: hidden;
+}
+.promo-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -20%;
+  width: 60%; height: 200%;
+  background: radial-gradient(circle, rgba(183,148,246,0.15) 0%, transparent 70%);
   pointer-events: none;
+  z-index: 0;
 }
-
-.banner-text-blue {
-  color: #3b82f6;
-  font-weight: 900;
-  text-shadow: 0 0 8px rgba(59, 130, 246, 0.8), 0 2px 4px rgba(0,0,0,0.8);
-  letter-spacing: 0.5px;
+.banner-left, .banner-center, .banner-right { position: relative; z-index: 1; }
+.banner-left { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 200px; }
+.banner-left .title {
+  font-size: 11px; font-weight: 900; color: var(--lilac-bright);
+  text-transform: uppercase; letter-spacing: 2px;
+  background: var(--lilac-soft); padding: 4px 12px; border-radius: 8px;
+  display: inline-block; width: fit-content;
+  border: 1px solid var(--lilac-line);
+  text-shadow: 0 0 10px rgba(214,188,250,.9);
+  box-shadow: var(--lilac-glow-soft);
 }
-
-.banner-top-text {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: clamp(10px, 1.5vw, 14px);
-  margin-bottom: 1%;
+.banner-left .main-title {
+  font-size: clamp(20px, 2.5vw, 32px); font-weight: 900;
+  text-transform: uppercase; letter-spacing: -.01em; line-height: 1.1;
+  color: #fff; text-shadow: 0 0 12px rgba(214,188,250,.4);
 }
-
-.banner-main-bonus {
-  font-size: clamp(24px, 4vw, 42px);
-  line-height: 1;
-  margin-bottom: 2%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #ffd97a;
+.banner-left .sub-title {
+  font-size: clamp(14px, 1.8vw, 18px); font-weight: 800;
+  text-transform: uppercase; letter-spacing: .5px;
+  color: var(--lilac); text-shadow: 0 0 12px rgba(183,148,246,.85);
 }
-.banner-main-bonus span {
-  font-size: clamp(18px, 3vw, 32px);
+.banner-center {
+  display: flex; align-items: center; gap: 24px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--line);
+  padding: 12px 24px; border-radius: 16px;
+  backdrop-filter: blur(4px);
 }
-
-.banner-click-zone {
-  position: absolute;
-  bottom: 12%;
-  left: 3.5%;
-  width: 45%;
-  height: 30%;
-  cursor: pointer;
-  pointer-events: auto;
-  z-index: 10;
-  border-radius: 8px;
-  transition: background 0.2s;
+.banner-timer-block, .banner-bonus-block { display: flex; flex-direction: column; gap: 4px; }
+.banner-timer-block .bt-label, .banner-bonus-block .bb-label {
+  font-size: 10px; font-weight: 800; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 1.5px;
 }
-.banner-click-zone:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.banner-code-display {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: clamp(12px, 1.8vw, 18px);
-  font-weight: 800;
+.banner-timer-block .bt-value {
+  font-size: clamp(28px, 3.5vw, 42px); font-weight: 900;
+  letter-spacing: .02em; font-variant-numeric: tabular-nums; line-height: 1;
   color: #fff;
-  margin-top: 4px;
+  text-shadow: 0 0 15px rgba(255,255,255,0.5), 0 0 30px var(--lilac-glow);
 }
-.banner-code-display span {
-  color: #3b82f6;
-  text-shadow: 0 0 8px rgba(59, 130, 246, 0.9);
-  letter-spacing: 2px;
+.banner-bonus-block { border-left: 1px solid var(--line-strong); padding-left: 24px; }
+.banner-bonus-block .bb-value {
+  font-size: clamp(28px, 3.5vw, 42px); font-weight: 900;
+  letter-spacing: .02em; line-height: 1;
+  color: var(--green); font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 15px rgba(92,240,176,.6), 0 0 30px rgba(92,240,176,.3);
 }
-
-.banner-copy-btn {
-  background: transparent;
-  border: none;
-  color: #3b82f6;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: auto;
-  opacity: 0.8;
-  transition: opacity 0.15s;
+.banner-right { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; min-width: 250px; }
+.promo-code-display {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; background: #0a0812; padding: 14px 24px;
+  border-radius: 12px; border: 2px dashed var(--lilac-line); width: 100%;
+  box-shadow: inset 0 0 20px rgba(183,148,246,0.15), 0 0 15px -5px rgba(183,148,246,.4);
+  transition: all 0.2s;
 }
-.banner-copy-btn:hover { opacity: 1; }
-.banner-copy-btn svg { width: 16px; height: 16px; filter: drop-shadow(0 0 4px rgba(59,130,246,0.8)); }
-
+.promo-code-display:hover {
+  border-style: solid; background: #0d0a17;
+  box-shadow: inset 0 0 20px rgba(183,148,246,0.25), 0 0 25px -5px rgba(183,148,246,.6);
+}
+.promo-code-display .pcd-code {
+  font-size: clamp(20px, 2.5vw, 28px); font-weight: 900;
+  letter-spacing: 3px; text-transform: uppercase; color: #fff;
+  text-shadow: 0 0 12px rgba(255,255,255,0.8), 0 0 25px var(--lilac-glow);
+}
+.promo-code-display .pcd-copy {
+  background: transparent; border: none; color: var(--lilac-bright);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  opacity: 0.8; transition: all 0.2s;
+  filter: drop-shadow(0 0 6px rgba(214,188,250,0.85));
+}
+.promo-code-display .pcd-copy:hover { opacity: 1; transform: scale(1.1); }
+.promo-code-display .pcd-copy svg { width: 20px; height: 20px; }
+.activate-btn {
+  background: var(--lilac-soft); color: var(--lilac);
+  border: 1px solid var(--lilac-line); border-radius: 12px;
+  padding: 14px 32px; font-size: 15px; font-weight: 900;
+  cursor: pointer; transition: all 0.2s;
+  text-transform: uppercase; letter-spacing: 1px; width: 100%;
+  box-shadow: var(--lilac-glow-soft), inset 0 0 10px rgba(183,148,246,0.1);
+  text-shadow: 0 0 10px rgba(183,148,246,.9);
+}
+.activate-btn:hover {
+  background: rgba(183,148,246,.28);
+  box-shadow: var(--lilac-glow); transform: translateY(-2px);
+}
 @media (max-width: 768px) {
-  .promo-banner-image {
-    aspect-ratio: 4 / 3;
-    background-size: contain;
-    background-color: #12101b;
-    min-height: 260px;
-  }
-  .banner-overlay { padding: 10px; }
-  .banner-click-zone { width: 100%; height: 40%; bottom: 10%; left: 0; }
+  .promo-banner { padding: 20px; flex-direction: column; align-items: stretch; }
+  .banner-center { justify-content: space-between; padding: 16px; }
+  .banner-bonus-block { padding-left: 16px; }
+  .banner-right { align-items: stretch; }
+  .promo-code-display { justify-content: center; }
 }
 
 .bonus-page{padding:8px 0 40px;display:flex;flex-direction:column;gap:18px;}
@@ -533,27 +542,6 @@ body{
   .username-case-btn{max-width:100%;}
   .staking-tiers{grid-template-columns:1fr;}
 }
-
-.promo-banner{margin:16px 0;padding:30px 36px;border-radius:var(--r-lg);background:var(--bg-surface);border:1px solid var(--lilac-line);display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;flex-wrap:wrap;gap:20px;box-shadow:var(--lilac-glow-soft), inset 0 0 60px rgba(183,148,246,.05);}
-.banner-left{display:flex;flex-direction:column;gap:6px;z-index:1;}
-.banner-left .title{font-size:11px;font-weight:800;color:var(--lilac-bright);text-transform:uppercase;letter-spacing:2px;background:var(--lilac-soft);padding:4px 10px;border-radius:6px;display:inline-block;width:fit-content;border:1px solid var(--lilac-line);text-shadow:0 0 10px rgba(214,188,250,.9);box-shadow:var(--lilac-glow-soft);}
-.banner-left .main-title{font-size:clamp(22px,3vw,32px);font-weight:900;text-transform:uppercase;letter-spacing:-.01em;line-height:1.06;color:#fff;text-shadow:0 0 12px rgba(214,188,250,.4);}
-.banner-left .sub-title{font-size:clamp(16px,2.2vw,22px);font-weight:900;text-transform:uppercase;letter-spacing:-.005em;line-height:1.08;color:var(--lilac);text-shadow:0 0 12px rgba(183,148,246,.85);}
-.banner-center{z-index:1;display:flex;align-items:center;gap:24px;background:var(--bg-surface-hover);border:1px solid var(--line);padding:18px 28px;border-radius:12px;}
-.banner-timer-block{display:flex;flex-direction:column;gap:4px;}
-.banner-timer-block .bt-label{font-size:10px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.14em;}
-.banner-timer-block .bt-value{font-size:38px;font-weight:900;letter-spacing:.01em;font-variant-numeric:tabular-nums;line-height:1;color:var(--lilac-bright);text-shadow:0 0 12px rgba(214,188,250,.95), 0 0 28px rgba(183,148,246,.55);}
-.banner-bonus-block{display:flex;flex-direction:column;gap:4px;border-left:1px solid var(--line);padding-left:24px;}
-.banner-bonus-block .bb-label{font-size:10px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.14em;}
-.banner-bonus-block .bb-value{font-size:38px;font-weight:900;letter-spacing:.01em;line-height:1;color:var(--green);font-variant-numeric:tabular-nums;text-shadow:0 0 12px rgba(92,240,176,.95), 0 0 28px rgba(92,240,176,.55);}
-.banner-right{z-index:1;display:flex;flex-direction:column;align-items:flex-end;gap:12px;width:100%;max-width:320px;}
-.promo-code-display{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg-elevated);padding:13px 22px;border-radius:10px;border:1px dashed var(--lilac-line);width:100%;box-shadow:inset 0 0 30px rgba(183,148,246,.08);}
-.promo-code-display .pcd-code{font-size:26px;font-weight:900;letter-spacing:3px;text-transform:uppercase;color:var(--lilac-bright);text-shadow:0 0 14px rgba(214,188,250,.95), 0 0 30px rgba(183,148,246,.5);}
-.promo-code-display .pcd-copy{background:transparent;border:none;color:var(--lilac-bright);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.9;transition:opacity .15s;filter:drop-shadow(0 0 6px rgba(214,188,250,.85));}
-.promo-code-display .pcd-copy:hover{opacity:1;}
-.promo-code-display .pcd-copy svg{width:18px;height:18px;}
-.activate-btn{background:var(--lilac-soft);color:var(--lilac);border:1px solid var(--lilac-line);border-radius:10px;padding:13px 32px;font-size:14px;font-weight:800;cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:1px;width:100%;box-shadow:var(--lilac-glow-soft);text-shadow:0 0 10px rgba(183,148,246,.9);}
-.activate-btn:hover{background:rgba(183,148,246,.24);box-shadow:var(--lilac-glow);}
 
 .cases-hero{position:relative;margin:16px 0 20px;padding:28px 32px;border-radius:var(--r-xl);overflow:hidden;background:var(--bg-surface);border:1px solid var(--lilac-line);display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;box-shadow:var(--lilac-glow-soft), inset 0 0 80px rgba(183,148,246,.06);}
 .cases-hero-left{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px;min-width:0;}
@@ -1151,34 +1139,31 @@ body{
             </div>
 
             <div class="tab-panel active" id="panelMenu">
-                <!-- НОВЫЙ БАННЕР -->
-                <div class="promo-banner-image">
-                    <div class="banner-overlay">
-                        <!-- Верхняя строка -->
-                        <div class="banner-top-text">
-                            <span style="color:#ffd97a; font-weight:800; font-size:11px; letter-spacing:1px;">АВТО-ПРОМОКОД</span>
-                            <span style="color:var(--text-muted); font-size:11px;">• Новый код через</span>
-                            <span class="banner-text-blue" id="autoPromoTimer">01:45:46</span>
+                <div class="promo-banner">
+                    <div class="banner-left">
+                        <div class="title">АВТО-ПРОМОКОД</div>
+                        <div class="main-title">НОВЫЙ БОНУС К ДЕПОЗИТУ</div>
+                        <div class="sub-title">КАЖДЫЕ 2 ЧАСА</div>
+                    </div>
+                    <div class="banner-center">
+                        <div class="banner-timer-block">
+                            <div class="bt-label">ОСТАЛОСЬ</div>
+                            <div class="bt-value" id="autoPromoTimer">01:45:46</div>
                         </div>
-
-                        <!-- Основной текст: Бонус + Процент -->
-                        <div class="banner-main-bonus">
-                            Бонус:
-                            <span class="banner-text-blue" id="autoPromoBonus">+15%</span>
+                        <div class="banner-bonus-block">
+                            <div class="bb-label">БОНУС</div>
+                            <div class="bb-value" id="autoPromoBonus">+15%</div>
                         </div>
-
-                        <!-- Текст с кодом -->
-                        <div class="banner-code-display">
-                            <span style="color:var(--text-muted); font-size:10px; font-weight:600; letter-spacing:0;">Код</span>
-                            <span id="autoPromoCode">JACKPOT</span>
-                            <button class="banner-copy-btn" onclick="copyAutoPromoCode()" title="Копировать">
+                    </div>
+                    <div class="banner-right">
+                        <div class="promo-code-display">
+                            <span class="pcd-code" id="autoPromoCode">JACKPOT</span>
+                            <button class="pcd-copy" onclick="copyAutoPromoCode()" title="Копировать">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             </button>
                         </div>
+                        <button class="activate-btn" onclick="activateAutoPromo()">АКТИВИРОВАТЬ</button>
                     </div>
-                    
-                    <!-- Невидимая кнопка для активации -->
-                    <div class="banner-click-zone" onclick="activateAutoPromo()" title="Активировать промокод"></div>
                 </div>
 
                 <div class="cases-hero">
