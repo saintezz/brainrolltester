@@ -34,7 +34,6 @@ const MINES_TTL_MS = 10 * 60 * 1000;
 
 // ================== USERNAME CASE + STAKING =================
 const USERNAME_CASE_COOLDOWN_MS = 12 * 60 * 60 * 1000;
-// Ник должен содержать эту приписку (без @, регистр не важен)
 const USERNAME_TAG = 'BrainrotGGame';
 const USERNAME_TAG_LOWER = USERNAME_TAG.toLowerCase();
 
@@ -82,18 +81,45 @@ const CASE_ONLY_ITEMS = Object.freeze({
   goldstrawberry: { name: 'Gold Strawberry Elephant', price: 45000 }, lavastrawberry: { name: 'Lava Strawberry Elephant', price: 56000 }
 });
 
+// ★ НОВЫЕ КЕЙСЫ ДОБАВЛЕНЫ: orange, apple, allin
 const CASES = Object.freeze({
   school: { name: 'School Case', price: 12, rewards: [{ id: 'lagrande', chance: 40 }, { id: 'nuclearo', chance: 25 }, { id: 'tangtang', chance: 15 }, { id: 'tictacsahur', chance: 10 }, { id: 'worl', chance: 5 }, { id: 'lostangsitos', chance: 4 }, { id: 'garama', chance: 0.9 }, { id: 'burguro', chance: 0.1 }] },
+  orange: { name: 'Orange Case', price: 29, rewards: [
+    { id: 'tangtang', chance: 55 },
+    { id: 'worl', chance: 25 },
+    { id: 'witchbroom', chance: 10 },
+    { id: 'garama', chance: 5 },
+    { id: 'sammyni', chance: 3 },
+    { id: 'popcuru', chance: 2 }
+  ] },
   sun: { name: 'Sun Case', price: 39, rewards: [{ id: 'tictacsahur', chance: 50 }, { id: 'worl', chance: 30 }, { id: 'garama', chance: 17 }, { id: 'burguro', chance: 2 }, { id: 'cerberus', chance: 1 }] },
+  apple: { name: 'Apple Case', price: 59, rewards: [
+    { id: 'witchbroom', chance: 50 },
+    { id: 'garama', chance: 25 },
+    { id: 'sammyni', chance: 15 },
+    { id: 'burguro', chance: 10 }
+  ] },
   winter: { name: 'Winter Case', price: 61, rewards: [{ id: 'lostangsitos', chance: 40 }, { id: 'garama', chance: 30 }, { id: 'burguro', chance: 10 }, { id: 'popcuru', chance: 5 }, { id: 'fragrama', chance: 4 }, { id: 'cerberus', chance: 0.5 }, { id: 'dugdugdug', chance: 0.3 }, { id: 'roseyandteddy', chance: 0.1 }, { id: 'lacasaboo', chance: 0.1 }] },
   autumn: { name: 'Autumn Case', price: 90, rewards: [{ id: 'garama', chance: 40 }, { id: 'burguro', chance: 30 }, { id: 'popcuru', chance: 20 }, { id: 'cloverat', chance: 5 }, { id: 'guest666', chance: 4 }, { id: 'lossecret', chance: 3 }, { id: 'roseyandteddy', chance: 1 }] },
   radioactive: { name: 'Radioctive Case', price: 150, rewards: [{ id: 'fragrama', chance: 60 }, { id: 'globba', chance: 30 }, { id: 'losamigos', chance: 9 }, { id: 'rubiko', chance: 0.9 }, { id: 'ketupas', chance: 0.1 }] },
   money: { name: 'Money Case', price: 201, rewards: [{ id: 'cerberus', chance: 70 }, { id: 'dugdugdug', chance: 20 }, { id: 'cloverat', chance: 9 }, { id: 'guest666', chance: 0.3 }, { id: 'ricodinero', chance: 0.3 }, { id: 'lacasaboo', chance: 0.2 }, { id: 'skelly', chance: 0.1 }] },
   spring: { name: 'Spring Case', price: 451, rewards: [{ id: 'rubiko', chance: 50 }, { id: 'ricodinero', chance: 20 }, { id: 'lacasaboo', chance: 20 }, { id: 'ketupas', chance: 8 }, { id: 'skelly', chance: 2 }] },
+  allin: { name: 'ALL IN Case', price: 590, rewards: [
+    { id: 'coin20', chance: 60 },
+    { id: 'dragon', chance: 39.9 },
+    { id: 'skibidi', chance: 0.1 }
+  ] },
   summer: { name: 'Summer Case', price: 3241, rewards: [{ id: 'kraken', chance: 50 }, { id: 'lasupreme', chance: 20 }, { id: 'digi', chance: 15 }, { id: 'dragonaquanini', chance: 10 }, { id: 'antonio', chance: 4 }, { id: 'skibidi', chance: 1 }] },
   easter: { name: 'Easter Case', price: 9000, rewards: [{ id: 'antonio', chance: 50 }, { id: 'griffin', chance: 30 }, { id: 'skibidi', chance: 10 }, { id: 'johnpork', chance: 5 }, { id: 'meowl', chance: 4 }, { id: 'strawberryelephant', chance: 0.9 }, { id: 'headless', chance: 0.1 }] },
   farm: { name: 'Farm Case', price: 54000, rewards: [{ id: 'strawberryelephant', chance: 99 }, { id: 'headless', chance: 1 }] },
   username: { name: 'Username Case', price: 0, rewards: [{ id: 'coin2', chance: 50 }, { id: 'lagrande', chance: 49.9 }, { id: 'dragon', chance: 0.1 }] }
+});
+
+// ★ ВИРТУАЛЬНЫЕ НАГРАДЫ-МОНЕТЫ (не попадают в инвентарь)
+// coin20 — выпадает из ALL IN Case, начисляет +20 монет на баланс
+const COIN_REWARDS = Object.freeze({
+  coin20: 20,
+  coin2: 2
 });
 
 const MAX_CHANCE = 80;
@@ -111,6 +137,10 @@ function getItem(id) {
   if (typeof id !== 'string') return null;
   if (Object.prototype.hasOwnProperty.call(ITEMS, id)) return ITEMS[id];
   if (Object.prototype.hasOwnProperty.call(CASE_ONLY_ITEMS, id)) return CASE_ONLY_ITEMS[id];
+  // Для coin-наград возвращаем виртуальный предмет
+  if (Object.prototype.hasOwnProperty.call(COIN_REWARDS, id)) {
+    return { name: COIN_REWARDS[id] + ' монет', price: COIN_REWARDS[id], isCoin: true };
+  }
   return null;
 }
 function getCase(id) {
@@ -137,7 +167,6 @@ function getOnlineCount() {
   return count;
 }
 
-// Ник содержит @BrainrotGGame (без @ в самом теге, регистронезависимо)
 function nickHasRequiredTag(nick) {
   if (!nick || typeof nick !== 'string') return false;
   const cleaned = nick.replace(/@/g, ' ').toLowerCase();
@@ -297,9 +326,6 @@ async function listActiveBans() {
   }));
 }
 
-// Проверка ника пользователя на наличие тега @BrainrotGGame
-// Принимает nick (first_name + last_name), который пришёл из initData.
-// Если nick не передан — берём custom_nick или сохранённый username (fallback).
 async function getUsernameCaseStatus(telegramId, nick) {
   const hasRequired = nickHasRequiredTag(nick || '');
   const res = await pool.query(
@@ -499,7 +525,6 @@ const server = http.createServer(async (req, res) => {
       const user = getTelegramUser(req);
       if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
 
-      // Клиент может передать nick в query (?nick=...), но основной источник — initData.user
       const nickFromQuery = String(reqUrl.searchParams.get('nick') || '');
       const nick = nickFromQuery || user.nick || '';
 
@@ -537,10 +562,11 @@ const server = http.createServer(async (req, res) => {
       let rewardType = 'item';
       let rewardValue = wonId;
 
-      if (wonId === 'coin2') {
+      // ★ Обработка виртуальных монет
+      if (COIN_REWARDS[wonId]) {
         rewardType = 'balance';
-        rewardValue = 2;
-        newBalance = u.balance + 2;
+        rewardValue = COIN_REWARDS[wonId];
+        newBalance = u.balance + COIN_REWARDS[wonId];
       } else {
         const wonObj = getItem(wonId);
         if (!wonObj) return sendJSON(res, 500, { ok: false, error: 'Ошибка награды' });
@@ -662,14 +688,24 @@ const server = http.createServer(async (req, res) => {
       const totalCost = c.price * quantity;
       if (!isFinite(u.balance) || u.balance < totalCost) return sendJSON(res, 400, { ok: false, error: 'Недостаточно монет' });
 
+      // ★ Обработка виртуальных монет (coin20, coin2 и т.д.)
       let newInv = [...u.inventory];
       let newBestDrop = u.best_drop;
       const wonItems = [];
+      let balanceGained = 0;
 
       for (let i = 0; i < quantity; i++) {
         const rng = secureRandom() * 100; let acc = 0; let wonId = c.rewards[0].id;
         for (const r of c.rewards) { acc += r.chance; if (rng <= acc) { wonId = r.id; break; } }
-        newInv.push(wonId); wonItems.push(wonId);
+        wonItems.push(wonId);
+
+        // ★ Если это coin-награда — начисляем монеты на баланс, в инвентарь НЕ кладём
+        if (Object.prototype.hasOwnProperty.call(COIN_REWARDS, wonId)) {
+          balanceGained += COIN_REWARDS[wonId];
+          continue;
+        }
+
+        newInv.push(wonId);
 
         const wonItemObj = getItem(wonId);
         if (wonItemObj && (!newBestDrop || wonItemObj.price > newBestDrop.price)) {
@@ -677,8 +713,9 @@ const server = http.createServer(async (req, res) => {
         }
       }
 
-      await updateUser(user.id, { balance: u.balance - totalCost, inventory: newInv, best_drop: newBestDrop });
-      return sendJSON(res, 200, { ok: true, won: wonItems, new_balance: u.balance - totalCost, inventory: newInv, best_drop: newBestDrop });
+      const newBalance = u.balance - totalCost + balanceGained;
+      await updateUser(user.id, { balance: newBalance, inventory: newInv, best_drop: newBestDrop });
+      return sendJSON(res, 200, { ok: true, won: wonItems, new_balance: newBalance, inventory: newInv, best_drop: newBestDrop });
     }
 
     // ================== АПГРЕЙД ==================
@@ -1062,6 +1099,6 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log('🚀 Brainrot Game server started on port ' + PORT);
-  console.log('✅ BOT_TOKEN: OK (length=' + BOT_TOKEN.length + ')');
+  console.log('Бурмалда забилдилась на адресе: ' + PORT);
+  console.log('ТОКЕН БОТА: OK (length=' + BOT_TOKEN.length + ')');
 });
