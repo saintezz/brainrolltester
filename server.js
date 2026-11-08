@@ -32,6 +32,10 @@ const RATE_LIMIT_WINDOW_MS = 1000;
 const RATE_LIMIT_MAX = 30;
 const MINES_TTL_MS = 10 * 60 * 1000;
 
+// ★ Минимальная цена предмета для пополнения/вывода
+const MIN_DEPOSIT_PRICE = 41;
+const MIN_WITHDRAW_PRICE = 41;
+
 // ================== USERNAME CASE + STAKING =================
 const USERNAME_CASE_COOLDOWN_MS = 12 * 60 * 60 * 1000;
 const USERNAME_TAG = 'BrainrotGGame';
@@ -81,7 +85,7 @@ const CASE_ONLY_ITEMS = Object.freeze({
   goldstrawberry: { name: 'Gold Strawberry Elephant', price: 45000 }, lavastrawberry: { name: 'Lava Strawberry Elephant', price: 56000 }
 });
 
-// ★ НОВЫЕ КЕЙСЫ ДОБАВЛЕНЫ: orange, apple, allin
+// ★ НОВЫЕ КЕЙСЫ: orange, apple, allin
 const CASES = Object.freeze({
   school: { name: 'School Case', price: 12, rewards: [{ id: 'lagrande', chance: 40 }, { id: 'nuclearo', chance: 25 }, { id: 'tangtang', chance: 15 }, { id: 'tictacsahur', chance: 10 }, { id: 'worl', chance: 5 }, { id: 'lostangsitos', chance: 4 }, { id: 'garama', chance: 0.9 }, { id: 'burguro', chance: 0.1 }] },
   orange: { name: 'Orange Case', price: 29, rewards: [
@@ -115,8 +119,6 @@ const CASES = Object.freeze({
   username: { name: 'Username Case', price: 0, rewards: [{ id: 'coin2', chance: 50 }, { id: 'lagrande', chance: 49.9 }, { id: 'dragon', chance: 0.1 }] }
 });
 
-// ★ ВИРТУАЛЬНЫЕ НАГРАДЫ-МОНЕТЫ (не попадают в инвентарь)
-// coin20 — выпадает из ALL IN Case, начисляет +20 монет на баланс
 const COIN_REWARDS = Object.freeze({
   coin20: 20,
   coin2: 2
@@ -137,7 +139,6 @@ function getItem(id) {
   if (typeof id !== 'string') return null;
   if (Object.prototype.hasOwnProperty.call(ITEMS, id)) return ITEMS[id];
   if (Object.prototype.hasOwnProperty.call(CASE_ONLY_ITEMS, id)) return CASE_ONLY_ITEMS[id];
-  // Для coin-наград возвращаем виртуальный предмет
   if (Object.prototype.hasOwnProperty.call(COIN_REWARDS, id)) {
     return { name: COIN_REWARDS[id] + ' монет', price: COIN_REWARDS[id], isCoin: true };
   }
@@ -269,18 +270,20 @@ async function getUser(telegramId, username) {
     const newUser = {
       id: telegramId, balance: START_BALANCE, inventory: [],
       username: username || '', custom_nick: '', avatar: '',
-      promos_used: [], ban: null, unban_notice: null, best_drop: null
+      promos_used: [], ban: null, unban_notice: null, best_drop: null,
+      pending_withdraw_details: {}
     };
     await pool.query(
-      `INSERT INTO users (id, balance, inventory, username, custom_nick, avatar, promos_used, ban, unban_notice, best_drop) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-      [newUser.id, newUser.balance, JSON.stringify(newUser.inventory), newUser.username, newUser.custom_nick, newUser.avatar, JSON.stringify(newUser.promos_used), null, null, null]
+      `INSERT INTO users (id, balance, inventory, username, custom_nick, avatar, promos_used, ban, unban_notice, best_drop, pending_withdraw_details) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+      [newUser.id, newUser.balance, JSON.stringify(newUser.inventory), newUser.username, newUser.custom_nick, newUser.avatar, JSON.stringify(newUser.promos_used), null, null, null, JSON.stringify({})]
     );
     return newUser;
   }
   const u = res.rows[0];
   u.inventory = u.inventory || [];
   u.promos_used = u.promos_used || [];
+  u.pending_withdraw_details = u.pending_withdraw_details || {};
   if (username && u.username !== username) {
     await pool.query('UPDATE users SET username = $1, updated_at = NOW() WHERE id = $2', [username, telegramId]);
     u.username = username;
@@ -313,6 +316,7 @@ function publicUser(u, pendingWithdrawIds = []) {
     inventory: Array.isArray(u.inventory) ? u.inventory : [],
     username: u.username || '', custom_nick: u.custom_nick || '', avatar: u.avatar || '',
     pending_withdraw_ids: pendingWithdrawIds,
+    pending_withdraw_details: (u.pending_withdraw_details && typeof u.pending_withdraw_details === 'object') ? u.pending_withdraw_details : {},
     banned, ban: banned ? u.ban : null,
     best_drop: u.best_drop || null,
     unban_notice: (u.unban_notice && !u.unban_notice.seen) ? { reason: u.unban_notice.reason || 'Решение администрации', at: u.unban_notice.at || null } : null
@@ -562,7 +566,6 @@ const server = http.createServer(async (req, res) => {
       let rewardType = 'item';
       let rewardValue = wonId;
 
-      // ★ Обработка виртуальных монет
       if (COIN_REWARDS[wonId]) {
         rewardType = 'balance';
         rewardValue = COIN_REWARDS[wonId];
@@ -688,7 +691,6 @@ const server = http.createServer(async (req, res) => {
       const totalCost = c.price * quantity;
       if (!isFinite(u.balance) || u.balance < totalCost) return sendJSON(res, 400, { ok: false, error: 'Недостаточно монет' });
 
-      // ★ Обработка виртуальных монет (coin20, coin2 и т.д.)
       let newInv = [...u.inventory];
       let newBestDrop = u.best_drop;
       const wonItems = [];
@@ -699,7 +701,6 @@ const server = http.createServer(async (req, res) => {
         for (const r of c.rewards) { acc += r.chance; if (rng <= acc) { wonId = r.id; break; } }
         wonItems.push(wonId);
 
-        // ★ Если это coin-награда — начисляем монеты на баланс, в инвентарь НЕ кладём
         if (Object.prototype.hasOwnProperty.call(COIN_REWARDS, wonId)) {
           balanceGained += COIN_REWARDS[wonId];
           continue;
@@ -906,6 +907,7 @@ const server = http.createServer(async (req, res) => {
 
       const item = getItem(item_id);
       if (!item) return sendJSON(res, 404, { ok: false, error: 'Предмет не найден' });
+      if (item.price < MIN_DEPOSIT_PRICE) return sendJSON(res, 400, { ok: false, error: 'Минимум ' + MIN_DEPOSIT_PRICE + ' монет для пополнения' });
 
       const u = await getUser(user.id, user.username);
       if (u.ban && u.ban.active) return sendJSON(res, 403, { ok: false, error: 'BANNED' });
@@ -968,13 +970,13 @@ const server = http.createServer(async (req, res) => {
 
       const item_id = body.item_id;
       const roblox_name = String(body.roblox_name || '').trim().slice(0, 40);
-      const time_slot = String(body.time_slot || '').trim().slice(0, 60);
+      const time_slot = String(body.time_slot || '').trim().slice(0, 60) || 'pending';
 
-      if (!item_id || !roblox_name || !time_slot) return sendJSON(res, 400, { ok: false, error: 'Не хватает данных' });
-      if (!/^\d{1,2}:\d{2}\s+МСК\s+\d{1,2}\s+[а-яё]+$/i.test(time_slot)) return sendJSON(res, 400, { ok: false, error: 'Неверный формат времени' });
+      if (!item_id || !roblox_name) return sendJSON(res, 400, { ok: false, error: 'Не хватает данных' });
 
       const item = getItem(item_id);
       if (!item) return sendJSON(res, 404, { ok: false, error: 'Предмет не найден' });
+      if (item.price < MIN_WITHDRAW_PRICE) return sendJSON(res, 400, { ok: false, error: 'Минимум ' + MIN_WITHDRAW_PRICE + ' монет для вывода' });
 
       const u = await getUser(user.id, user.username);
       if (u.ban && u.ban.active) return sendJSON(res, 403, { ok: false, error: 'BANNED' });
@@ -1003,7 +1005,7 @@ const server = http.createServer(async (req, res) => {
       const adminUser = requireAdmin(req);
       if (!adminUser) return sendJSON(res, 403, { ok: false, error: 'Нет доступа' });
 
-      const { id, status } = body;
+      const { id, status, time_slot } = body;
       if (!id || !['accepted', 'rejected'].includes(status)) return sendJSON(res, 400, { ok: false, error: 'Неверные данные' });
 
       const wdRes = await pool.query("SELECT * FROM withdraws WHERE id = $1", [id]);
@@ -1012,9 +1014,21 @@ const server = http.createServer(async (req, res) => {
       const wd = wdRes.rows[0];
       if (wd.status !== 'pending') return sendJSON(res, 409, { ok: false, error: 'Уже обработана' });
 
-      await pool.query("UPDATE withdraws SET status = $1, processed_at = NOW(), processed_by = $2 WHERE id = $3", [status, adminUser.username, id]);
-
       if (status === 'accepted') {
+        const finalTime = String(time_slot || wd.time_slot || '').trim().slice(0, 80);
+
+        await pool.query(
+          "UPDATE withdraws SET status = 'accepted', time_slot = $1, processed_at = NOW(), processed_by = $2 WHERE id = $3",
+          [finalTime, adminUser.username, id]
+        );
+
+        await pool.query(
+          `UPDATE users 
+           SET pending_withdraw_details = COALESCE(pending_withdraw_details, '{}'::jsonb) || jsonb_build_object($1::text, jsonb_build_object('approved', true, 'time', $2::text, 'shown', false))
+           WHERE id = $3`,
+          [wd.item_id, finalTime, wd.telegram_id]
+        );
+
         const u = await getUser(wd.telegram_id, wd.username);
         const i = u.inventory.indexOf(wd.item_id);
         if (i === -1) {
@@ -1024,8 +1038,34 @@ const server = http.createServer(async (req, res) => {
         const newInv = [...u.inventory];
         newInv.splice(i, 1);
         await updateUser(wd.telegram_id, { inventory: newInv });
+
+        return sendJSON(res, 200, { ok: true, withdraw: { ...wd, status: 'accepted', time_slot: finalTime } });
       }
-      return sendJSON(res, 200, { ok: true, withdraw: { ...wd, status } });
+
+      // rejected
+      await pool.query(
+        "UPDATE withdraws SET status = 'rejected', processed_at = NOW(), processed_by = $1 WHERE id = $2",
+        [adminUser.username, id]
+      );
+      await pool.query(
+        "UPDATE users SET pending_withdraw_details = COALESCE(pending_withdraw_details, '{}'::jsonb) - $1::text WHERE id = $2",
+        [wd.item_id, wd.telegram_id]
+      );
+      return sendJSON(res, 200, { ok: true, withdraw: { ...wd, status: 'rejected' } });
+    }
+
+    if (req.method === 'POST' && req.url === '/api/withdraw/mark-shown') {
+      const user = getTelegramUser(req);
+      if (!user) return sendJSON(res, 401, { ok: false, error: 'Не авторизован' });
+      const itemId = String(body.item_id || '');
+      if (!itemId) return sendJSON(res, 400, { ok: false, error: 'Не указан item_id' });
+      await pool.query(
+        `UPDATE users 
+         SET pending_withdraw_details = jsonb_set(COALESCE(pending_withdraw_details, '{}'::jsonb), ARRAY[$1::text, 'shown'], 'true')
+         WHERE id = $2 AND pending_withdraw_details ? $1`,
+        [itemId, user.id]
+      );
+      return sendJSON(res, 200, { ok: true });
     }
 
     // ================== БАНЫ И ЮЗЕР ==================
