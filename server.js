@@ -1141,4 +1141,3 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log('Бурмалда забилдилась на адресе: ' + PORT);
   console.log('ТОКЕН БОТА: OK (length=' + BOT_TOKEN.length + ')');
-});
